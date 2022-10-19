@@ -14,7 +14,14 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@arql/contextualiser": ["packages/contextualiser/src/index.ts"],
+      "@arql/models": ["packages/models/src/index.ts"],
+      "@arql/operators": ["packages/operators/src/index.ts"],
+      "@arql/parser": ["packages/parser/src/index.ts"],
+      "@arql/sources": ["packages/sources/src/index.ts"],
+      "@arql/util": ["packages/util/src/index.ts"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }
