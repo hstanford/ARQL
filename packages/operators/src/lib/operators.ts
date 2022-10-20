@@ -6,7 +6,9 @@
  * arity of the operators
  */
 
-import { ExprUnary } from '@arql/parser';
+import { Expr } from '@arql/parser';
+
+export const EXPR = Symbol('EXPR');
 
 export interface Operator {
   name: string;
@@ -17,15 +19,22 @@ export interface RankedOperator extends Operator {
   rank: number;
 }
 
-function indexOfSymbol(arr: ExprUnary[], symbol: string) {
+export interface ExprTree {
+  type: 'exprtree';
+  op: string;
+  args: (Expr | ExprTree)[];
+}
+
+function indexOfSymbol(arr: (Expr | ExprTree)[], symbol: string) {
   for (let i = 0; i < arr.length; i++) {
-    const item: ExprUnary = arr[i];
-    if (item.type === 'op' && item.symbol === symbol) return i;
+    const item: Expr | ExprTree = arr[i];
+    if (!Array.isArray(item) && item.type === 'op' && item.symbol === symbol)
+      return i;
   }
   return -1;
 }
 
-function match(expr: ExprUnary[], op: RankedOperator) {
+function match(expr: (Expr | ExprTree)[], op: RankedOperator) {
   const args = [];
   const initial = op.pattern.find((val) => !(typeof val === 'symbol'));
   if (!initial || typeof initial === 'symbol') {
@@ -40,8 +49,8 @@ function match(expr: ExprUnary[], op: RankedOperator) {
   }
 
   for (let i = 0; i < op.pattern.length; i++) {
-    const item: ExprUnary = expr[i + pOffset];
-    if (item.type === 'op') {
+    const item: Expr | ExprTree = expr[i + pOffset];
+    if (!Array.isArray(item) && item.type === 'op') {
       if (op.pattern[i] !== item.symbol) throw new Error('No match');
     } else {
       if (!(typeof op.pattern[i] === 'symbol')) throw new Error('No match');
@@ -51,26 +60,28 @@ function match(expr: ExprUnary[], op: RankedOperator) {
   }
 
   // matching pattern, splice
-  expr.splice(pOffset, op.pattern.length, {
+  const exprTree: ExprTree = {
     type: 'exprtree',
     op: op.name,
     args,
-  });
+  };
+  expr.splice(pOffset, op.pattern.length, exprTree);
 }
 
-export default function (opMap: Map<string, RankedOperator>) {
-  return function resolve(expr: ExprUnary[] = []) {
+export function resolver(opMap: Map<string, RankedOperator>) {
+  return function resolve(expr: (Expr | ExprTree)[] = []) {
     const keys = [];
     const out = [...expr];
-    for (const token of expr) {
+    for (const [i, token] of expr.entries()) {
+      // recurse nested expressions
+      if (Array.isArray(token)) {
+        const resolved = resolve(token);
+        out.splice(i, i + 1, resolved);
+        continue;
+      }
       if (token.type === 'op') {
         keys.push(token.symbol);
       }
-
-      // recursion handled by main parser
-      /*if (token.type === 'expr' && Array.isArray(token.value)) {
-         token.value = resolve(token.value);
-       }*/
     }
 
     const ops = keys
@@ -94,6 +105,6 @@ export default function (opMap: Map<string, RankedOperator>) {
       match(out, op);
     }
 
-    return out[0];
+    return out[0] as ExprTree;
   };
 }

@@ -1,3 +1,4 @@
+import { EXPR } from '@arql/operators';
 import { Contextualiser } from './contextualiser';
 import { testSource } from './test_helpers';
 
@@ -12,11 +13,23 @@ describe('contextualiser', () => {
       nArgs: 1,
     };
 
-    const cxr = new Contextualiser(models, [filter], []);
+    const cxr = new Contextualiser(
+      models,
+      [filter],
+      [],
+      new Map([
+        [
+          '=',
+          {
+            pattern: [EXPR, '=', EXPR],
+            rank: 1,
+            name: 'equals',
+          },
+        ],
+      ])
+    );
     const contextualised = cxr.run({
-      dest: undefined,
-      modifier: undefined,
-      sourceCollection: {
+      value: {
         alias: 'test',
         shape: {
           fields: [
@@ -35,14 +48,11 @@ describe('contextualiser', () => {
         transforms: [
           {
             args: [
-              {
-                args: [
-                  { parts: [], root: 'foo', type: 'alphachain' },
-                  { index: 0, type: 'param' },
-                ],
-                op: 'equals',
-                type: 'exprtree',
-              },
+              [
+                { parts: [], root: 'foo', type: 'alphachain' },
+                { type: 'op', symbol: '=' },
+                { index: 0, type: 'param' },
+              ],
             ],
             description: {
               parts: [],

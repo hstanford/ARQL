@@ -1,10 +1,4 @@
-import buildParser from './parser';
-
-const run = buildParser((args) => ({
-  type: 'exprtree',
-  op: '',
-  args,
-}));
+import { run } from './parser';
 
 test('keyword parses a single word correctly', () => {
   const out = run('hello', 'keyword');
@@ -88,295 +82,6 @@ test('opchar matches one of a specific set of characters', () => {
   const out = run('&', 'opchar');
   expect(out).toBe('&');
   expect(() => run('h', 'opchar')).toThrow();
-});
-
-test('modifier matches ->, -x and -+ but not -*', () => {
-  let out = run('->', 'modifier');
-  expect(out).toBe('->');
-  out = run('-x', 'modifier');
-  expect(out).toBe('-x');
-  out = run('-+', 'modifier');
-  expect(out).toBe('-+');
-  expect(() => run('-*', 'modifier')).toThrow();
-});
-
-test('exprNoOp matches a param, an alphachain, or a parenthesised expression', () => {
-  let out = run('$20', 'exprNoOp');
-  expect(out).toEqual({
-    type: 'param',
-    index: 20,
-  });
-  out = run('users.name', 'exprNoOp');
-  expect(out).toEqual({
-    type: 'alphachain',
-    root: 'users',
-    parts: ['name'],
-  });
-  out = run('($1)', 'exprNoOp');
-  expect(out).toEqual({ type: 'param', index: 1 });
-});
-
-test('funOrExpr matches a function or an expression', () => {
-  let out = run('test($1)', 'funOrExpr');
-  expect(out).toEqual({
-    type: 'function',
-    expr: {
-      type: 'alphachain',
-      root: 'test',
-      parts: [],
-    },
-    args: [
-      {
-        type: 'param',
-        index: 1,
-      },
-    ],
-  });
-
-  out = run('(test + foo)', 'funOrExpr');
-  expect(out).toEqual({
-    type: 'exprtree',
-    op: '',
-    args: [
-      {
-        type: 'alphachain',
-        root: 'test',
-        parts: [],
-      },
-      {
-        type: 'op',
-        symbol: '+',
-      },
-      {
-        type: 'alphachain',
-        root: 'foo',
-        parts: [],
-      },
-    ],
-  });
-});
-
-test('exprUnary matches prefix and postfix operators', () => {
-  let out = run('!foo', 'exprUnary');
-  expect(out).toEqual([
-    {
-      type: 'op',
-      symbol: '!',
-    },
-    {
-      type: 'alphachain',
-      root: 'foo',
-      parts: [],
-    },
-  ]);
-
-  out = run('foo!', 'exprUnary');
-  expect(out).toEqual([
-    {
-      type: 'alphachain',
-      root: 'foo',
-      parts: [],
-    },
-    {
-      type: 'op',
-      symbol: '!',
-    },
-  ]);
-
-  out = run('! : foo.bar & & @', 'exprUnary');
-  expect(out).toEqual([
-    {
-      type: 'op',
-      symbol: '!',
-    },
-    {
-      type: 'op',
-      symbol: ':',
-    },
-    {
-      type: 'alphachain',
-      root: 'foo',
-      parts: ['bar'],
-    },
-    {
-      type: 'op',
-      symbol: '&',
-    },
-    {
-      type: 'op',
-      symbol: '&',
-    },
-    {
-      type: 'op',
-      symbol: '@',
-    },
-  ]);
-});
-
-test('exprOp matches unary, binary and ternary expressions', () => {
-  let out = run('!foo', 'exprOp');
-  expect(out).toEqual([
-    {
-      type: 'op',
-      symbol: '!',
-    },
-    {
-      type: 'alphachain',
-      root: 'foo',
-      parts: [],
-    },
-  ]);
-
-  out = run('foo + bar.baz', 'exprOp');
-  expect(out).toEqual({
-    type: 'exprtree',
-    op: '',
-    args: [
-      {
-        type: 'alphachain',
-        root: 'foo',
-        parts: [],
-      },
-      {
-        type: 'op',
-        symbol: '+',
-      },
-      {
-        type: 'alphachain',
-        root: 'bar',
-        parts: ['baz'],
-      },
-    ],
-  });
-
-  out = run('foo + bar.baz * bat!', 'exprOp');
-  expect(out).toEqual({
-    type: 'exprtree',
-    op: '',
-    args: [
-      {
-        type: 'alphachain',
-        root: 'foo',
-        parts: [],
-      },
-      {
-        type: 'op',
-        symbol: '+',
-      },
-      {
-        type: 'alphachain',
-        root: 'bar',
-        parts: ['baz'],
-      },
-      {
-        type: 'op',
-        symbol: '*',
-      },
-      {
-        type: 'alphachain',
-        root: 'bat',
-        parts: [],
-      },
-      {
-        type: 'op',
-        symbol: '!',
-      },
-    ],
-  });
-});
-
-test('expr should handle nested and non-nested expressions, and also plain params and alphachains', () => {
-  let out = run('foo', 'expr');
-  expect(out).toEqual({
-    type: 'alphachain',
-    root: 'foo',
-    parts: [],
-  });
-
-  out = run('$1', 'expr');
-  expect(out).toEqual({
-    type: 'param',
-    index: 1,
-  });
-
-  out = run('(foo.bar === $1) && !baz', 'expr');
-  expect(out).toEqual({
-    type: 'exprtree',
-    op: '',
-    args: [
-      {
-        type: 'exprtree',
-        op: '',
-        args: [
-          {
-            type: 'alphachain',
-            root: 'foo',
-            parts: ['bar'],
-          },
-          {
-            type: 'op',
-            symbol: '===',
-          },
-          {
-            type: 'param',
-            index: 1,
-          },
-        ],
-      },
-      {
-        type: 'op',
-        symbol: '&&',
-      },
-      {
-        type: 'op',
-        symbol: '!',
-      },
-      {
-        type: 'alphachain',
-        root: 'baz',
-        parts: [],
-      },
-    ],
-  });
-});
-
-test('exprlist should match a comma-separated series of expressions', () => {
-  const out = run('$1, foo.bar, baz + $2', 'exprlist');
-  expect(out).toEqual([
-    {
-      type: 'param',
-      index: 1,
-    },
-    {
-      type: 'alphachain',
-      root: 'foo',
-      parts: ['bar'],
-    },
-    {
-      type: 'exprtree',
-      op: '',
-      args: [
-        {
-          type: 'alphachain',
-          root: 'baz',
-          parts: [],
-        },
-        {
-          type: 'op',
-          symbol: '+',
-        },
-        {
-          type: 'param',
-          index: 2,
-        },
-      ],
-    },
-  ]);
-});
-
-test('exprlist should return null for an empty string', () => {
-  const out = run('', 'exprlist');
-  expect(out).toEqual(null);
 });
 
 test('transformarg should accept an expression, a shape, or a collection', () => {
@@ -543,25 +248,21 @@ test('collection should consist of "[base collection or model] [transforms] [sha
       {
         type: 'transform',
         args: [
-          {
-            type: 'exprtree',
-            op: '',
-            args: [
-              {
-                type: 'alphachain',
-                root: 'u',
-                parts: ['id'],
-              },
-              {
-                type: 'op',
-                symbol: '=',
-              },
-              {
-                type: 'param',
-                index: 1,
-              },
-            ],
-          },
+          [
+            {
+              type: 'alphachain',
+              root: 'u',
+              parts: ['id'],
+            },
+            {
+              type: 'op',
+              symbol: '=',
+            },
+            {
+              type: 'param',
+              index: 1,
+            },
+          ],
         ],
         description: {
           type: 'alphachain',
@@ -621,40 +322,6 @@ test('collectionlist should handle a comma-separated list of basic collections',
   ]);
 });
 
-test('dest should match a simple model, transform, and shape', () => {
-  const out = run('u: users | filter() {name}', 'dest');
-  expect(out).toEqual({
-    type: 'dest',
-    alias: 'u',
-    value: 'users',
-    transforms: [
-      {
-        type: 'transform',
-        description: {
-          type: 'alphachain',
-          root: 'filter',
-          parts: [],
-        },
-        args: [],
-      },
-    ],
-    shape: {
-      type: 'shape',
-      fields: [
-        {
-          type: 'field',
-          alias: 'name',
-          value: {
-            parts: [],
-            root: 'name',
-            type: 'alphachain',
-          },
-        },
-      ],
-    },
-  });
-});
-
 test('shape should match a simple field in curly braces', () => {
   const out = run('{name}', 'shape');
   expect(out).toEqual({
@@ -683,9 +350,7 @@ test('basic query', () => {
     'query'
   );
   expect(out).toEqual({
-    dest: undefined,
-    modifier: undefined,
-    sourceCollection: {
+    value: {
       alias: 'test',
       shape: {
         fields: [
@@ -704,25 +369,21 @@ test('basic query', () => {
       transforms: [
         {
           args: [
-            {
-              args: [
-                {
-                  parts: [],
-                  root: 'foo',
-                  type: 'alphachain',
-                },
-                {
-                  symbol: '=',
-                  type: 'op',
-                },
-                {
-                  index: 1,
-                  type: 'param',
-                },
-              ],
-              op: '',
-              type: 'exprtree',
-            },
+            [
+              {
+                parts: [],
+                root: 'foo',
+                type: 'alphachain',
+              },
+              {
+                symbol: '=',
+                type: 'op',
+              },
+              {
+                index: 1,
+                type: 'param',
+              },
+            ],
           ],
           description: {
             parts: [],
@@ -758,7 +419,7 @@ test('complex query', () => {
   );
   expect(out).toEqual({
     type: 'query',
-    sourceCollection: {
+    value: {
       type: 'collection',
       alias: undefined,
       value: [
@@ -794,26 +455,22 @@ test('complex query', () => {
             parts: [],
           },
           args: [
-            {
-              type: 'exprtree',
-              op: '',
-              args: [
-                {
-                  type: 'alphachain',
-                  root: 'o',
-                  parts: ['userId'],
-                },
-                {
-                  type: 'op',
-                  symbol: '=',
-                },
-                {
-                  type: 'alphachain',
-                  root: 'u',
-                  parts: ['id'],
-                },
-              ],
-            },
+            [
+              {
+                type: 'alphachain',
+                root: 'o',
+                parts: ['userId'],
+              },
+              {
+                type: 'op',
+                symbol: '=',
+              },
+              {
+                type: 'alphachain',
+                root: 'u',
+                parts: ['id'],
+              },
+            ],
           ],
         },
       ],
@@ -841,8 +498,6 @@ test('complex query', () => {
         ],
       },
     },
-    modifier: undefined,
-    dest: undefined,
   });
 });
 

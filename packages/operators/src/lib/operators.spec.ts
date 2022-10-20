@@ -1,6 +1,4 @@
-import resolver from './operators';
-
-const EXPR = Symbol('EXPR');
+import { EXPR, resolver } from './operators';
 
 describe('operators', () => {
   it('should work', () => {

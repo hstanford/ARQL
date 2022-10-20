@@ -1,15 +1,14 @@
 import { DataModel, TransformDef } from '@arql/models';
+import { ExprTree, RankedOperator, resolver } from '@arql/operators';
 import {
   getAlias,
   Alphachain,
   Transform,
   Collection,
   Query,
-  isShape,
-  isAlphachain,
-  isWildcard,
   Field,
-  ExprUnary,
+  Expr,
+  BaseExpr,
 } from '@arql/parser';
 import { uniq } from '@arql/util';
 import { ContextualisedCollection } from './collection';
@@ -39,14 +38,17 @@ export class Contextualiser {
   models: Map<string, DataModel>;
   transforms: TransformDef[];
   functions: TransformDef[];
+  resolveExpr: ReturnType<typeof resolver>;
   constructor(
     models: Map<string, DataModel>,
     transforms: TransformDef[],
-    functions: TransformDef[]
+    functions: TransformDef[],
+    opMap: Map<string, RankedOperator>
   ) {
     this.models = models;
     this.transforms = transforms;
     this.functions = functions;
+    this.resolveExpr = resolver(opMap);
   }
 
   /**
@@ -55,7 +57,7 @@ export class Contextualiser {
    * @returns a contextualised query tree
    */
   run(ast: Query) {
-    if (!ast.sourceCollection) {
+    if (!ast.value) {
       throw new Error('Can only contextualise collections');
     }
 
@@ -63,7 +65,7 @@ export class Contextualiser {
       aliases: new Map(),
     };
 
-    const collection = this.handleCollection(ast.sourceCollection, context);
+    const collection = this.handleCollection(ast.value, context);
 
     // propagate field requirements down through the tree.
     // if no external interface has been specified for the top-level collection,
@@ -142,7 +144,7 @@ export class Contextualiser {
       out.shape = uniq(
         collection.shape.fields
           .map((field) =>
-            isWildcard(field)
+            field.type === 'wildcard'
               ? out.availableFields.map((f) => selectField(f, out))
               : this.getField(field, out, context)
           )
@@ -222,12 +224,12 @@ export class Contextualiser {
 
     // handle transform arguments
     for (const arg of transform.args) {
-      if (isShape(arg)) {
+      if (!Array.isArray(arg) && arg.type === 'shape') {
         // the last shape mentioned as a transform argument
         // becomes the external interface of the transform
         contextualisedTransform.shape = arg.fields
           .map((f) =>
-            isWildcard(f)
+            f.type === 'wildcard'
               ? [model]
                   .flat()
                   .map((m) =>
@@ -242,16 +244,12 @@ export class Contextualiser {
         contextualisedTransform._requirements.flags.supportsShaping = true;
         continue;
       }
-      if (arg.type === 'exprtree' || isAlphachain(arg)) {
-        contextualisedTransform.args.push(
-          this.getExpression(arg, model, context)
-        );
-        continue;
-      }
-      if (arg.type === 'collection') {
+      if (!Array.isArray(arg) && arg.type === 'collection') {
         throw new Error('Collection as transform arg not supported');
       }
-      throw new Error(`Unrecognised arg type ${arg.type}`);
+      contextualisedTransform.args.push(
+        this.getExpression(arg, model, context)
+      );
     }
 
     return contextualisedTransform;
@@ -292,13 +290,10 @@ export class Contextualiser {
         | ContextualisedExpr
         | ContextualisedParam
         | ContextualisedFunction => {
-        if (isShape(arg)) {
+        if (!Array.isArray(arg) && arg.type === 'shape') {
           throw new Error('Cannot pass shape to inline function');
         }
-        if (arg.type === 'exprtree' || isAlphachain(arg)) {
-          return this.getExpression(arg, model, context);
-        }
-        throw new Error(`Unrecognised arg type`);
+        return this.getExpression(arg, model, context);
       }
     );
 
@@ -350,7 +345,7 @@ export class Contextualiser {
    * @returns a contextualised field, expression, parameter or function
    */
   getExpression(
-    expr: ExprUnary,
+    ipt: Expr | ExprTree,
     model:
       | ContextualisedCollection
       | ContextualisedTransform
@@ -362,7 +357,11 @@ export class Contextualiser {
     | ContextualisedExpr
     | ContextualisedParam
     | ContextualisedFunction {
-    if (isAlphachain(expr)) {
+    const expr: BaseExpr | ExprTree = Array.isArray(ipt)
+      ? this.resolveExpr(ipt)
+      : ipt;
+    console.log(expr);
+    if (expr.type === 'alphachain') {
       // a simple foo.bar should resolve to a plain field
       // accessed from the available fields of the collection
       let field: ContextualisedField | undefined;
@@ -394,12 +393,12 @@ export class Contextualiser {
     } else if (expr.type === 'param') {
       return new ContextualisedParam({ index: expr.index });
     } else if (expr.type === 'function') {
-      if (!isAlphachain(expr.expr)) {
+      if (expr.name.type !== 'alphachain') {
         // no support for something that looks like (a + b)(x)
         throw new Error('Unhandled function call on complex sub-expression');
       }
       return this.getFunction(
-        { type: 'transform', description: expr.expr, args: expr.args },
+        { type: 'transform', description: expr.name, args: expr.args },
         model,
         context
       );
@@ -414,7 +413,8 @@ export default function contextualise(
   ast: Query,
   models: Map<string, DataModel>,
   transforms: TransformDef[],
-  functions: TransformDef[]
+  functions: TransformDef[],
+  opMap: Map<string, RankedOperator>
 ) {
-  return new Contextualiser(models, transforms, functions).run(ast);
+  return new Contextualiser(models, transforms, functions, opMap).run(ast);
 }
