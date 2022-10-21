@@ -44,7 +44,7 @@ export const transformArgs: Parser<(Expr | Shape | Collection)[] | null> =
     ]).map((parts) => [parts[0], ...parts[2]].filter((p) => p !== null))
   );
 
-export const transform: Parser<Transform, string, any> = sequenceOf([
+export const transform: Parser<Transform> = sequenceOf([
   alphachain,
   optionalWhitespace,
   possibly(
@@ -62,7 +62,7 @@ export const transform: Parser<Transform, string, any> = sequenceOf([
   args: parts[2] || [],
 }));
 
-export const possiblyTransforms: Parser<Transform[], string, any> = many(
+export const possiblyTransforms: Parser<Transform[]> = many(
   sequenceOf([
     char('|'),
     optionalWhitespace,
@@ -73,7 +73,7 @@ export const possiblyTransforms: Parser<Transform[], string, any> = many(
 
 // transforms are applied to a collection using a vertical bar, conceptually
 // similar to the "pipe" in unix.
-export const transforms: Parser<Transform[], string, any> = many1(
+export const transforms: Parser<Transform[]> = many1(
   sequenceOf([
     char('|'),
     optionalWhitespace,

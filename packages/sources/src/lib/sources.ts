@@ -17,5 +17,8 @@ export class UnresolveableSource extends DataSource {
   supportsSubscriptions = false;
   supportsParameters = false;
   subCollectionDepth = 0;
+  async resolve() {
+    return [];
+  }
 }
 export const Unresolveable = new UnresolveableSource([], {}, {});

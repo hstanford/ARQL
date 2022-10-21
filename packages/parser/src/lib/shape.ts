@@ -21,7 +21,7 @@ export interface Shape {
 //   userId: users.id,                                ->     "userId": 1,
 //   orders | filter(users.id = orders.userId) {id}   ->     "orders": [{"id": 2}]
 // }                                                       }]
-export const shape: Parser<Shape, string, any> = sequenceOf([
+export const shape: Parser<Shape> = sequenceOf([
   char('{'),
   optionalWhitespace,
   fieldList,
@@ -34,7 +34,7 @@ export const shape: Parser<Shape, string, any> = sequenceOf([
 
 // when selecting static data it's often useful to express many shapes
 // between [] in an array-like syntax. e.g. [{id: $1}, {id: $2}]
-export const multiShape: Parser<Shape[], string, any> = sequenceOf([
+export const multiShape: Parser<Shape[]> = sequenceOf([
   char('['),
   optionalWhitespace,
   sepBy(sequenceOf([optionalWhitespace, char(','), optionalWhitespace]))(

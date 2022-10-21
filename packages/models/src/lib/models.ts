@@ -1,5 +1,4 @@
 import { Dictionary, PickByNotValue, uniq } from '@arql/util';
-import { ContextualisedCollection } from '@arql/contextualiser';
 
 export abstract class Node<T> {
   abstract propKeys: readonly (keyof this)[];
@@ -17,13 +16,19 @@ export abstract class Node<T> {
   }
 
   clone(override?: Partial<T>) {
-    const Cls = this.constructor as new (opts: Partial<T>, parent: any) => this;
+    const Cls = this.constructor as new (
+      opts: Partial<T>,
+      parent: unknown
+    ) => this;
+    const opts = (this.propKeys as (keyof T)[]).reduce(
+      (agg: Partial<T>, key: keyof T) =>
+        Object.assign(agg, {
+          [key]: (this as { [K in keyof T]: unknown })[key],
+        }),
+      {} as Partial<T>
+    ) as Partial<T>;
     const newInstance = new Cls(
-      (this.propKeys as any).reduce(
-        (agg: any, key: any) =>
-          Object.assign(agg, { [key]: (this as any)[key] }),
-        {} as T
-      ),
+      opts,
       this.parentKey ? this[this.parentKey] : undefined
     );
     if (override) Object.assign(newInstance, override);
@@ -31,7 +36,10 @@ export abstract class Node<T> {
   }
 }
 
+// TODO: can these be typed more narrowly?
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type operatorOp = (...args: any[]) => any;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type transformFn = (...args: any[]) => any;
 
 /**
@@ -60,8 +68,11 @@ function combineFlags(...flags: Partial<Flags>[]) {
       const castKey = key as keyof Flags;
       const val = flagSet[castKey];
       if (typeof val === 'boolean') {
+        // TODO: find a nice way of doing this without "any" casts
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         outFlags[castKey] = !!(flagSet[castKey] || outFlags[castKey]) as any;
       } else if (typeof val === 'number') {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         outFlags[castKey] = (val + ((outFlags[castKey] as number) ?? 0)) as any;
       } else {
         throw new Error(`Unexpected flag value ${typeof val}`);
@@ -157,14 +168,13 @@ export abstract class DataSource extends Flags {
     return field;
   }
 
-  async resolve(
-    subquery: ContextualisedCollection,
+  abstract resolve(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    subquery: any, // should be ContextualisedCollection,
     data: Dictionary[] | null,
     results: Dictionary[][],
-    params: any[]
-  ): Promise<Dictionary[] | Dictionary> {
-    return [];
-  }
+    params: any[] // eslint-disable-line @typescript-eslint/no-explicit-any
+  ): Promise<Dictionary[] | Dictionary>;
 
   implementsOp(opName: string) {
     return this.operators[opName];
@@ -250,11 +260,6 @@ export class DataField extends Node<DataFieldDef> {
     };
   }
 }
-
-export function isDataField(ipt: any): ipt is DataField {
-  return ipt?.type === 'datafield';
-}
-
 export interface DataModelDef {
   name: string;
   fields: DataFieldDef[];
@@ -274,7 +279,7 @@ export class DataModel extends Node<DataModelDef> {
     this.source = source;
   }
   get availableFields(): DataField[] {
-    return Object.values(this.fields).filter(isDataField);
+    return Object.values(this.fields);
   }
   get requiredFields(): DataField[] {
     // a Data model doesn't put any requirements out
@@ -297,10 +302,6 @@ export class DataModel extends Node<DataModelDef> {
   }
 }
 
-export function isDataModel(ipt: any): ipt is DataModel {
-  return ipt instanceof DataModel;
-}
-
 export type dataType = 'string' | 'number' | 'boolean' | 'json' | 'date';
 
 /**
@@ -315,7 +316,7 @@ export type DataTypes = {
   number: number;
   string: string;
   boolean: boolean;
-  json: { [key: string]: any };
+  json: { [key: string]: any }; // eslint-disable-line @typescript-eslint/no-explicit-any
   date: Date;
 };
 

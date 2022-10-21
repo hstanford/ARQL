@@ -24,7 +24,7 @@ export interface Collection {
 // a collection corresponds to another collection or data model providing
 // the incoming data, 0 or more transforms, and then finally an
 // optional "shape"
-export const collection: Parser<Collection, string, any> = recursiveParser(() =>
+export const collection: Parser<Collection> = recursiveParser(() =>
   sequenceOf([
     possibly(alias),
     optionalWhitespace,
@@ -47,8 +47,8 @@ export const collection: Parser<Collection, string, any> = recursiveParser(() =>
   }))
 );
 
-export const collectionWithTransforms: Parser<Collection, string, any> =
-  recursiveParser(() =>
+export const collectionWithTransforms: Parser<Collection> = recursiveParser(
+  () =>
     sequenceOf([
       possibly(alias),
       optionalWhitespace,
@@ -69,52 +69,50 @@ export const collectionWithTransforms: Parser<Collection, string, any> =
       transforms: parts[4],
       shape: parts[5],
     }))
-  );
+);
 
-export const collectionWithShape: Parser<Collection, string, any> =
-  recursiveParser(() =>
-    sequenceOf([
-      possibly(alias),
-      optionalWhitespace,
-      possibly(choice([collectionlist, alphachain])),
-      optionalWhitespace,
-      possiblyTransforms,
-      choice([shape, multiShape]),
-    ]).map((parts) => ({
-      type: 'collection',
-      alias:
-        parts[0] ||
-        (typeof parts[2] === 'string' && parts[2]) ||
-        (!Array.isArray(parts[2]) &&
-          parts[2]?.type === 'alphachain' &&
-          [parts[2].root, ...parts[2].parts].pop()) ||
-        undefined,
-      value: parts[2],
-      transforms: parts[4],
-      shape: parts[5],
-    }))
-  );
+export const collectionWithShape: Parser<Collection> = recursiveParser(() =>
+  sequenceOf([
+    possibly(alias),
+    optionalWhitespace,
+    possibly(choice([collectionlist, alphachain])),
+    optionalWhitespace,
+    possiblyTransforms,
+    choice([shape, multiShape]),
+  ]).map((parts) => ({
+    type: 'collection',
+    alias:
+      parts[0] ||
+      (typeof parts[2] === 'string' && parts[2]) ||
+      (!Array.isArray(parts[2]) &&
+        parts[2]?.type === 'alphachain' &&
+        [parts[2].root, ...parts[2].parts].pop()) ||
+      undefined,
+    value: parts[2],
+    transforms: parts[4],
+    shape: parts[5],
+  }))
+);
 
 // when you want to combine data from different collections, you can collect
 // them in parentheses as a collectionlist before applying a transform to combine
 // e.g. ( users, orders ) | join(users.id = orders.userId)
-export const collectionlist: Parser<Collection | Collection[], string, any> =
-  sequenceOf([
-    char('('),
-    optionalWhitespace,
-    collection,
-    optionalWhitespace,
-    many(
-      sequenceOf([
-        char(','),
-        optionalWhitespace,
-        collection,
-        optionalWhitespace,
-      ]).map((parts) => parts[2])
-    ),
-    possibly(char(',')),
-    optionalWhitespace,
-    char(')'),
-  ]).map((parts) => {
-    return parts[4].length ? [parts[2]].concat(parts[4]) : parts[2];
-  });
+export const collectionlist: Parser<Collection | Collection[]> = sequenceOf([
+  char('('),
+  optionalWhitespace,
+  collection,
+  optionalWhitespace,
+  many(
+    sequenceOf([
+      char(','),
+      optionalWhitespace,
+      collection,
+      optionalWhitespace,
+    ]).map((parts) => parts[2])
+  ),
+  possibly(char(',')),
+  optionalWhitespace,
+  char(')'),
+]).map((parts) => {
+  return parts[4].length ? [parts[2]].concat(parts[4]) : parts[2];
+});

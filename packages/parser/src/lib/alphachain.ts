@@ -8,7 +8,7 @@ export interface Alphachain {
 }
 
 // keyword preceeded by a "."
-export const dotSequence: Parser<string, string, any> = sequenceOf([
+export const dotSequence: Parser<string> = sequenceOf([
   char('.'),
   optionalWhitespace,
   keyword,
@@ -17,7 +17,7 @@ export const dotSequence: Parser<string, string, any> = sequenceOf([
 
 // a list of dot-separated keywords corresponds to accessing a field
 // in an object: e.g. users.id or users.settings.dark_mode
-export const alphachain: Parser<Alphachain, string, any> = sequenceOf([
+export const alphachain: Parser<Alphachain> = sequenceOf([
   keyword,
   optionalWhitespace,
   many(dotSequence),

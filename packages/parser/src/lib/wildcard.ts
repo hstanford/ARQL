@@ -8,7 +8,7 @@ export interface Wildcard {
   parts?: string[];
 }
 
-export const wildcard: Parser<Wildcard, string, any> = sequenceOf([
+export const wildcard: Parser<Wildcard> = sequenceOf([
   many(
     sequenceOf([
       keyword,

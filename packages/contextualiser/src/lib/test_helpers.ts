@@ -16,6 +16,9 @@ class TestSource extends DataSource {
   supportsSubscriptions = false;
   supportsParameters = false;
   subCollectionDepth = Infinity;
+  async resolve() {
+    return [];
+  }
 }
 export const testSource = new TestSource(
   [

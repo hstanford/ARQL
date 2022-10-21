@@ -1,4 +1,4 @@
-export type Dictionary<T = any> = { [key: string]: T };
+export type Dictionary<T = any> = { [key: string]: T }; // eslint-disable-line @typescript-eslint/no-explicit-any
 
 export type PickByNotValue<T, ValueType> = Pick<
   T,

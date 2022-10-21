@@ -25,7 +25,7 @@ export type Expr = BaseExpr | Expr[];
 // an expression is a series of parameters, fields, or collections transformed
 // in some way by operators and functions. Parentheses group sections of the
 // expression and can be used to subvert or clarify operator precedence.
-export const exprNoOp: Parser<Expr, string, any> = recursiveParser(function () {
+export const exprNoOp: Parser<Expr> = recursiveParser(function () {
   return choice([
     sequenceOf([
       char('('),
@@ -65,12 +65,12 @@ export const exprOp = recursiveParser(function () {
   });
 });
 
-export const expr: Parser<Expr | Expr[], string, any> = recursiveParser(() =>
+export const expr: Parser<Expr | Expr[]> = recursiveParser(() =>
   choice([collectionWithTransforms, collectionWithShape, exprOp, exprNoOp])
 );
 
 // a comma-separated list of expressions form function arguments
-export const exprlist: Parser<Expr[] | null, string, any> = possibly(
+export const exprlist: Parser<Expr[] | null> = possibly(
   sequenceOf([
     expr,
     optionalWhitespace,

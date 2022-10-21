@@ -18,7 +18,7 @@ export interface Field {
   value: Collection | Expr;
 }
 
-export const field: Parser<Field, string, any> = sequenceOf([
+export const field: Parser<Field> = sequenceOf([
   possibly(alias),
   optionalWhitespace,
   expr,
@@ -38,7 +38,7 @@ export const field: Parser<Field, string, any> = sequenceOf([
   };
 });
 
-export const fieldList: Parser<(Field | Wildcard)[], string, any> = sequenceOf([
+export const fieldList: Parser<(Field | Wildcard)[]> = sequenceOf([
   optionalWhitespace,
   sepBy(sequenceOf([optionalWhitespace, char(','), optionalWhitespace]))(
     possibly(choice([wildcard, field]))
