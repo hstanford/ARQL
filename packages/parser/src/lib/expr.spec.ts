@@ -1,9 +1,11 @@
-import { run } from './parser';
+import { expr, exprlist, exprNoOp, exprOp } from './expr';
+import { assertNoError } from './test_helpers';
 
 describe('base expr', () => {
   it('parses an expression successfully', () => {
-    const out = run('thing + foo', 'expr');
-    expect(out).toEqual([
+    const out = expr.run('thing + foo');
+    assertNoError(out);
+    expect(out.result).toEqual([
       { parts: [], root: 'thing', type: 'alphachain' },
       { type: 'op', symbol: '+' },
       { parts: [], root: 'foo', type: 'alphachain' },
@@ -11,8 +13,9 @@ describe('base expr', () => {
   });
 
   it('should handle plain alphachains', () => {
-    const out = run('foo', 'expr');
-    expect(out).toEqual({
+    const out = expr.run('foo');
+    assertNoError(out);
+    expect(out.result).toEqual({
       type: 'alphachain',
       root: 'foo',
       parts: [],
@@ -20,16 +23,18 @@ describe('base expr', () => {
   });
 
   it('should handle plain params', () => {
-    const out = run('$1', 'expr');
-    expect(out).toEqual({
+    const out = expr.run('$1');
+    assertNoError(out);
+    expect(out.result).toEqual({
       type: 'param',
       index: 1,
     });
   });
 
   it('should handle nested and non-nested expressions', () => {
-    const out = run('(foo.bar === $1) && !baz', 'expr');
-    expect(out).toEqual([
+    const out = expr.run('(foo.bar === $1) && !baz');
+    assertNoError(out);
+    expect(out.result).toEqual([
       [
         {
           type: 'alphachain',
@@ -64,16 +69,18 @@ describe('base expr', () => {
 
 describe('exprNoOp', () => {
   it('matches a param', () => {
-    const out = run('$20', 'exprNoOp');
-    expect(out).toEqual({
+    const out = exprNoOp.run('$20');
+    assertNoError(out);
+    expect(out.result).toEqual({
       type: 'param',
       index: 20,
     });
   });
 
   it('matches an alphachain', () => {
-    const out = run('users.name', 'exprNoOp');
-    expect(out).toEqual({
+    const out = exprNoOp.run('users.name');
+    assertNoError(out);
+    expect(out.result).toEqual({
       type: 'alphachain',
       root: 'users',
       parts: ['name'],
@@ -81,13 +88,15 @@ describe('exprNoOp', () => {
   });
 
   it('matches a parenthesised expression', () => {
-    const out = run('($1)', 'exprNoOp');
-    expect(out).toEqual({ type: 'param', index: 1 });
+    const out = exprNoOp.run('($1)');
+    assertNoError(out);
+    expect(out.result).toEqual({ type: 'param', index: 1 });
   });
 
   it('matches a function', () => {
-    const out = run('test($1)', 'exprNoOp');
-    expect(out).toEqual({
+    const out = exprNoOp.run('test($1)');
+    assertNoError(out);
+    expect(out.result).toEqual({
       type: 'function',
       name: {
         type: 'alphachain',
@@ -104,8 +113,9 @@ describe('exprNoOp', () => {
   });
 
   it('matches an expression', () => {
-    const out = run('(test + foo)', 'exprNoOp');
-    expect(out).toEqual([
+    const out = exprNoOp.run('(test + foo)');
+    assertNoError(out);
+    expect(out.result).toEqual([
       {
         type: 'alphachain',
         root: 'test',
@@ -126,8 +136,9 @@ describe('exprNoOp', () => {
 
 describe('exprOp', () => {
   it('matches prefix operators', () => {
-    const out = run('!foo', 'exprOp');
-    expect(out).toEqual([
+    const out = exprOp.run('!foo');
+    assertNoError(out);
+    expect(out.result).toEqual([
       {
         type: 'op',
         symbol: '!',
@@ -141,8 +152,9 @@ describe('exprOp', () => {
   });
 
   it('matches postfix operators', () => {
-    const out = run('foo!', 'exprOp');
-    expect(out).toEqual([
+    const out = exprOp.run('foo!');
+    assertNoError(out);
+    expect(out.result).toEqual([
       {
         type: 'alphachain',
         root: 'foo',
@@ -156,8 +168,9 @@ describe('exprOp', () => {
   });
 
   it('matches combinations of prefix and postfix operators', () => {
-    const out = run('! : foo.bar & & @', 'exprOp');
-    expect(out).toEqual([
+    const out = exprOp.run('! : foo.bar & & @');
+    assertNoError(out);
+    expect(out.result).toEqual([
       {
         type: 'op',
         symbol: '!',
@@ -187,8 +200,9 @@ describe('exprOp', () => {
   });
 
   it('matches unary expressions', () => {
-    const out = run('!foo', 'exprOp');
-    expect(out).toEqual([
+    const out = exprOp.run('!foo');
+    assertNoError(out);
+    expect(out.result).toEqual([
       {
         type: 'op',
         symbol: '!',
@@ -202,8 +216,9 @@ describe('exprOp', () => {
   });
 
   it('matches binary expressions', () => {
-    const out = run('foo + bar.baz', 'exprOp');
-    expect(out).toEqual([
+    const out = exprOp.run('foo + bar.baz');
+    assertNoError(out);
+    expect(out.result).toEqual([
       {
         type: 'alphachain',
         root: 'foo',
@@ -222,8 +237,9 @@ describe('exprOp', () => {
   });
 
   it('matches ternary expressions', () => {
-    const out = run('foo + bar.baz * bat!', 'exprOp');
-    expect(out).toEqual([
+    const out = exprOp.run('foo + bar.baz * bat!');
+    assertNoError(out);
+    expect(out.result).toEqual([
       {
         type: 'alphachain',
         root: 'foo',
@@ -257,8 +273,9 @@ describe('exprOp', () => {
 
 describe('exprlist', () => {
   it('should match a comma-separated series of expressions', () => {
-    const out = run('$1, foo.bar, baz + $2', 'exprlist');
-    expect(out).toEqual([
+    const out = exprlist.run('$1, foo.bar, baz + $2');
+    assertNoError(out);
+    expect(out.result).toEqual([
       {
         type: 'param',
         index: 1,
@@ -287,7 +304,9 @@ describe('exprlist', () => {
   });
 
   it('should return null for an empty string', () => {
-    const out = run('', 'exprlist');
-    expect(out).toEqual(null);
+    // TODO: should it? [] feels more natural
+    const out = exprlist.run('');
+    assertNoError(out);
+    expect(out.result).toEqual(null);
   });
 });

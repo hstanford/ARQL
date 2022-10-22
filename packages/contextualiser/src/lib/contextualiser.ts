@@ -360,7 +360,6 @@ export class Contextualiser {
     const expr: BaseExpr | ExprTree = Array.isArray(ipt)
       ? this.resolveExpr(ipt)
       : ipt;
-    console.log(expr);
     if (expr.type === 'alphachain') {
       // a simple foo.bar should resolve to a plain field
       // accessed from the available fields of the collection
@@ -409,7 +408,7 @@ export class Contextualiser {
 }
 
 // helper wrapper around Contextualiser.prototype.run as a default entry point
-export default function contextualise(
+export function contextualise(
   ast: Query,
   models: Map<string, DataModel>,
   transforms: TransformDef[],

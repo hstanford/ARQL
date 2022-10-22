@@ -1,0 +1,42 @@
+{
+  "name": "test",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/test/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/test",
+        "main": "apps/test/src/index.ts",
+        "tsConfig": "apps/test/tsconfig.lib.json",
+        "assets": ["apps/test/*.md"]
+      }
+    },
+    "run": {
+      "executor": "@webundsoehne/nx-builders:ts-node-dev",
+      "options": {
+        "cwd": "./apps/test",
+        "main": "./apps/test/src/index.ts",
+        "tsConfig": "./apps/test/tsconfig.lib.json"
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/test/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "apps/test/jest.config.ts",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}

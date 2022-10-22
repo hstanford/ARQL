@@ -108,3 +108,16 @@ export function resolver(opMap: Map<string, RankedOperator>) {
     return out[0] as ExprTree;
   };
 }
+
+export function getOperatorLookup(
+  operators: Operator[]
+): Map<string, RankedOperator> {
+  return operators.reduce((acc, item, idx) => {
+    for (const token of item.pattern) {
+      if (token === EXPR) continue;
+
+      acc.set(token, { ...item, rank: idx });
+    }
+    return acc;
+  }, new Map());
+}

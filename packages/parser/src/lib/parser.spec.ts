@@ -1,8 +1,8 @@
-import { run } from './parser';
+import { parse } from './parser';
 
 describe('holistic parser tests', () => {
   it('should be able to parse a basic query', () => {
-    const out = run(
+    const out = parse(
       `
     test | filter(foo = $1) {
       bar
@@ -66,7 +66,7 @@ describe('holistic parser tests', () => {
   });
 
   it('should be able to parse a complex query with multicollections and aliases', () => {
-    const out = run(
+    const out = parse(
       `
   (
     u: users,

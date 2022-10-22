@@ -61,17 +61,13 @@ const parsers = {
   query,
 };
 
-export function run<T extends keyof typeof parsers>(
+export function parse<T extends keyof typeof parsers = 'query'>(
   str: string,
-  parserName: T
+  parserName?: T
 ) {
   type extractGeneric<Type> = Type extends Parser<infer X> ? X : never;
   type S = extractGeneric<typeof parsers[T]>;
-  const out = parsers[parserName].run(str);
+  const out = parsers[parserName || 'query'].run(str);
   if (out.isError === true) throw new Error(out.error);
   else return out.result as S;
 }
-
-run.query = function (str: string) {
-  return run(str, 'query');
-};
