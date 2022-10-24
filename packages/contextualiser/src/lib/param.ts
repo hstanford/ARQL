@@ -12,8 +12,7 @@ export interface ContextualisedParamDef {
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface ContextualisedParam extends ContextualisedParamDef {}
 export class ContextualisedParam extends Node<ContextualisedParamDef> {
-  type = 'param' as const;
-  propKeys = ['index'] as const;
+  type = 'contextualised_param' as const;
 
   /**
    * def is a serialisation getter for testing

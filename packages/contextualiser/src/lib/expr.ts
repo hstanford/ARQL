@@ -1,14 +1,7 @@
-import {
-  combineRequirements,
-  DataSource,
-  Node,
-  Requirements,
-} from '@arql/models';
-import { uniq } from '@arql/util';
-import { ContextualisedField } from './field';
+import { combineRequirements, Node, Requirements } from '@arql/models';
 import { ContextualisedFunction } from './function';
 import { ContextualisedParam } from './param';
-import { constituentFields } from './util';
+import { constituentFields, ContextualiserState, ID, isId } from './util';
 
 /**
  * An expression is a tree-like representation of a mathematical expression
@@ -28,21 +21,22 @@ import { constituentFields } from './util';
  * `a + b` === `add(a, b)`
  */
 export interface ContextualisedExprDef {
+  context: ContextualiserState;
   /** The name of the operation that makes up this expression */
   op: string;
   /** The arguments to this operation - can be sub-expressions, fields, parameters, or functions */
   args: (
     | ContextualisedExpr
-    | ContextualisedField
     | ContextualisedParam
     | ContextualisedFunction
+    | ID
   )[];
+  additionalRequirements?: Requirements;
 }
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface ContextualisedExpr extends ContextualisedExprDef {}
 export class ContextualisedExpr extends Node<ContextualisedExprDef> {
-  type = 'exprtree' as const;
-  propKeys = ['op', 'args'] as const;
+  type = 'contextualised_expr' as const;
   override _requirements: Requirements = {
     sources: [],
     flags: { supportsExpressions: true },
@@ -54,21 +48,13 @@ export class ContextualisedExpr extends Node<ContextualisedExprDef> {
   /**
    * "constituentFields" lists all the core data fields that originate elsewhere
    */
-  get constituentFields(): ContextualisedField[] {
+  get constituentFields(): ID[] {
     // propagate required fields down to the arguments
-    const fields: ContextualisedField[] = [];
+    const fields: ID[] = [];
     for (const arg of this.args) {
       fields.push(...constituentFields(arg));
     }
     return fields;
-  }
-
-  /**
-   * "sources" list the data sources required to satisfy all the commitments
-   * this expression has
-   */
-  get sources(): DataSource[] {
-    return uniq(this.constituentFields.map((f) => f.sources).flat());
   }
 
   /**
@@ -77,14 +63,16 @@ export class ContextualisedExpr extends Node<ContextualisedExprDef> {
   get def(): unknown {
     return {
       op: this.op,
-      args: this.args.map((a) => a.def),
+      args: this.args.map((a) => (isId(a) ? a : a.def)),
     };
   }
 
   get requirements(): Requirements {
     return combineRequirements(
       this._requirements,
-      ...this.args.map((a) => a.requirements)
+      ...this.args.map((a) =>
+        isId(a) ? this.context.get(a).requirements : a.requirements
+      )
     );
   }
 }

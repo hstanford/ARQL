@@ -1,6 +1,7 @@
 import { DataModel, DataSource } from '@arql/models';
 import { ContextualisedCollection } from './collection';
 import { ContextualisedField } from './field';
+import { ContextualiserState } from './util';
 
 class TestSource extends DataSource {
   supportsExpressionFields = false;
@@ -44,19 +45,30 @@ export const testModel = testSource.models.find(
   (m) => m.name === 'test'
 ) as DataModel;
 
-export const testCollection = new ContextualisedCollection({
-  name: 'test',
-  origin: testModel,
-});
+export function testObjects(context: ContextualiserState) {
+  const testCollection = new ContextualisedCollection({
+    context,
+    name: 'test',
+    origin: testModel,
+  });
 
-export const fooField = new ContextualisedField({
-  field: testModel.fields[0],
-  name: 'foo',
-  origin: testCollection,
-});
+  const fooField = new ContextualisedField({
+    context,
+    field: testModel.fields[0],
+    name: 'foo',
+    origin: testCollection,
+  });
 
-export const barField = new ContextualisedField({
-  field: testModel.fields[1],
-  name: 'bar',
-  origin: testCollection,
-});
+  const barField = new ContextualisedField({
+    context,
+    field: testModel.fields[1],
+    name: 'bar',
+    origin: testCollection,
+  });
+
+  return {
+    testCollection,
+    fooField,
+    barField,
+  };
+}

@@ -1,53 +1,39 @@
-import {
-  combineRequirements,
-  DataSource,
-  Node,
-  Requirements,
-} from '@arql/models';
-import { uniq } from '@arql/util';
+import { combineRequirements, Node, Requirements } from '@arql/models';
 import { ContextualisedExpr } from './expr';
-import { ContextualisedField } from './field';
 import { ContextualisedParam } from './param';
-import { constituentFields } from './util';
+import { constituentFields, ContextualiserState, ID, isId } from './util';
 
 /**
- * Transforms represent functions, which can operate over collections,
+ * Functions can operate over collections,
  * fields, params, and other functions
  */
 export interface ContextualisedFunctionDef {
+  context: ContextualiserState;
   name: string;
   modifier: string[];
   args: (
-    | ContextualisedField
     | ContextualisedExpr
     | ContextualisedParam
     | ContextualisedFunction
+    | ID
   )[];
+  additionalRequirements?: Requirements;
 }
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface ContextualisedFunction extends ContextualisedFunctionDef {}
 export class ContextualisedFunction extends Node<ContextualisedFunctionDef> {
-  type = 'contextualised_transform' as const;
-  propKeys = ['name', 'modifier', 'args', 'sources'] as const;
+  type = 'contextualised_function' as const;
 
   /**
    * "constituentFields" lists all the core data fields that originate elsewhere
    */
-  get constituentFields(): ContextualisedField[] {
+  get constituentFields(): ID[] {
     // propagate required fields down to the arguments
-    const fields: ContextualisedField[] = [];
+    const fields: ID[] = [];
     for (const arg of this.args) {
       fields.push(...constituentFields(arg));
     }
     return fields;
-  }
-
-  /**
-   * "sources" list the data sources required to satisfy all the commitments
-   * this expression has
-   */
-  get sources(): DataSource[] {
-    return uniq(this.constituentFields.map((f) => f.sources).flat());
   }
 
   /**
@@ -57,16 +43,16 @@ export class ContextualisedFunction extends Node<ContextualisedFunctionDef> {
     return {
       name: this.name,
       modifier: this.modifier,
-      args: this.args.map((a) =>
-        Array.isArray(a) ? a.map((subA) => subA.def) : a.def
-      ),
+      args: this.args.map((a) => (isId(a) ? a : a.def)),
     };
   }
 
   get requirements(): Requirements {
     return combineRequirements(
       this._requirements,
-      ...this.args.map((arg) => arg.requirements)
+      ...this.args.map((arg) =>
+        isId(arg) ? this.context.get(arg).requirements : arg.requirements
+      )
     );
   }
 }

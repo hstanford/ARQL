@@ -1,10 +1,35 @@
-import { DataField } from '@arql/models';
+import { DataField, DataModel } from '@arql/models';
 import { ContextualisedCollection } from './collection';
 import { ContextualisedExpr } from './expr';
 import { ContextualisedField } from './field';
 import { ContextualisedFunction } from './function';
 import { ContextualisedParam } from './param';
 import { ContextualisedTransform } from './transform';
+
+export type ID = number;
+
+export function isId(item: ContextualisedNodeType | ID): item is ID {
+  return typeof item === 'number';
+}
+
+export type ContextualisedNodeType =
+  | ContextualisedCollection
+  | ContextualisedExpr
+  | ContextualisedField
+  | ContextualisedFunction
+  | ContextualisedParam
+  | ContextualisedTransform;
+
+export class ContextualiserState {
+  aliases: Map<
+    string,
+    ContextualisedCollection | ContextualisedTransform | DataModel
+  > = new Map();
+  items: ContextualisedNodeType[] = [];
+  get(id: ID): ContextualisedNodeType {
+    return this.items[id];
+  }
+}
 
 /**
  * lists all the core data fields that originate elsewhere
@@ -18,15 +43,19 @@ export function constituentFields(
     | ContextualisedParam
     | ContextualisedExpr
     | ContextualisedFunction
-): ContextualisedField[] {
+    | ID
+): ID[] {
+  if (typeof item === 'number') {
+    return [item];
+  }
   // propagate required fields down to the arguments
-  const fields: ContextualisedField[] = [];
+  const fields: ID[] = [];
   if (item instanceof ContextualisedExpr) {
     fields.push(...item.constituentFields);
   } else if (item instanceof ContextualisedParam) {
     // params have no field requirements
   } else if (item instanceof ContextualisedField) {
-    fields.push(item);
+    fields.push(item.id);
   } else if (item instanceof ContextualisedFunction) {
     fields.push(...item.constituentFields);
   } else if (item instanceof DataField) {
@@ -47,11 +76,13 @@ export function constituentFields(
  */
 export function selectField(
   field: ContextualisedField | DataField,
-  origin: ContextualisedCollection | ContextualisedTransform
+  origin: ContextualisedCollection | ContextualisedTransform,
+  context: ContextualiserState
 ) {
   return new ContextualisedField({
+    context,
     name: field.name,
     origin,
-    field,
+    field: field instanceof ContextualisedField ? field.id : field,
   });
 }

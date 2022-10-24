@@ -2,6 +2,7 @@ import { parse } from '@arql/parser';
 import { contextualise } from '@arql/contextualiser';
 import { DataModel, TransformDef } from '@arql/models';
 import { RankedOperator } from '@arql/operators';
+import { delegate } from '@arql/delegator';
 
 export function runner({
   models,
@@ -24,6 +25,10 @@ export function runner({
       functions,
       opMap
     );
-    return contextualised;
+    const { delegatedQuery, subQueries } = delegate(contextualised);
+    return {
+      delegatedQuery,
+      subQueries,
+    };
   };
 }

@@ -1,10 +1,13 @@
 import { ContextualisedCollection } from './collection';
 import { ContextualisedField } from './field';
 import { testModel } from './test_helpers';
+import { ContextualiserState } from './util';
 
 describe('collection', () => {
   it('should expose the available fields of data model', () => {
+    const context = new ContextualiserState();
     const coll = new ContextualisedCollection({
+      context,
       name: 'alpha',
       origin: testModel,
     });
@@ -15,6 +18,7 @@ describe('collection', () => {
           datatype: 'string',
           name: 'foo',
         },
+        id: 1,
         name: 'foo',
         origin: {
           name: 'alpha',
@@ -25,6 +29,7 @@ describe('collection', () => {
           datatype: 'string',
           name: 'bar',
         },
+        id: 2,
         name: 'bar',
         origin: {
           name: 'alpha',
@@ -34,43 +39,30 @@ describe('collection', () => {
   });
 
   it('should expose the available fields of a nested collection', () => {
+    const context = new ContextualiserState();
     const coll = new ContextualisedCollection({
+      context,
       name: 'alpha',
       origin: testModel,
     });
     const coll2 = new ContextualisedCollection({
+      context,
       name: 'beta',
       origin: coll,
     });
 
     expect(coll2.availableFields.map((af) => af.def)).toEqual([
       {
-        field: {
-          field: {
-            datatype: 'string',
-            name: 'foo',
-          },
-          name: 'foo',
-          origin: {
-            name: 'alpha',
-          },
-        },
+        field: 2,
+        id: 4,
         name: 'foo',
         origin: {
           name: 'beta',
         },
       },
       {
-        field: {
-          field: {
-            datatype: 'string',
-            name: 'bar',
-          },
-          name: 'bar',
-          origin: {
-            name: 'alpha',
-          },
-        },
+        field: 3,
+        id: 5,
         name: 'bar',
         origin: {
           name: 'beta',
@@ -80,11 +72,14 @@ describe('collection', () => {
   });
 
   it('should propagate required changes down to nested collections', () => {
+    const context = new ContextualiserState();
     const coll = new ContextualisedCollection({
+      context,
       name: 'alpha',
       origin: testModel,
     });
     const coll2 = new ContextualisedCollection({
+      context,
       name: 'beta',
       origin: coll,
     });
@@ -100,6 +95,7 @@ describe('collection', () => {
           datatype: 'string',
           name: 'foo',
         },
+        id: 2,
         name: 'foo',
         origin: {
           name: 'alpha',
@@ -108,16 +104,8 @@ describe('collection', () => {
     ]);
     expect(coll2.requiredFields.map((af) => af.def)).toEqual([
       {
-        field: {
-          field: {
-            datatype: 'string',
-            name: 'foo',
-          },
-          name: 'foo',
-          origin: {
-            name: 'alpha',
-          },
-        },
+        field: 2,
+        id: 4,
         name: 'foo',
         origin: {
           name: 'beta',
@@ -127,11 +115,14 @@ describe('collection', () => {
   });
 
   it('should respect selecting an aliased field', () => {
+    const context = new ContextualiserState();
     const coll = new ContextualisedCollection({
+      context,
       name: 'alpha',
       origin: testModel,
     });
     const coll2 = new ContextualisedCollection({
+      context,
       name: 'beta',
       origin: coll,
     });
@@ -143,24 +134,17 @@ describe('collection', () => {
     ).find((af) => af.name === 'foo') as ContextualisedField;
     coll2.shape = [
       new ContextualisedField({
+        context,
         name: 'baz',
         origin: coll2,
-        field: fooField,
+        field: fooField.id,
       }),
     ];
 
     expect(coll2.availableFields.map((af) => af.def)).toEqual([
       {
-        field: {
-          field: {
-            datatype: 'string',
-            name: 'foo',
-          },
-          name: 'foo',
-          origin: {
-            name: 'alpha',
-          },
-        },
+        field: 2,
+        id: 4,
         name: 'baz',
         origin: {
           name: 'beta',

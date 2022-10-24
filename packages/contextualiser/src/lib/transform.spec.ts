@@ -1,32 +1,46 @@
 import { ContextualisedField } from './field';
-import { barField, fooField, testCollection } from './test_helpers';
+import { testObjects } from './test_helpers';
 import { ContextualisedParam } from './param';
 import { ContextualisedTransform } from './transform';
+import { ContextualiserState } from './util';
 
 describe('transform', () => {
   it('can get the available fields from the origin collection', () => {
+    const context = new ContextualiserState();
+    const { testCollection } = testObjects(context);
     const transform = new ContextualisedTransform({
+      context,
       args: [],
       modifier: [],
       name: 'foo',
       origin: testCollection,
     });
+    expect(transform.id).toBe(3);
     expect(transform.availableFields.map((af) => af.def)).toEqual([
-      new ContextualisedField({
-        field: fooField,
-        origin: transform,
+      {
+        field: 4,
+        id: 6,
         name: 'foo',
-      }).def,
-      new ContextualisedField({
-        field: barField,
-        origin: transform,
+        origin: {
+          name: 'foo',
+        },
+      },
+      {
+        field: 5,
+        id: 7,
         name: 'bar',
-      }).def,
+        origin: {
+          name: 'foo',
+        },
+      },
     ]);
   });
 
   it('can get available fields when shaped', () => {
+    const context = new ContextualiserState();
+    const { testCollection, fooField } = testObjects(context);
     const transform = new ContextualisedTransform({
+      context,
       args: [],
       modifier: [],
       name: 'foo',
@@ -34,40 +48,37 @@ describe('transform', () => {
     });
     transform.shape = [
       new ContextualisedField({
-        field: fooField,
+        context,
+        field: fooField.id,
         origin: transform,
         name: 'foo',
       }),
     ];
     expect(transform.availableFields.map((af) => af.def)).toEqual([
-      new ContextualisedField({
-        field: fooField,
-        origin: transform,
+      {
+        field: 1,
+        id: 4,
         name: 'foo',
-      }).def,
+        origin: {
+          name: 'foo',
+        },
+      },
     ]);
   });
 
   it('can get fields mentioned in args as constituent fields', () => {
+    const context = new ContextualiserState();
+    const { testCollection } = testObjects(context);
     const transform = new ContextualisedTransform({
+      context,
       args: [new ContextualisedParam({ index: 0 })],
       modifier: [],
       name: 'foo',
       origin: testCollection,
     });
-    transform.args.push(
-      new ContextualisedField({
-        field: fooField,
-        origin: transform,
-        name: 'foo',
-      })
-    );
-    expect(transform.constituentFields.map((af) => af.def)).toEqual([
-      new ContextualisedField({
-        field: fooField,
-        origin: transform,
-        name: 'foo',
-      }).def,
+    transform.args.push(testCollection.availableFields[0]?.id);
+    expect(transform.constituentFields).toEqual([
+      testCollection.availableFields[0]?.id,
     ]);
   });
 });

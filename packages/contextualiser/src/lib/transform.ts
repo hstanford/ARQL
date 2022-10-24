@@ -1,26 +1,28 @@
-import {
-  combineRequirements,
-  DataSource,
-  Node,
-  Requirements,
-} from '@arql/models';
+import { combineRequirements, Node, Requirements } from '@arql/models';
 import { uniq } from '@arql/util';
 import { ContextualisedCollection } from './collection';
 import { ContextualisedExpr } from './expr';
 import { ContextualisedField } from './field';
 import { ContextualisedFunction } from './function';
 import { ContextualisedParam } from './param';
-import { constituentFields, selectField } from './util';
+import {
+  constituentFields,
+  ContextualiserState,
+  ID,
+  isId,
+  selectField,
+} from './util';
 
 /**
  * Transforms represent functions that act on entire collections.
  * examples might include `filter` and `union`
  */
 export interface ContextualisedTransformDef {
+  context: ContextualiserState;
   name: string;
   modifier: string[];
   args: (
-    | ContextualisedField
+    | ID
     | ContextualisedExpr
     | ContextualisedParam
     | ContextualisedFunction
@@ -34,15 +36,14 @@ export interface ContextualisedTransformDef {
 export interface ContextualisedTransform extends ContextualisedTransformDef {}
 export class ContextualisedTransform extends Node<ContextualisedTransformDef> {
   type = 'contextualised_transform' as const;
-  propKeys = [
-    'name',
-    'modifier',
-    'args',
-    'origin',
-    'sources',
-    'requiredFields',
-    'shape',
-  ] as const;
+
+  constructor(opts: ContextualisedTransformDef) {
+    super(opts);
+    this.id = this.context.items.length;
+    this.context.items.push(this);
+  }
+
+  id: number;
 
   /**
    * "shape" is the override external interface to the collection
@@ -55,32 +56,25 @@ export class ContextualisedTransform extends Node<ContextualisedTransformDef> {
    */
   requiredFields: ContextualisedField[] = [];
 
+  _availableFields: ContextualisedField[] = [];
+
   /**
    * "Available fields" provide the fields that make up the external interface
    * of the transform. Other collections that originate from this transform
    * can reference and use these fields.
    */
   get availableFields(): ContextualisedField[] {
-    return uniq(
-      this.shape ||
-        [this.origin]
-          .flat()
-          .map((o) => o.availableFields.map((f) => selectField(f, this)))
-          .flat()
-    );
-  }
-
-  /**
-   * "sources" list the data sources required to satisfy all the commitments
-   * this transform has
-   */
-  get sources(): DataSource[] {
-    return uniq(
-      this.requiredFields
-        .map((f) => f.sources)
+    if (this.shape) return this.shape;
+    if (this._availableFields?.length) return this._availableFields;
+    this._availableFields = uniq(
+      [this.origin]
         .flat()
-        .concat(this.constituentFields.map((f) => f.sources).flat())
+        .map((o) =>
+          o.availableFields.map((f) => selectField(f, this, this.context))
+        )
+        .flat()
     );
+    return this._availableFields;
   }
 
   /**
@@ -90,7 +84,7 @@ export class ContextualisedTransform extends Node<ContextualisedTransformDef> {
   applyRequiredFields(fields: ContextualisedField[]) {
     this.requiredFields = uniq(this.requiredFields.concat(fields));
 
-    let requiredSubfields: ContextualisedField[] = [];
+    let requiredSubfields: ID[] = [];
     for (const field of this.requiredFields) {
       requiredSubfields.push(...field.constituentFields);
     }
@@ -100,9 +94,7 @@ export class ContextualisedTransform extends Node<ContextualisedTransformDef> {
     // TODO: can we just pass requiredSubfields through as requiredFields?
     [this.origin].flat().forEach((o) => {
       const requiredFields = o.availableFields.filter((af) => {
-        const found = requiredSubfields.find(
-          (rf) => rf.name === af.name && rf.origin === af.origin
-        );
+        const found = requiredSubfields.find((rf) => rf === af.id);
         if (found) {
           requiredSubfields = requiredSubfields.filter((f) => f !== found);
         }
@@ -112,12 +104,8 @@ export class ContextualisedTransform extends Node<ContextualisedTransformDef> {
     });
 
     if (requiredSubfields.length) {
-      console.log(
-        requiredSubfields,
-        [this.origin].flat().map((o) => o.availableFields)
-      );
       throw new Error(
-        `Could not find fields ${requiredSubfields.map((f) => f.def)}`
+        `Could not find fields ${requiredSubfields.map((f) => f)}`
       );
     }
   }
@@ -125,7 +113,7 @@ export class ContextualisedTransform extends Node<ContextualisedTransformDef> {
   /**
    * "constituentFields" lists all the core data fields that originate elsewhere
    */
-  get constituentFields(): ContextualisedField[] {
+  get constituentFields(): ID[] {
     return uniq(this.args.map(constituentFields).flat());
   }
 
@@ -134,11 +122,10 @@ export class ContextualisedTransform extends Node<ContextualisedTransformDef> {
    */
   get def(): unknown {
     return {
+      id: this.id,
       name: this.name,
       modifier: this.modifier,
-      args: this.args.map((a) =>
-        Array.isArray(a) ? a.map((subA) => subA.def) : a.def
-      ),
+      args: this.args.map((a) => (isId(a) ? a : a.def)),
       origin: Array.isArray(this.origin)
         ? this.origin.map((o) => o.def)
         : this.origin.def,
@@ -152,7 +139,9 @@ export class ContextualisedTransform extends Node<ContextualisedTransformDef> {
       this._requirements,
       ...[this.origin].flat().map((o) => o.requirements),
       ...this.requiredFields.map((rf) => rf.requirements),
-      ...this.args.map((a) => a.requirements)
+      ...this.args.map((a) =>
+        isId(a) ? this.context.get(a).requirements : a.requirements
+      )
     );
   }
 }

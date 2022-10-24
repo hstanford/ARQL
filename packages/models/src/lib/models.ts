@@ -1,7 +1,6 @@
 import { Dictionary, PickByNotValue, uniq } from '@arql/util';
 
 export abstract class Node<T> {
-  abstract propKeys: readonly (keyof this)[];
   parentKey: keyof this | undefined = undefined;
   _requirements: Requirements = {
     sources: [],
@@ -13,26 +12,6 @@ export abstract class Node<T> {
   abstract get requirements(): Requirements;
   constructor(opts?: T) {
     opts && Object.assign(this, opts);
-  }
-
-  clone(override?: Partial<T>) {
-    const Cls = this.constructor as new (
-      opts: Partial<T>,
-      parent: unknown
-    ) => this;
-    const opts = (this.propKeys as (keyof T)[]).reduce(
-      (agg: Partial<T>, key: keyof T) =>
-        Object.assign(agg, {
-          [key]: (this as { [K in keyof T]: unknown })[key],
-        }),
-      {} as Partial<T>
-    ) as Partial<T>;
-    const newInstance = new Cls(
-      opts,
-      this.parentKey ? this[this.parentKey] : undefined
-    );
-    if (override) Object.assign(newInstance, override);
-    return newInstance;
   }
 }
 

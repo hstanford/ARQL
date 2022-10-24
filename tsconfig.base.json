@@ -17,6 +17,7 @@
     "paths": {
       "@arql/contextualiser": ["packages/contextualiser/src/index.ts"],
       "@arql/core": ["packages/core/src/index.ts"],
+      "@arql/delegator": ["packages/delegator/src/index.ts"],
       "@arql/models": ["packages/models/src/index.ts"],
       "@arql/operators": ["packages/operators/src/index.ts"],
       "@arql/parser": ["packages/parser/src/index.ts"],

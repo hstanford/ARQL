@@ -1,20 +1,20 @@
 import {
   combineRequirements,
   DataModel,
-  DataSource,
   Node,
   Requirements,
 } from '@arql/models';
 import { uniq } from '@arql/util';
 import { ContextualisedField } from './field';
 import { ContextualisedTransform } from './transform';
-import { selectField } from './util';
+import { ContextualiserState, ID, selectField } from './util';
 
 /**
  * Collections are an intermediate state of data, representing a set
  * of homogeneous key-value records
  */
 export interface ContextualisedCollectionDef {
+  context: ContextualiserState;
   name?: string;
   origin: DataModel | ContextualisedCollection | ContextualisedTransform;
 }
@@ -22,7 +22,6 @@ export interface ContextualisedCollectionDef {
 export interface ContextualisedCollection extends ContextualisedCollectionDef {}
 export class ContextualisedCollection extends Node<ContextualisedCollectionDef> {
   type = 'contextualised_collection' as const;
-  propKeys = ['name', 'shape', 'origin', 'requiredFields'] as const;
   override _requirements: Requirements = {
     sources: [],
     flags: {
@@ -33,10 +32,20 @@ export class ContextualisedCollection extends Node<ContextualisedCollectionDef> 
     operations: [],
   };
 
+  constructor(opts: ContextualisedCollectionDef) {
+    super(opts);
+    this.id = this.context.items.length;
+    this.context.items.push(this);
+  }
+
+  id: ID;
+
   /**
    * "shape" is the override external interface to the collection
    */
   shape?: ContextualisedField[] = undefined;
+
+  _availableFields: ContextualisedField[] = [];
 
   /**
    * "requiredFields" have to be resolved in order to satisfy the root of the query
@@ -50,17 +59,12 @@ export class ContextualisedCollection extends Node<ContextualisedCollectionDef> 
    * can reference and use these fields.
    */
   get availableFields(): ContextualisedField[] {
-    return (
-      this.shape || this.origin.availableFields.map((f) => selectField(f, this))
+    if (this.shape) return this.shape;
+    if (this._availableFields.length) return this._availableFields;
+    this._availableFields = this.origin.availableFields.map((f) =>
+      selectField(f, this, this.context)
     );
-  }
-
-  /**
-   * "sources" list the data sources required to satisfy all the commitments
-   * this collection has
-   */
-  get sources(): DataSource[] {
-    return uniq(this.requiredFields.map((f) => f.sources).flat() || []);
+    return this._availableFields;
   }
 
   /**
@@ -76,15 +80,13 @@ export class ContextualisedCollection extends Node<ContextualisedCollectionDef> 
     ) {
       // collect constituent fields from the required fields. For example:
       // the field "foo: bar + baz" would require two fields from its origin
-      let requiredSubfields: ContextualisedField[] = [];
+      let requiredSubfields: ID[] = [];
       for (const field of this.requiredFields) {
         requiredSubfields.push(...field.constituentFields);
       }
       // TODO: can we just pass requiredSubfields through as requiredFields?
       const requiredFields = this.origin.availableFields.filter((af) => {
-        const found = requiredSubfields.find(
-          (rf) => rf.name === af.name && rf.origin === af.origin
-        );
+        const found = requiredSubfields.find((rf) => rf === af.id);
         if (found) {
           requiredSubfields = requiredSubfields.filter((f) => f !== found);
         }
@@ -94,7 +96,7 @@ export class ContextualisedCollection extends Node<ContextualisedCollectionDef> 
       if (requiredSubfields.length) {
         throw new Error(
           `Couldn't find fields ${JSON.stringify(
-            requiredSubfields.map((f) => f.def)
+            requiredSubfields.map((f) => f)
           )}`
         );
       }
@@ -106,6 +108,7 @@ export class ContextualisedCollection extends Node<ContextualisedCollectionDef> 
    */
   get def(): unknown {
     return {
+      id: this.id,
       name: this.name,
       shape: this.shape?.map((f) => f.def),
       origin: this.origin.def,

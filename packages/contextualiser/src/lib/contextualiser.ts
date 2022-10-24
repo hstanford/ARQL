@@ -17,14 +17,7 @@ import { ContextualisedField } from './field';
 import { ContextualisedFunction } from './function';
 import { ContextualisedParam } from './param';
 import { ContextualisedTransform } from './transform';
-import { selectField } from './util';
-
-export interface ContextualiserState {
-  aliases: Map<
-    string,
-    ContextualisedCollection | ContextualisedTransform | DataModel
-  >;
-}
+import { ContextualiserState, ID, selectField } from './util';
 
 /**
  * CONTEXTUALISER
@@ -61,9 +54,7 @@ export class Contextualiser {
       throw new Error('Can only contextualise collections');
     }
 
-    const context: ContextualiserState = {
-      aliases: new Map(),
-    };
+    const context = new ContextualiserState();
 
     const collection = this.handleCollection(ast.value, context);
 
@@ -107,6 +98,7 @@ export class Contextualiser {
       }
 
       value = new ContextualisedCollection({
+        context,
         origin: model,
         name: collection.alias ?? model.name,
       });
@@ -145,7 +137,7 @@ export class Contextualiser {
         collection.shape.fields
           .map((field) =>
             field.type === 'wildcard'
-              ? out.availableFields.map((f) => selectField(f, out))
+              ? out.availableFields.map((f) => selectField(f, out, context))
               : this.getField(field, out, context)
           )
           .flat()
@@ -156,6 +148,7 @@ export class Contextualiser {
     // alias the collection if needed
     if (collection.alias) {
       out = new ContextualisedCollection({
+        context,
         name: collection.alias,
         origin: value,
       });
@@ -214,6 +207,7 @@ export class Contextualiser {
       throw new Error(`Unrecognised transform ${transform.description.root}`);
 
     const contextualisedTransform = new ContextualisedTransform({
+      context,
       name: match.name,
       modifier: transform.description.parts.filter(
         (part) => match.modifiers && match.modifiers.includes(part)
@@ -234,7 +228,7 @@ export class Contextualiser {
                   .flat()
                   .map((m) =>
                     m.availableFields.map((f) =>
-                      selectField(f, contextualisedTransform)
+                      selectField(f, contextualisedTransform, context)
                     )
                   )
                   .flat()
@@ -275,6 +269,7 @@ export class Contextualiser {
       throw new Error(`Unrecognised function ${func.description.root}`);
 
     const contextualisedFunction = new ContextualisedFunction({
+      context,
       name: match.name,
       modifier: func.description.parts.filter(
         (part) => match.modifiers && match.modifiers.indexOf(part) !== -1
@@ -282,20 +277,12 @@ export class Contextualiser {
       args: [],
     });
 
-    contextualisedFunction.args = func.args.map(
-      (
-        arg
-      ):
-        | ContextualisedField
-        | ContextualisedExpr
-        | ContextualisedParam
-        | ContextualisedFunction => {
-        if (!Array.isArray(arg) && arg.type === 'shape') {
-          throw new Error('Cannot pass shape to inline function');
-        }
-        return this.getExpression(arg, model, context);
+    contextualisedFunction.args = func.args.map((arg) => {
+      if (!Array.isArray(arg) && arg.type === 'shape') {
+        throw new Error('Cannot pass shape to inline function');
       }
-    );
+      return this.getExpression(arg, model, context);
+    });
 
     return contextualisedFunction;
   }
@@ -322,13 +309,15 @@ export class Contextualiser {
         throw new Error(`Could not find ${JSON.stringify(field)}`);
       }
 
-      contextualisedField = selectField(dataField, model);
+      contextualisedField = selectField(dataField, model, context);
     } else {
       contextualisedField = new ContextualisedField({
+        context,
         name: field.alias || '',
         field: this.getExpression(field.value, model.origin, context),
         origin: model,
       });
+      context.items.push(contextualisedField);
       if (field.alias) {
         model._requirements.flags.supportsFieldAliasing = true;
       }
@@ -352,11 +341,7 @@ export class Contextualiser {
       | (ContextualisedCollection | ContextualisedTransform)[],
     context: ContextualiserState,
     nested?: boolean
-  ):
-    | ContextualisedField
-    | ContextualisedExpr
-    | ContextualisedParam
-    | ContextualisedFunction {
+  ): ID | ContextualisedExpr | ContextualisedParam | ContextualisedFunction {
     const expr: BaseExpr | ExprTree = Array.isArray(ipt)
       ? this.resolveExpr(ipt)
       : ipt;
@@ -374,7 +359,7 @@ export class Contextualiser {
         throw new Error(`Can't find subfield for ${expr.root}`);
       }
 
-      return field;
+      return field.id;
     } else if (expr.type === 'exprtree') {
       // a more complex expression should be resolved recursively
       const args = expr.args.map((arg) =>
@@ -383,6 +368,7 @@ export class Contextualiser {
       const contExpr = new ContextualisedExpr({
         ...expr,
         args,
+        context,
       });
       // if an expr is nested we need to set the flag
       if (nested) {

@@ -73,6 +73,7 @@ describe('contextualiser', () => {
     });
 
     const contextualisedFoo = {
+      id: 2,
       field: {
         datatype: 'string',
         name: 'foo',
@@ -83,6 +84,7 @@ describe('contextualiser', () => {
       },
     };
     const contextualisedBar = {
+      id: 3,
       field: {
         datatype: 'string',
         name: 'bar',
@@ -94,12 +96,13 @@ describe('contextualiser', () => {
     };
     const testModel = testSource.models[0].def;
     expect(contextualised.def).toEqual({
+      id: 6,
       name: 'test',
       origin: {
         args: [
           {
             args: [
-              contextualisedFoo,
+              2,
               {
                 index: 0,
               },
@@ -109,7 +112,9 @@ describe('contextualiser', () => {
         ],
         modifier: [],
         name: 'filter',
+        id: 1,
         origin: {
+          id: 0,
           name: 'test',
           origin: testModel,
           requiredFields: [contextualisedFoo, contextualisedBar],
@@ -117,7 +122,8 @@ describe('contextualiser', () => {
         },
         requiredFields: [
           {
-            field: contextualisedBar,
+            field: 3,
+            id: 4,
             name: 'bar',
             origin: {
               name: 'filter',
@@ -126,7 +132,8 @@ describe('contextualiser', () => {
         ],
         shape: [
           {
-            field: contextualisedBar,
+            id: 4,
+            field: 3,
             name: 'bar',
             origin: {
               name: 'filter',
@@ -136,13 +143,8 @@ describe('contextualiser', () => {
       },
       requiredFields: [
         {
-          field: {
-            field: contextualisedBar,
-            name: 'bar',
-            origin: {
-              name: 'filter',
-            },
-          },
+          field: 4,
+          id: 7,
           name: 'bar',
           origin: {
             name: 'test',
