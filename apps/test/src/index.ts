@@ -1,6 +1,6 @@
 import { test } from './lib';
 
-const out = test('test | filter(foo = $1) {bar}');
+const out = test('(test, test) | filter(foo = $1) {bar}');
 
 /*console.log(
   JSON.stringify(out.delegatedQuery.def, null, 2),
@@ -11,4 +11,4 @@ const out = test('test | filter(foo = $1) {bar}');
   )
 );*/
 
-console.log(out.delegatedQuery);
+console.log(out.delegatedQuery, out.subQueries);

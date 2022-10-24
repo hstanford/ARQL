@@ -7,13 +7,14 @@ class TestSource extends DataSource {
   supportsGraphFields = false;
   supportsQueryNarrowing = false;
   supportsRecursiveJoins = false;
-  supportsShaping = false;
+  supportsShaping = true;
   supportsStaticDataInjection = false;
   supportsSubCollections = false;
   supportsSubExpressions = false;
   supportsSubscriptions = false;
   supportsParameters = true;
   subCollectionDepth = Infinity;
+
   async resolve() {
     return [];
   }
@@ -34,8 +35,16 @@ export const testSource = new TestSource(
       ],
     },
   ],
-  {},
-  {}
+  {
+    equals: (a, b) => {
+      return a === b;
+    },
+  },
+  {
+    filter: (items) => {
+      return items;
+    },
+  }
 );
 
 export const testModel = testSource.models.find(

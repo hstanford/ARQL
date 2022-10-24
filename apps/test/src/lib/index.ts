@@ -1,15 +1,11 @@
 import { runner } from '@arql/core';
 import { testModel } from './models';
 import { operators } from './operators';
+import { transforms } from './transforms';
 
 const run = runner({
   models: new Map([['test', testModel]]),
-  transforms: [
-    {
-      name: 'filter',
-      nArgs: '1',
-    },
-  ].map((o) => ({ ...o, type: 'transformdef' })),
+  transforms,
   functions: [],
   opMap: operators,
 });

@@ -5,9 +5,11 @@ import {
   ContextualisedFunction,
   ContextualisedParam,
   ContextualisedTransform,
+  ContextualiserState,
+  ID,
   isId,
 } from '@arql/contextualiser';
-import { Node, Requirements } from '@arql/models';
+import { Node, Requirements, TransformDef } from '@arql/models';
 import { delegateCollection, DelegatedCollection } from './collection';
 import { DelegatedResults } from './results';
 
@@ -24,24 +26,34 @@ export type DelegatedTransformOrigins =
  * examples might include `filter` and `union`
  */
 export interface DelegatedTransformDef {
-  name: string;
+  /** an object tracking the state of the ast the field is part of */
+  context: ContextualiserState;
+
+  /** the interface definition of the transform that resolves this node */
+  transform: TransformDef;
+
+  /** flags that change the behaviour of the transform, e.g. "left" for a join */
   modifier: string[];
+
+  /** arguments passed to the transform */
   args: (
-    | number
+    | ID
     | ContextualisedExpr
     | ContextualisedParam
     | ContextualisedFunction
   )[];
+
+  /** where the data offered by this transform comes from */
   origin: DelegatedTransformOrigins;
 }
+
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface DelegatedTransform extends DelegatedTransformDef {}
+
 export class DelegatedTransform extends Node<DelegatedTransformDef> {
   type = 'delegated_transform' as const;
 
-  /**
-   * "shape" is the override external interface to the collection
-   */
+  /** the override external interface to the collection */
   shape?: ContextualisedField[] = undefined;
 
   /**
@@ -55,13 +67,29 @@ export class DelegatedTransform extends Node<DelegatedTransformDef> {
     origin: DelegatedTransformOrigins
   ) {
     super();
+    this.id = transform.id;
+    this.context = transform.context;
     this.name = transform.name;
     this.modifier = transform.modifier;
     this.args = transform.args;
-    this.origin = origin;
     this.requiredFields = transform.requiredFields;
     this.shape = transform.shape;
+
+    this.origin = origin;
   }
+
+  /** a number identifying this transform */
+  id: ID;
+
+  /** the name of the function that resolves this node */
+  name: string;
+
+  /**
+   * "Available fields" provide the fields that make up the external interface
+   * of the transform. Other collections that originate from this transform
+   * can reference and use these fields.
+   */
+  availableFields: ContextualisedField[] = [];
 
   get requirements(): Requirements {
     return this._requirements;
@@ -81,6 +109,10 @@ export class DelegatedTransform extends Node<DelegatedTransformDef> {
   }
 }
 
+/**
+ * recursively check if a node can be broken off and resolved independently
+ * in which case it's added to "queries" and replaced with a DelegatedResults node
+ */
 export function delegateTransform(
   transform: ContextualisedTransform,
   queries: (ContextualisedCollection | ContextualisedTransform)[]
@@ -90,6 +122,8 @@ export function delegateTransform(
   }
 
   if (transform.requirements.sources.length > 1) {
+    // if multiple sources are required to resolve the node, recurse down
+    // until nodes are reached that only require one source
     if (Array.isArray(transform.origin)) {
       const origins: DelegatedTransformOrigin[] = [];
       for (const origin of transform.origin) {

@@ -370,6 +370,7 @@ export class Contextualiser {
         args,
         context,
       });
+      contExpr._requirements.operations.push(expr.op);
       // if an expr is nested we need to set the flag
       if (nested) {
         contExpr._requirements.flags.supportsSubExpressions = true;
