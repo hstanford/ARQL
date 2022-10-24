@@ -8,7 +8,9 @@ import { ContextualisedTransform } from './transform';
 
 export type ID = number;
 
-export function isId(item: ContextualisedNodeType | ID): item is ID {
+export function isId(
+  item: ContextualisedNodeType | DataField | ID
+): item is ID {
   return typeof item === 'number';
 }
 

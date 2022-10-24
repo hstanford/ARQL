@@ -12,7 +12,11 @@ describe('transform', () => {
       context,
       args: [],
       modifier: [],
-      name: 'foo',
+      transform: {
+        name: 'foo',
+        type: 'transformdef',
+        nArgs: 1,
+      },
       origin: testCollection,
     });
     expect(transform.id).toBe(3);
@@ -43,7 +47,11 @@ describe('transform', () => {
       context,
       args: [],
       modifier: [],
-      name: 'foo',
+      transform: {
+        name: 'foo',
+        type: 'transformdef',
+        nArgs: 1,
+      },
       origin: testCollection,
     });
     transform.shape = [
@@ -73,7 +81,11 @@ describe('transform', () => {
       context,
       args: [new ContextualisedParam({ index: 0 })],
       modifier: [],
-      name: 'foo',
+      transform: {
+        name: 'foo',
+        type: 'transformdef',
+        nArgs: 1,
+      },
       origin: testCollection,
     });
     transform.args.push(testCollection.availableFields[0]?.id);

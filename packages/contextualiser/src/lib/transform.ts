@@ -1,4 +1,9 @@
-import { combineRequirements, Node, Requirements } from '@arql/models';
+import {
+  combineRequirements,
+  Node,
+  Requirements,
+  TransformDef,
+} from '@arql/models';
 import { uniq } from '@arql/util';
 import { ContextualisedCollection } from './collection';
 import { ContextualisedExpr } from './expr';
@@ -18,22 +23,33 @@ import {
  * examples might include `filter` and `union`
  */
 export interface ContextualisedTransformDef {
+  /** an object tracking the state of the ast the field is part of */
   context: ContextualiserState;
-  name: string;
+
+  /** the interface definition of the transform that resolves this node */
+  transform: TransformDef;
+
+  /** flags that change the behaviour of the transform, e.g. "left" for a join */
   modifier: string[];
+
+  /** arguments passed to the transform */
   args: (
     | ID
     | ContextualisedExpr
     | ContextualisedParam
     | ContextualisedFunction
   )[];
+
+  /** where the data offered by this transform comes from */
   origin:
     | ContextualisedCollection
     | ContextualisedTransform
     | (ContextualisedCollection | ContextualisedTransform)[];
 }
+
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface ContextualisedTransform extends ContextualisedTransformDef {}
+
 export class ContextualisedTransform extends Node<ContextualisedTransformDef> {
   type = 'contextualised_transform' as const;
 
@@ -41,13 +57,19 @@ export class ContextualisedTransform extends Node<ContextualisedTransformDef> {
     super(opts);
     this.id = this.context.items.length;
     this.context.items.push(this);
+
+    this.name = this.transform.name;
+
+    this._requirements.transforms.push(this.transform);
   }
 
-  id: number;
+  /** a number identifying this transform */
+  id: ID;
 
-  /**
-   * "shape" is the override external interface to the collection
-   */
+  /** the name of the function that resolves this node */
+  name: string;
+
+  /** the override external interface to the transform */
   shape?: ContextualisedField[] = undefined;
 
   /**
@@ -56,6 +78,10 @@ export class ContextualisedTransform extends Node<ContextualisedTransformDef> {
    */
   requiredFields: ContextualisedField[] = [];
 
+  /**
+   * a cache of the available fields: we don't want different instances of
+   * fields coming back each time we access "availableFields"
+   */
   _availableFields: ContextualisedField[] = [];
 
   /**
@@ -79,11 +105,15 @@ export class ContextualisedTransform extends Node<ContextualisedTransformDef> {
 
   /**
    * "applyRequiredFields" adds the "fields" passed to the method as required fields
-   * and propagates the requirements down to the collection's origin
+   * and propagates the requirements down to the transform's origin[s]
    */
   applyRequiredFields(fields: ContextualisedField[]) {
     this.requiredFields = uniq(this.requiredFields.concat(fields));
 
+    // propagate required fields down
+
+    // collect constituent fields from the required fields. For example:
+    // the field "foo: bar + baz" would require two fields from its origin
     let requiredSubfields: ID[] = [];
     for (const field of this.requiredFields) {
       requiredSubfields.push(...field.constituentFields);
@@ -91,7 +121,7 @@ export class ContextualisedTransform extends Node<ContextualisedTransformDef> {
     requiredSubfields.push(...this.constituentFields);
     requiredSubfields = uniq(requiredSubfields);
 
-    // TODO: can we just pass requiredSubfields through as requiredFields?
+    // find the required subFields within the origins and mark those as required
     [this.origin].flat().forEach((o) => {
       const requiredFields = o.availableFields.filter((af) => {
         const found = requiredSubfields.find((rf) => rf === af.id);
@@ -117,9 +147,7 @@ export class ContextualisedTransform extends Node<ContextualisedTransformDef> {
     return uniq(this.args.map(constituentFields).flat());
   }
 
-  /**
-   * def is a serialisation getter for testing
-   */
+  /** a serialisation getter for testing */
   get def(): unknown {
     return {
       id: this.id,
@@ -134,6 +162,10 @@ export class ContextualisedTransform extends Node<ContextualisedTransformDef> {
     };
   }
 
+  /**
+   * Requirements that this transform and all its constituent nodes
+   * demand in order for it to be resolved by any particular source
+   */
   get requirements(): Requirements {
     return combineRequirements(
       this._requirements,

@@ -21,9 +21,12 @@ import { constituentFields, ContextualiserState, ID, isId } from './util';
  * `a + b` === `add(a, b)`
  */
 export interface ContextualisedExprDef {
+  /** an object tracking the state of the ast the expression is part of */
   context: ContextualiserState;
-  /** The name of the operation that makes up this expression */
+
+  /** The name of the operation that resolves this expression */
   op: string;
+
   /** The arguments to this operation - can be sub-expressions, fields, parameters, or functions */
   args: (
     | ContextualisedExpr
@@ -31,22 +34,30 @@ export interface ContextualisedExprDef {
     | ContextualisedFunction
     | ID
   )[];
-  additionalRequirements?: Requirements;
 }
+
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface ContextualisedExpr extends ContextualisedExprDef {}
+
 export class ContextualisedExpr extends Node<ContextualisedExprDef> {
   type = 'contextualised_expr' as const;
+
+  /**
+   * Requirements that this expression (but not its arguments) demands
+   * in order for it to be resolved by any particular source
+   */
   override _requirements: Requirements = {
     sources: [],
-    flags: { supportsExpressions: true },
+    flags: {
+      supportsExpressions: true,
+    },
     functions: [],
     operations: [],
     transforms: [],
   };
 
   /**
-   * "constituentFields" lists all the core data fields that originate elsewhere
+   * lists all the core data fields that originate elsewhere
    */
   get constituentFields(): ID[] {
     // propagate required fields down to the arguments
@@ -67,6 +78,10 @@ export class ContextualisedExpr extends Node<ContextualisedExprDef> {
     };
   }
 
+  /**
+   * Requirements that this expression and all its arguments
+   * demand in order for it to be resolved by any particular source
+   */
   get requirements(): Requirements {
     return combineRequirements(
       this._requirements,

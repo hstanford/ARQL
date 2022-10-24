@@ -97,10 +97,12 @@ export abstract class Flags {
   abstract supportsExpressions: boolean;
   abstract supportsSubExpressions: boolean;
 
-  // the maximum depth of nested collections that the source can query.
-  // "1" implies that the query tree handed off to the delegator must
-  // have at most one contextualised query.
-  // "undefined" indicates no limit to the depth
+  /**
+   * the maximum depth of nested collections that the source can query.
+   * "1" implies that the query tree handed off to the delegator must
+   * have at most one contextualised query.
+   * "undefined" indicates no limit to the depth
+   */
   abstract subCollectionDepth: number;
 
   abstract supportsShaping: boolean;

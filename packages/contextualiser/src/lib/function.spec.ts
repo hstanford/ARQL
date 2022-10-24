@@ -11,7 +11,11 @@ describe('function', () => {
     const { fooField } = testObjects(context);
     const fn = new ContextualisedFunction({
       context,
-      name: 'equals',
+      function: {
+        name: 'equals',
+        type: 'transformdef',
+        nArgs: 2,
+      },
       modifier: [],
       args: [
         fooField.id,
@@ -30,7 +34,11 @@ describe('function', () => {
 
     const fn = new ContextualisedFunction({
       context,
-      name: 'equals',
+      function: {
+        name: 'equals',
+        type: 'transformdef',
+        nArgs: 2,
+      },
       modifier: [],
       args: [fooField.id, barField.id],
     });
@@ -53,7 +61,11 @@ describe('function', () => {
     });
     const fn = new ContextualisedFunction({
       context,
-      name: 'equals',
+      function: {
+        name: 'equals',
+        type: 'transformdef',
+        nArgs: 2,
+      },
       modifier: [],
       args: [field.id, new ContextualisedParam({ index: 0 })],
     });
@@ -76,7 +88,11 @@ describe('function', () => {
     });
     const fn = new ContextualisedFunction({
       context,
-      name: 'equals',
+      function: {
+        name: 'equals',
+        type: 'transformdef',
+        nArgs: 2,
+      },
       modifier: [],
       args: [field.id, new ContextualisedParam({ index: 0 })],
     });
@@ -88,7 +104,11 @@ describe('function', () => {
     const context = new ContextualiserState();
     const fn = new ContextualisedFunction({
       context,
-      name: 'equals',
+      function: {
+        name: 'equals',
+        type: 'transformdef',
+        nArgs: 2,
+      },
       modifier: [],
       args: [
         new ContextualisedParam({ index: 0 }),

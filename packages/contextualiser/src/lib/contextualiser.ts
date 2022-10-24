@@ -208,7 +208,7 @@ export class Contextualiser {
 
     const contextualisedTransform = new ContextualisedTransform({
       context,
-      name: match.name,
+      transform: match,
       modifier: transform.description.parts.filter(
         (part) => match.modifiers && match.modifiers.includes(part)
       ),
@@ -270,7 +270,7 @@ export class Contextualiser {
 
     const contextualisedFunction = new ContextualisedFunction({
       context,
-      name: match.name,
+      function: match,
       modifier: func.description.parts.filter(
         (part) => match.modifiers && match.modifiers.indexOf(part) !== -1
       ),

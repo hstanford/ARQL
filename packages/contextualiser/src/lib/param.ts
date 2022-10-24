@@ -1,4 +1,4 @@
-import { combineRequirements, Node, Requirements } from '@arql/models';
+import { Node, Requirements } from '@arql/models';
 
 /**
  * A parameter represents static data (e.g. strings, numbers, json)
@@ -15,6 +15,20 @@ export class ContextualisedParam extends Node<ContextualisedParamDef> {
   type = 'contextualised_param' as const;
 
   /**
+   * Requirements that this parameter demands in order for it to be
+   * resolved by any particular source
+   */
+  override _requirements: Requirements = {
+    sources: [],
+    flags: {
+      supportsParameters: true,
+    },
+    functions: [],
+    transforms: [],
+    operations: [],
+  };
+
+  /**
    * def is a serialisation getter for testing
    */
   get def() {
@@ -24,14 +38,6 @@ export class ContextualisedParam extends Node<ContextualisedParamDef> {
   }
 
   get requirements(): Requirements {
-    return combineRequirements(this._requirements, {
-      sources: [],
-      flags: {
-        supportsParameters: true,
-      },
-      functions: [],
-      transforms: [],
-      operations: [],
-    });
+    return this._requirements;
   }
 }
