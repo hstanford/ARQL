@@ -5,8 +5,7 @@
   "scripts": {},
   "private": true,
   "dependencies": {
-    "arcsecond": "^5.0.0",
-    "tslib": "^2.3.0"
+    "arcsecond": "^5.0.0"
   },
   "devDependencies": {
     "@nrwl/cli": "15.0.0",
