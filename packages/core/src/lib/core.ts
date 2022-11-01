@@ -25,6 +25,7 @@ export function runner({
       functions,
       opMap
     );
+    console.log(contextualised.origin);
     const { delegatedQuery, subQueries } = delegate(contextualised);
     return {
       delegatedQuery,

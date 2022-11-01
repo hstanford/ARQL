@@ -15,11 +15,10 @@
       }
     },
     "run": {
-      "executor": "@webundsoehne/nx-builders:ts-node-dev",
+      "executor": "nx:run-commands",
       "options": {
         "cwd": "./apps/test",
-        "main": "./apps/test/src/index.ts",
-        "tsConfig": "./apps/test/tsconfig.lib.json"
+        "command": "TS_NODE_PROJECT=./tsconfig.lib.json NX_BASE_TSCONFIG=../../tsconfig.base.json node --loader nx-ts-esm-loader -r tsconfig-paths/register src/index.ts"
       }
     },
     "lint": {

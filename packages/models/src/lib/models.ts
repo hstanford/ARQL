@@ -127,16 +127,19 @@ export abstract class DataSource extends Flags {
   models: DataModel[];
   operators: Record<string, operatorOp>;
   transforms: Record<string, transformFn>;
+  functions: Record<string, transformFn>;
 
   constructor(
     models: DataModelDef[],
     operators: Record<string, operatorOp>,
-    transforms: Record<string, transformFn>
+    transforms: Record<string, transformFn>,
+    functions: Record<string, transformFn>
   ) {
     super();
     this.models = models.map((m) => new DataModel(m, this));
     this.operators = operators;
     this.transforms = transforms;
+    this.functions = functions;
   }
 
   getField(modelName: string, fieldName: string, ...parts: string[]) {
@@ -151,9 +154,7 @@ export abstract class DataSource extends Flags {
 
   abstract resolve(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    subquery: any, // should be ContextualisedCollection,
-    data: Dictionary[] | null,
-    results: Dictionary[][],
+    subquery: any, // should be ContextualisedCollection | ContextualisedTransform,
     params: any[] // eslint-disable-line @typescript-eslint/no-explicit-any
   ): Promise<Dictionary[] | Dictionary>;
 
@@ -163,6 +164,10 @@ export abstract class DataSource extends Flags {
 
   implementsTransform(transform: TransformDef) {
     return this.transforms[transform.name]; // TODO: make it check modifiers and args
+  }
+
+  implementsFunction(fn: TransformDef) {
+    return this.functions[fn.name]; // TODO: make it check modifiers and args
   }
 
   satisfies(requirements: Requirements) {
@@ -243,7 +248,7 @@ export class DataField extends Node<DataFieldDef> {
 }
 export interface DataModelDef {
   name: string;
-  fields: DataFieldDef[];
+  fields: readonly DataFieldDef[];
 }
 export interface DataModel extends DataModelDef {
   source: DataSource;
@@ -326,4 +331,8 @@ export type ModelType<
 
 export type ModelsDeclarationTypes<M extends ModelsDeclaration> = {
   [T in keyof M]: ModelType<M, T>;
+};
+
+export type ModelDefType<M extends DataModelDef> = {
+  [F in M['fields'][number] as F['name']]: DataTypes[F['datatype']];
 };

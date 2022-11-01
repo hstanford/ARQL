@@ -1,5 +1,5 @@
 import { runner } from '@arql/core';
-import { testModel } from './models';
+import { models, testModel, testSource } from './models';
 import { operators } from './operators';
 import { transforms } from './transforms';
 
@@ -10,7 +10,8 @@ const run = runner({
   opMap: operators,
 });
 
-export function test(query: string) {
+export async function test(query: string) {
+  await testSource.init(models, {});
   const out = run(query, []);
   return out;
 }

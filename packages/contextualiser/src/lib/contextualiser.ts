@@ -64,7 +64,7 @@ export class Contextualiser {
     if (!collection.shape?.length) {
       collection.applyRequiredFields(collection.availableFields);
     } else {
-      collection.applyRequiredFields([]);
+      collection.applyRequiredFields(collection.shape);
     }
 
     return collection;

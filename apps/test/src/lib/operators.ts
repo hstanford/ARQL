@@ -5,4 +5,8 @@ export const operators = getOperatorLookup([
     name: 'equals',
     pattern: [EXPR, '=', EXPR],
   },
+  {
+    name: 'or',
+    pattern: [EXPR, '||', EXPR],
+  },
 ]);

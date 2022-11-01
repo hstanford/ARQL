@@ -1,5 +1,5 @@
 {
-  "name": "@arql/core",
+  "name": "@arql/source-postgresql",
   "version": "0.0.1",
   "type": "module"
 }
