@@ -84,6 +84,7 @@ export async function collectTransform(
   }
 
   return transformFn(
+    transform.modifier,
     origin,
     (record) =>
       transform.args.map((arg) =>

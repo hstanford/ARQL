@@ -8,6 +8,7 @@ export interface CollectorConfig {
   transforms: Record<
     string,
     (
+      modifier: string[],
       origin: Results | Record<string, Results | ResultMap[]>,
       args: (record: Result | ResultMap) => Field[],
       constituentFields: ContextualisedField[],

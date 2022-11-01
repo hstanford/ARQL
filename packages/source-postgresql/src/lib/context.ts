@@ -7,6 +7,7 @@ export type SourceContext = {
   transforms: Record<
     string,
     (
+      modifier: string[],
       origin: SubQuery[],
       args: (AliasableNodes | ParameterNode)[],
       sql: Sql

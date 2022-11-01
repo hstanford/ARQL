@@ -34,7 +34,7 @@ export const testSource = new PostgreSQL(
     },
   },
   {
-    filter: (queries, args) => {
+    filter: (modifier, queries, args) => {
       if (queries.length !== 1) {
         throw new Error('Single origin required for filter transform');
       }
@@ -43,6 +43,20 @@ export const testSource = new PostgreSQL(
       }
       const query = queries[0];
       return query.where(args[0]);
+    },
+    sort: (modifier, queries, args) => {
+      if (queries.length !== 1) {
+        throw new Error('Single origin required for sort transform');
+      }
+      if (!args.length) {
+        throw new Error('At least one argument expected for sort transform');
+      }
+      const query = queries[0];
+      return query.order(
+        ...args.map((arg) =>
+          'desc' in arg && modifier.includes('desc') ? arg.desc() : arg
+        )
+      );
     },
   },
   {}

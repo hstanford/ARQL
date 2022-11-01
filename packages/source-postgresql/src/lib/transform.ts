@@ -42,6 +42,7 @@ export function buildTransform(
   }
 
   let out = transformFn(
+    transform.modifier,
     origins,
     transform.args.map((arg) =>
       buildFieldValue(arg, constituentFields, context)

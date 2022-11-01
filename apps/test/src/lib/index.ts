@@ -11,11 +11,38 @@ const run = runner({
   opMap: operators,
   collectorConfig: {
     transforms: {
-      filter: (origin, args, constituentFields, context, shape) => {
+      filter: (modifier, origin, args, constituentFields, context, shape) => {
         if (!Array.isArray(origin)) {
           throw new Error('Directly filtering multi-origin is not supported');
         }
         let out = origin.filter((record) => args(record)[0]);
+        if (shape) {
+          out = applyShape(shape, out, constituentFields, context);
+        }
+        return out;
+      },
+      sort: (modifier, origin, args, constituentFields, context, shape) => {
+        if (!Array.isArray(origin)) {
+          throw new Error('Directly sorting multi-origin is not supported');
+        }
+        function compare(a: unknown, b: unknown) {
+          if (typeof a === 'number' && typeof b === 'number') {
+            return a - b;
+          } else {
+            return ('' + a).localeCompare('' + b);
+          }
+        }
+        let out = origin.sort((record1, record2) => {
+          let init = 0;
+          const argList1 = args(record1);
+          const argList2 = args(record2);
+          for (const idx in argList1) {
+            const val = compare(argList1[idx], argList2[idx]);
+            init = modifier.includes('desc') ? init - val : init + val;
+            if (init) break;
+          }
+          return init;
+        });
         if (shape) {
           out = applyShape(shape, out, constituentFields, context);
         }

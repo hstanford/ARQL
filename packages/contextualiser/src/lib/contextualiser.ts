@@ -1,4 +1,4 @@
-import { DataField, DataModel, TransformDef } from '@arql/models';
+import { DataModel, TransformDef } from '@arql/models';
 import { ExprTree, RankedOperator, resolver } from '@arql/operators';
 import {
   getAlias,
