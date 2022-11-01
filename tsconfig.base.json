@@ -16,6 +16,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@arql/collector": ["packages/collector/src/index.ts"],
       "@arql/contextualiser": ["packages/contextualiser/src/index.ts"],
       "@arql/core": ["packages/core/src/index.ts"],
       "@arql/delegator": ["packages/delegator/src/index.ts"],

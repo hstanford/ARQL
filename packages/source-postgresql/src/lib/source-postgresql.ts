@@ -3,6 +3,7 @@ import {
   ContextualisedTransform,
 } from '@arql/contextualiser';
 import { DataModelDef, DataSource, ModelDefType } from '@arql/models';
+import { Dictionary } from '@arql/util';
 import { Sql, TableWithColumns } from 'sql-ts';
 import { buildQuery } from './collection';
 import { SourceContext } from './context';
@@ -85,7 +86,7 @@ export class PostgreSQL<M extends DataModelDef[]> extends DataSource {
   async resolve(
     subquery: ContextualisedCollection | ContextualisedTransform,
     params: Params
-  ) /*: Promise<Dictionary<any> | Dictionary<any>[]>*/ {
-    return this.buildQuery(subquery, params).toQuery();
+  ): Promise<Dictionary<unknown>[]> {
+    return [this.buildQuery(subquery, params).toQuery()];
   }
 }

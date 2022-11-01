@@ -150,6 +150,7 @@ export function delegateTransform(
         index: queries.length,
         id: transform.id,
         fields: transform.availableFields,
+        name: transform.name,
       });
       queries.push(transform);
       return resultsNode;

@@ -119,6 +119,7 @@ export function delegateCollection(
         index: queries.length,
         id: collection.id,
         fields: collection.availableFields,
+        name: collection.name,
       });
       queries.push(collection);
       return resultsNode;

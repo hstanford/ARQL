@@ -156,7 +156,7 @@ export abstract class DataSource extends Flags {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     subquery: any, // should be ContextualisedCollection | ContextualisedTransform,
     params: any[] // eslint-disable-line @typescript-eslint/no-explicit-any
-  ): Promise<Dictionary[] | Dictionary>;
+  ): Promise<Dictionary[]>;
 
   implementsOp(opName: string) {
     return this.operators[opName];

@@ -2,12 +2,18 @@ import {
   ContextualisedCollection,
   ContextualisedTransform,
 } from '@arql/contextualiser';
-import { delegateCollection } from './collection';
-import { delegateTransform } from './transform';
+import { delegateCollection, DelegatedCollection } from './collection';
+import { DelegatedResults } from './results';
+import { DelegatedTransform, delegateTransform } from './transform';
+
+export interface DelegatorOutput {
+  delegatedQuery: DelegatedCollection | DelegatedResults | DelegatedTransform;
+  subQueries: (ContextualisedCollection | ContextualisedTransform)[];
+}
 
 export function delegate(
   query: ContextualisedCollection | ContextualisedTransform
-) {
+): DelegatorOutput {
   const subQueries: (ContextualisedCollection | ContextualisedTransform)[] = [];
   const delegatedQuery =
     query instanceof ContextualisedCollection

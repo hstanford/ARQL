@@ -14,6 +14,9 @@ export interface DelegatedResultsDef {
 
   /** the fields exposed by the detatched node */
   fields: ContextualisedField[]; // FIXME: these fields still have an origin pointing to a collection/transform
+
+  /** the name of the node the results node has replaced */
+  name?: string;
 }
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface DelegatedResults extends DelegatedResultsDef {}
