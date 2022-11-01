@@ -35,7 +35,13 @@ const run = runner({
 });
 
 export async function test(query: string, params: unknown[]) {
-  await testSource.init(models, {});
+  await testSource.init(models, {
+    user: 'postgres',
+    host: 'localhost',
+    database: 'postgres',
+    password: 'postgres',
+    port: 5432,
+  });
   const out = run(query, params);
   return out;
 }

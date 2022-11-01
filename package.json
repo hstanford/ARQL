@@ -8,6 +8,7 @@
   "dependencies": {
     "arcsecond": "^5.0.0",
     "lodash": "^4.17.21",
+    "pg": "^8.8.0",
     "sql-ts": "^6.2.0",
     "tslib": "^2.3.0"
   },
@@ -22,6 +23,7 @@
     "@types/jest": "28.1.1",
     "@types/lodash": "^4.14.186",
     "@types/node": "16.11.7",
+    "@types/pg": "^8.6.5",
     "@typescript-eslint/eslint-plugin": "^5.36.1",
     "@typescript-eslint/parser": "^5.36.1",
     "@webundsoehne/nx-builders": "^6.0.1",

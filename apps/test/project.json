@@ -21,6 +21,13 @@
         "command": "TS_NODE_PROJECT=./tsconfig.lib.json NX_BASE_TSCONFIG=../../tsconfig.base.json node --loader nx-ts-esm-loader -r tsconfig-paths/register src/index.ts"
       }
     },
+    "db": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "./apps/test",
+        "command": "docker compose run db"
+      }
+    },
     "lint": {
       "executor": "@nrwl/linter:eslint",
       "outputs": ["{options.outputFile}"],

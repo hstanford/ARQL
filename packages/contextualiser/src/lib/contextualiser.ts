@@ -1,4 +1,4 @@
-import { DataModel, TransformDef } from '@arql/models';
+import { DataField, DataModel, TransformDef } from '@arql/models';
 import { ExprTree, RankedOperator, resolver } from '@arql/operators';
 import {
   getAlias,
@@ -180,6 +180,14 @@ export class Contextualiser {
 
     if (!model) {
       throw new Error(`Failed to find model ${JSON.stringify(alphachain)}`);
+    }
+
+    if (model instanceof DataModel) {
+      return new ContextualisedCollection({
+        context,
+        origin: model,
+        name: model.name,
+      });
     }
 
     return model;

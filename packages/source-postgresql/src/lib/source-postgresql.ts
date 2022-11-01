@@ -9,6 +9,7 @@ import { buildQuery } from './collection';
 import { SourceContext } from './context';
 import { buildTransform } from './transform';
 import { Params, Query } from './types';
+import pg from 'pg';
 
 export function sourcePostgresql(): string {
   return 'source-postgresql';
@@ -38,23 +39,24 @@ export class PostgreSQL<M extends DataModelDef[]> extends DataSource {
   }
 
   async init(models: M, connectionVariables: Record<string, unknown>) {
-    const { Sql } = await import('sql-ts');
-    this.sql = new Sql('postgres', connectionVariables);
+    const sql = (this.sql = new Sql('postgres', connectionVariables));
     // really need HKT to do this better
     this.sqlModels = models.reduce((acc, m) => {
-      const def = this.sql?.define<ModelDefType<typeof m>>({
+      const def = sql.define<ModelDefType<typeof m>>({
         name: m.name,
         columns: m.fields.map((f) => f.name),
       });
       acc[m.name] = def;
       return acc;
     }, {} as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+    this.pool = new pg.Pool(connectionVariables);
   }
 
   sql?: Sql;
   sqlModels?: {
     [K in M[number] as K['name']]: TableWithColumns<ModelDefType<K>>;
   };
+  pool?: pg.Pool;
 
   buildQuery(
     query: ContextualisedCollection | ContextualisedTransform,
@@ -87,6 +89,11 @@ export class PostgreSQL<M extends DataModelDef[]> extends DataSource {
     subquery: ContextualisedCollection | ContextualisedTransform,
     params: Params
   ): Promise<Dictionary<unknown>[]> {
-    return [this.buildQuery(subquery, params).toQuery()];
+    if (!this.pool) {
+      throw new Error('Not initialised');
+    }
+    const query = this.buildQuery(subquery, params).toQuery();
+    const result = await this.pool.query(query);
+    return result.rows;
   }
 }
