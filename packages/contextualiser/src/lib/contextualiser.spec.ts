@@ -73,7 +73,7 @@ describe('contextualiser', () => {
     });
 
     const contextualisedFoo = {
-      id: 2,
+      id: 3,
       field: {
         datatype: 'string',
         name: 'foo',
@@ -84,7 +84,7 @@ describe('contextualiser', () => {
       },
     };
     const contextualisedBar = {
-      id: 3,
+      id: 4,
       field: {
         datatype: 'string',
         name: 'bar',
@@ -96,13 +96,13 @@ describe('contextualiser', () => {
     };
     const testModel = testSource.models[0].def;
     expect(contextualised.def).toEqual({
-      id: 6,
+      id: 9,
       name: 'test',
       origin: {
         args: [
           {
             args: [
-              2,
+              5,
               {
                 index: 0,
               },
@@ -112,18 +112,41 @@ describe('contextualiser', () => {
         ],
         modifier: [],
         name: 'filter',
-        id: 1,
+        id: 2,
         origin: {
-          id: 0,
+          id: 1,
           name: 'test',
-          origin: testModel,
-          requiredFields: [contextualisedFoo, contextualisedBar],
+          origin: {
+            id: 0,
+            name: 'test',
+            origin: testModel,
+            requiredFields: [contextualisedFoo, contextualisedBar],
+            shape: undefined,
+          },
+          requiredFields: [
+            {
+              field: contextualisedFoo.id,
+              id: 5,
+              name: 'foo',
+              origin: {
+                name: 'test',
+              },
+            },
+            {
+              field: contextualisedBar.id,
+              id: 6,
+              name: 'bar',
+              origin: {
+                name: 'test',
+              },
+            },
+          ],
           shape: undefined,
         },
         requiredFields: [
           {
-            field: 3,
-            id: 4,
+            field: 6,
+            id: 7,
             name: 'bar',
             origin: {
               name: 'filter',
@@ -132,8 +155,8 @@ describe('contextualiser', () => {
         ],
         shape: [
           {
-            id: 4,
-            field: 3,
+            id: 7,
+            field: 6,
             name: 'bar',
             origin: {
               name: 'filter',
@@ -143,8 +166,8 @@ describe('contextualiser', () => {
       },
       requiredFields: [
         {
-          field: 4,
-          id: 7,
+          field: 7,
+          id: 10,
           name: 'bar',
           origin: {
             name: 'test',
