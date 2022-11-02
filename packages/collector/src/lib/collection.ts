@@ -5,7 +5,7 @@ import {
   DelegatedTransform,
 } from '@arql/delegator';
 import { DataModel } from '@arql/models';
-import { CollectorContext, isResultMaps, ResultMap, Results } from './context';
+import { CollectorContext, isResultMaps, Records, Row } from './context';
 import { buildFieldValue } from './field';
 import { collectTransform } from './transform';
 
@@ -13,7 +13,7 @@ import { collectTransform } from './transform';
 // match "constituentFields" into the interface matching "shape"
 export function applyShape(
   shape: ContextualisedField[],
-  records: Results | ResultMap[],
+  records: Records,
   constituentFields: ContextualisedField[],
   context: CollectorContext
 ) {
@@ -37,12 +37,12 @@ export async function collectCollection(
   collection: DelegatedCollection,
   queryResults: Record<string, unknown>[][],
   context: CollectorContext
-): Promise<Results> {
+): Promise<Row[]> {
   // the expected interface of the data exposed by the collection's origin
   let constituentFields: ContextualisedField[];
 
   // the data resolved by the collection
-  let out: Results | ResultMap[];
+  let out: Records;
 
   // resolve the collection's origin
   if (collection.origin instanceof DataModel) {

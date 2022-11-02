@@ -8,14 +8,12 @@ import {
   isMultiOrigin,
 } from '@arql/delegator';
 import { collectCollection } from './collection';
-import { CollectorContext, Result, ResultMap, Results } from './context';
+import { CollectorContext, Row, ResultMap, Records } from './context';
 import { buildFieldValue } from './field';
-
-type Records = Results | ResultMap[];
 
 type OriginValue<T> = T extends DelegatedTransformOrigin[]
   ? Record<string, Records>
-  : Results;
+  : Row[];
 
 type OriginResult<T> = {
   origin: OriginValue<T>;
@@ -80,7 +78,7 @@ export async function collectTransform(
   transform: DelegatedTransform,
   queryResults: Record<string, unknown>[][],
   context: CollectorContext
-): Promise<Results | ResultMap[]> {
+): Promise<Records> {
   // resolve the data of the origin(s)
   const { origin, constituentFields } = await getOrigins(
     transform.origin,
@@ -95,7 +93,7 @@ export async function collectTransform(
   }
 
   // function to resolve arguments from any particular record
-  const argsFn = (record: Result | ResultMap) =>
+  const argsFn = (record: Row | ResultMap) =>
     transform.args.map((arg) =>
       buildFieldValue(arg, record, constituentFields, context)
     );

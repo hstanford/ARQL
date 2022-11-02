@@ -1,29 +1,39 @@
 import { ContextualisedField } from '@arql/contextualiser';
 
+// an individual data value
 export type Field = unknown;
-export type Result = Record<string, unknown>;
-export type ResultMap = Map<string, Result>;
-export function isResultMaps(
-  items: Results | ResultMap[]
-): items is ResultMap[] {
+
+// a {key: value} store of data
+export type Row = Record<string, Field>;
+
+// a multi-row object, the data resolution of a multi-collection in @arql/contextualiser
+export type ResultMap = Map<string, Row>;
+export function isResultMaps(items: Row[] | ResultMap[]): items is ResultMap[] {
   return items[0] instanceof Map;
 }
-export type Results = Result[];
+
+// general exposed data type
+export type Records = Row[] | ResultMap[];
+
+// expected configuration format for the collector
 export interface CollectorConfig {
   transforms: Record<
     string,
     (
       modifier: string[],
-      origin: Results | Record<string, Results | ResultMap[]>,
-      args: (record: Result | ResultMap) => Field[],
+      origin: Row[] | Record<string, Records>,
+      args: (record: Row | ResultMap) => Field[],
       constituentFields: ContextualisedField[],
       context: CollectorContext,
       shape?: ContextualisedField[]
-    ) => Results | ResultMap[]
+    ) => Records
   >;
   functions: Record<string, (args: Field[]) => Field>;
   operators: Record<string, (args: Field[]) => Field>;
 }
+
+// the interface of a context object that is accessible
+// everywhere in the collector
 export interface CollectorContext extends CollectorConfig {
   params: unknown[];
 }
