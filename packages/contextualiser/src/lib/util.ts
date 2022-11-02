@@ -1,4 +1,5 @@
-import { DataField, DataModel } from '@arql/models';
+import { DataField, DataModel, TransformDef } from '@arql/models';
+import { RankedOperator } from '@arql/operators';
 import { ContextualisedCollection } from './collection';
 import { ContextualisedExpr } from './expr';
 import { ContextualisedField } from './field';
@@ -31,6 +32,13 @@ export class ContextualiserState {
   get(id: ID): ContextualisedNodeType {
     return this.items[id];
   }
+}
+
+export interface ContextualiserConfig {
+  models: Map<string, DataModel>;
+  transforms: TransformDef[];
+  functions: TransformDef[];
+  opMap: Map<string, RankedOperator>;
 }
 
 /**

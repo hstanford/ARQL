@@ -5,10 +5,12 @@ import { operators } from './operators';
 import { transforms } from './transforms';
 
 const run = runner({
-  models: new Map([['test', testModel]]),
-  transforms,
-  functions: [],
-  opMap: operators,
+  contextualiserConfig: {
+    models: new Map([['test', testModel]]),
+    transforms,
+    functions: [],
+    opMap: operators,
+  },
   collectorConfig: {
     transforms: {
       filter: (modifier, origin, args, constituentFields, context, shape) => {

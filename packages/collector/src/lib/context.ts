@@ -3,6 +3,11 @@ import { ContextualisedField } from '@arql/contextualiser';
 export type Field = unknown;
 export type Result = Record<string, unknown>;
 export type ResultMap = Map<string, Result>;
+export function isResultMaps(
+  items: Results | ResultMap[]
+): items is ResultMap[] {
+  return items[0] instanceof Map;
+}
 export type Results = Result[];
 export interface CollectorConfig {
   transforms: Record<

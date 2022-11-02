@@ -13,11 +13,11 @@ describe('contextualiser', () => {
       nArgs: 1,
     };
 
-    const cxr = new Contextualiser(
+    const cxr = new Contextualiser({
       models,
-      [filter],
-      [],
-      new Map([
+      transforms: [filter],
+      functions: [],
+      opMap: new Map([
         [
           '=',
           {
@@ -26,8 +26,8 @@ describe('contextualiser', () => {
             name: 'equals',
           },
         ],
-      ])
-    );
+      ]),
+    });
     const contextualised = cxr.run({
       value: {
         alias: 'test',

@@ -1,5 +1,5 @@
 import { DataModel, TransformDef } from '@arql/models';
-import { ExprTree, RankedOperator, resolver } from '@arql/operators';
+import { ExprTree, resolver } from '@arql/operators';
 import {
   getAlias,
   Alphachain,
@@ -17,7 +17,12 @@ import { ContextualisedField } from './field';
 import { ContextualisedFunction } from './function';
 import { ContextualisedParam } from './param';
 import { ContextualisedTransform } from './transform';
-import { ContextualiserState, ID, selectField } from './util';
+import {
+  ContextualiserConfig,
+  ContextualiserState,
+  ID,
+  selectField,
+} from './util';
 
 /**
  * CONTEXTUALISER
@@ -32,16 +37,11 @@ export class Contextualiser {
   transforms: TransformDef[];
   functions: TransformDef[];
   resolveExpr: ReturnType<typeof resolver>;
-  constructor(
-    models: Map<string, DataModel>,
-    transforms: TransformDef[],
-    functions: TransformDef[],
-    opMap: Map<string, RankedOperator>
-  ) {
-    this.models = models;
-    this.transforms = transforms;
-    this.functions = functions;
-    this.resolveExpr = resolver(opMap);
+  constructor(config: ContextualiserConfig) {
+    this.models = config.models;
+    this.transforms = config.transforms;
+    this.functions = config.functions;
+    this.resolveExpr = resolver(config.opMap);
   }
 
   /**
@@ -182,6 +182,8 @@ export class Contextualiser {
       throw new Error(`Failed to find model ${JSON.stringify(alphachain)}`);
     }
 
+    // DataModels need wrapping in a collection otherwise
+    // it becomes tricky to apply a complex shape directly
     if (model instanceof DataModel) {
       return new ContextualisedCollection({
         context,
@@ -403,12 +405,6 @@ export class Contextualiser {
 }
 
 // helper wrapper around Contextualiser.prototype.run as a default entry point
-export function contextualise(
-  ast: Query,
-  models: Map<string, DataModel>,
-  transforms: TransformDef[],
-  functions: TransformDef[],
-  opMap: Map<string, RankedOperator>
-) {
-  return new Contextualiser(models, transforms, functions, opMap).run(ast);
+export function contextualise(ast: Query, config: ContextualiserConfig) {
+  return new Contextualiser(config).run(ast);
 }

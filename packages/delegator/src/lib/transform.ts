@@ -13,13 +13,19 @@ import { Node, Requirements, TransformDef } from '@arql/models';
 import { delegateCollection, DelegatedCollection } from './collection';
 import { DelegatedResults } from './results';
 
-type DelegatedTransformOrigin =
+export type DelegatedTransformOrigin =
   | DelegatedCollection
   | DelegatedTransform
   | DelegatedResults;
 export type DelegatedTransformOrigins =
   | DelegatedTransformOrigin
   | DelegatedTransformOrigin[];
+
+export function isMultiOrigin(
+  origin: DelegatedTransformOrigins
+): origin is DelegatedTransformOrigin[] {
+  return Array.isArray(origin);
+}
 
 /**
  * Transforms represent functions that act on entire collections.

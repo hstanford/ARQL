@@ -3,14 +3,18 @@ import {
   DelegatedCollection,
   DelegatedResults,
   DelegatedTransform,
+  DelegatedTransformOrigin,
   DelegatedTransformOrigins,
+  isMultiOrigin,
 } from '@arql/delegator';
 import { collectCollection } from './collection';
-import { CollectorContext, ResultMap, Results } from './context';
+import { CollectorContext, Result, ResultMap, Results } from './context';
 import { buildFieldValue } from './field';
 
-type OriginValue<T> = T extends unknown[]
-  ? Record<string, Results | ResultMap[]>
+type Records = Results | ResultMap[];
+
+type OriginValue<T> = T extends DelegatedTransformOrigin[]
+  ? Record<string, Records>
   : Results;
 
 type OriginResult<T> = {
@@ -18,16 +22,21 @@ type OriginResult<T> = {
   constituentFields: ContextualisedField[];
 };
 
+// resolve the data of the origin(s) of a transform and the
+// fields that are exposed by that data
 async function getOrigins<T extends DelegatedTransformOrigins>(
   origin: T,
   queryResults: Record<string, unknown>[][],
   context: CollectorContext
 ): Promise<OriginResult<T>> {
+  // fields exposed by the origin(s)
   const constituentFields: ContextualisedField[] = [];
+
+  // resolve the data of a single origin and capture its exposed fields
   async function transformOrigin(
     origin: DelegatedCollection | DelegatedTransform | DelegatedResults
   ) {
-    let out: Results | ResultMap[] = [];
+    let out: Records = [];
     if (origin instanceof DelegatedResults) {
       out = queryResults[origin.index];
       constituentFields.push(...origin.fields);
@@ -43,53 +52,59 @@ async function getOrigins<T extends DelegatedTransformOrigins>(
     return out;
   }
 
-  if (Array.isArray(origin)) {
-    const origins: Record<string, Results | ResultMap[]> = {};
-    for (const orig of origin) {
-      const o: DelegatedCollection | DelegatedTransform | DelegatedResults =
-        orig;
-      const or = await transformOrigin(o);
-      if (!o.name) {
+  // resolve all the origins
+  let origins: Record<string, Records> | Records | undefined = undefined;
+  if (isMultiOrigin(origin)) {
+    origins = {};
+    for (const singleOrigin of origin) {
+      // we need a name in order to build the origins map
+      if (!singleOrigin.name) {
         throw new Error('Expected name for origin');
       }
-      origins[o.name] = or;
+
+      origins[singleOrigin.name] = await transformOrigin(singleOrigin);
     }
-    return {
-      origin: origins as OriginValue<T>,
-      constituentFields,
-    };
   } else {
-    return {
-      origin: (await transformOrigin(origin)) as OriginValue<T>,
-      constituentFields,
-    };
+    origins = await transformOrigin(origin);
   }
+
+  return {
+    // cast is necessary in order to preserve expected signature
+    origin: origins as OriginValue<T>,
+    constituentFields,
+  };
 }
 
+// resolve and transform the data this transform node represents
 export async function collectTransform(
   transform: DelegatedTransform,
   queryResults: Record<string, unknown>[][],
   context: CollectorContext
 ): Promise<Results | ResultMap[]> {
+  // resolve the data of the origin(s)
   const { origin, constituentFields } = await getOrigins(
     transform.origin,
     queryResults,
     context
   );
 
+  // assert the specified transformation function is configured
   const transformFn = context.transforms[transform.name];
-
   if (!transformFn) {
     throw new Error(`Missing transform implementation for ${transform.name}`);
   }
 
+  // function to resolve arguments from any particular record
+  const argsFn = (record: Result | ResultMap) =>
+    transform.args.map((arg) =>
+      buildFieldValue(arg, record, constituentFields, context)
+    );
+
+  // run the transform over the data
   return transformFn(
     transform.modifier,
     origin,
-    (record) =>
-      transform.args.map((arg) =>
-        buildFieldValue(arg, record, constituentFields, context)
-      ),
+    argsFn,
     constituentFields,
     context,
     transform.shape
