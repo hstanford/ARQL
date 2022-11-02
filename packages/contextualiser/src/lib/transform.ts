@@ -5,13 +5,13 @@ import {
   TransformDef,
 } from '@arql/models';
 import { uniq } from '@arql/util';
-import { ContextualisedCollection } from './collection';
 import { ContextualisedExpr } from './expr';
 import { ContextualisedField } from './field';
 import { ContextualisedFunction } from './function';
 import { ContextualisedParam } from './param';
 import {
   constituentFields,
+  ContextualisedQuery,
   ContextualiserState,
   ID,
   isId,
@@ -41,10 +41,7 @@ export interface ContextualisedTransformDef {
   )[];
 
   /** where the data offered by this transform comes from */
-  origin:
-    | ContextualisedCollection
-    | ContextualisedTransform
-    | (ContextualisedCollection | ContextualisedTransform)[];
+  origin: ContextualisedQuery | ContextualisedQuery[];
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface

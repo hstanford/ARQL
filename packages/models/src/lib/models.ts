@@ -154,7 +154,7 @@ export abstract class DataSource extends Flags {
 
   abstract resolve(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    subquery: any, // should be ContextualisedCollection | ContextualisedTransform,
+    subquery: any, // should be ContextualisedQuery,
     params: any[] // eslint-disable-line @typescript-eslint/no-explicit-any
   ): Promise<Dictionary[]>;
 

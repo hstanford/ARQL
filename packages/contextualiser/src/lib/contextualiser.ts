@@ -18,6 +18,7 @@ import { ContextualisedFunction } from './function';
 import { ContextualisedParam } from './param';
 import { ContextualisedTransform } from './transform';
 import {
+  ContextualisedQuery,
   ContextualiserConfig,
   ContextualiserState,
   ID,
@@ -79,11 +80,8 @@ export class Contextualiser {
   handleCollection(
     collection: Collection,
     context: ContextualiserState
-  ): ContextualisedCollection | ContextualisedTransform {
-    let value:
-      | ContextualisedCollection
-      | ContextualisedTransform
-      | (ContextualisedCollection | ContextualisedTransform)[];
+  ): ContextualisedQuery {
+    let value: ContextualisedQuery | ContextualisedQuery[];
 
     // recursively handle collection values, so the tree is contextualised
     // from the leaves upwards
@@ -126,7 +124,7 @@ export class Contextualiser {
     }
 
     // Narrowed to single collection
-    let out: ContextualisedCollection | ContextualisedTransform = value;
+    let out: ContextualisedQuery = value;
 
     // Apply the shape
     if (collection.shape) {
@@ -165,11 +163,7 @@ export class Contextualiser {
    * @returns a collection or data model
    */
   getModel(alphachain: Alphachain, context: ContextualiserState) {
-    let model:
-      | ContextualisedCollection
-      | ContextualisedTransform
-      | DataModel
-      | undefined;
+    let model: ContextualisedQuery | DataModel | undefined;
     if (context.aliases.has(alphachain.root)) {
       // it's the name of a collection in scope
       model = context.aliases.get(alphachain.root);
@@ -204,10 +198,7 @@ export class Contextualiser {
    */
   getTransform(
     transform: Transform,
-    model:
-      | ContextualisedCollection
-      | ContextualisedTransform
-      | (ContextualisedCollection | ContextualisedTransform)[],
+    model: ContextualisedQuery | ContextualisedQuery[],
     context: ContextualiserState
   ): ContextualisedTransform {
     const match = this.transforms.find(
@@ -268,10 +259,7 @@ export class Contextualiser {
    */
   getFunction(
     func: Transform,
-    model:
-      | ContextualisedCollection
-      | ContextualisedTransform
-      | (ContextualisedCollection | ContextualisedTransform)[],
+    model: ContextualisedQuery | ContextualisedQuery[],
     context: ContextualiserState
   ): ContextualisedFunction {
     const match = this.functions.find((f) => f.name === func.description.root);
@@ -306,7 +294,7 @@ export class Contextualiser {
    */
   getField(
     field: Field,
-    model: ContextualisedCollection | ContextualisedTransform,
+    model: ContextualisedQuery,
     context: ContextualiserState
   ): ContextualisedField {
     let contextualisedField: ContextualisedField;
@@ -345,10 +333,7 @@ export class Contextualiser {
    */
   getExpression(
     ipt: Expr | ExprTree,
-    model:
-      | ContextualisedCollection
-      | ContextualisedTransform
-      | (ContextualisedCollection | ContextualisedTransform)[],
+    model: ContextualisedQuery | ContextualisedQuery[],
     context: ContextualiserState,
     nested?: boolean
   ): ID | ContextualisedExpr | ContextualisedParam | ContextualisedFunction {

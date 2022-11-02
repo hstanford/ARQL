@@ -1,13 +1,20 @@
 import {
   ContextualisedCollection,
   ContextualisedField,
-  ContextualisedTransform,
+  ContextualisedQuery,
   ContextualiserState,
   ID,
 } from '@arql/contextualiser';
 import { DataModel, Node, Requirements } from '@arql/models';
 import { DelegatedResults } from './results';
-import { DelegatedTransform, delegateTransform } from './transform';
+import { DelegatedTransform } from './transform';
+import { delegateOrigin } from './util';
+
+export type DelegatedCollectionOrigin =
+  | DataModel
+  | DelegatedCollection
+  | DelegatedTransform
+  | DelegatedResults;
 
 /**
  * Collections are an intermediate state of data, representing a set
@@ -21,11 +28,7 @@ export interface DelegatedCollectionDef {
   name?: string;
 
   /** where the data offered by this collection comes from */
-  origin:
-    | DataModel
-    | DelegatedCollection
-    | DelegatedTransform
-    | DelegatedResults;
+  origin: DelegatedCollectionOrigin;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -88,54 +91,43 @@ export class DelegatedCollection extends Node<DelegatedCollectionDef> {
  */
 export function delegateCollection(
   collection: ContextualisedCollection,
-  queries: (ContextualisedCollection | ContextualisedTransform)[]
+  queries: ContextualisedQuery[]
 ): DelegatedCollection | DelegatedResults {
   if (collection.origin instanceof DelegatedResults) {
     throw new Error('Collection already delegated');
   }
 
-  if (collection.requirements.sources.length > 1) {
-    // if multiple sources are required to resolve the node, recurse down
-    // until nodes are reached that only require one source
-    if (collection.origin instanceof DataModel) {
-      // perhaps this collection has a graph join (in which case support needs adding)?
-      // Otherwise you should not have a single model coming from multiple sources
-      throw new Error(
-        'Collection from DataModel should not have multiple sources'
-      );
-    }
+  const sources = collection.requirements.sources;
 
-    return new DelegatedCollection(
-      collection,
-      collection.origin instanceof ContextualisedCollection
-        ? delegateCollection(collection.origin, queries)
-        : delegateTransform(collection.origin, queries)
-    );
-  } else if (collection.requirements.sources.length === 1) {
-    const source = collection.requirements.sources[0];
-    if (source.satisfies(collection.requirements)) {
-      // break off this collection into its own query
-      const resultsNode = new DelegatedResults({
-        index: queries.length,
-        id: collection.id,
-        fields: collection.availableFields,
-        name: collection.name,
-      });
-      queries.push(collection);
-      return resultsNode;
-    } else if (collection.origin instanceof DataModel) {
-      throw new Error('Data model collection does not satisfy requirements');
-    } else {
-      // if the source does not satisfy this node, recurse until
-      // a node is found that is satisfied by the source
-      return new DelegatedCollection(
-        collection,
-        collection.origin instanceof ContextualisedCollection
-          ? delegateCollection(collection.origin, queries)
-          : delegateTransform(collection.origin, queries)
-      );
-    }
-  } else {
+  if (!sources.length) {
     throw new Error('Collection should have at least one source');
   }
+
+  if (sources.length === 1 && sources[0].satisfies(collection.requirements)) {
+    // break off this collection into its own query
+    const resultsNode = new DelegatedResults({
+      index: queries.length,
+      id: collection.id,
+      fields: collection.availableFields,
+      name: collection.name,
+    });
+    queries.push(collection);
+    return resultsNode;
+  }
+
+  if (collection.origin instanceof DataModel) {
+    // perhaps this collection has a graph join (in which case support needs adding)?
+    // Otherwise you should not have a single model coming from multiple sources
+    throw new Error(
+      'Collection from DataModel should be resolvable from a single data source'
+    );
+  }
+
+  // if multiple sources are required to resolve the node, or the
+  // one source required cannot satisfy the requirements, recurse
+  // down until nodes are reached that only require one source
+  return new DelegatedCollection(
+    collection,
+    delegateOrigin(collection.origin, queries)
+  );
 }

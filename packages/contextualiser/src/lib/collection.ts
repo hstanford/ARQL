@@ -6,8 +6,12 @@ import {
 } from '@arql/models';
 import { uniq } from '@arql/util';
 import { ContextualisedField } from './field';
-import { ContextualisedTransform } from './transform';
-import { ContextualiserState, ID, selectField } from './util';
+import {
+  ContextualisedOrigin,
+  ContextualiserState,
+  ID,
+  selectField,
+} from './util';
 
 /**
  * Collections are an intermediate state of data, representing a set
@@ -21,7 +25,7 @@ export interface ContextualisedCollectionDef {
   name?: string;
 
   /** where the data offered by this collection comes from */
-  origin: DataModel | ContextualisedCollection | ContextualisedTransform;
+  origin: ContextualisedOrigin;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface

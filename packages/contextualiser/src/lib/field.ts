@@ -1,16 +1,19 @@
 import {
   combineRequirements,
   DataField,
-  DataModel,
   Node,
   Requirements,
 } from '@arql/models';
-import { ContextualisedCollection } from './collection';
 import { ContextualisedExpr } from './expr';
 import { ContextualisedFunction } from './function';
 import { ContextualisedParam } from './param';
-import { ContextualisedTransform } from './transform';
-import { constituentFields, ContextualiserState, ID, isId } from './util';
+import {
+  constituentFields,
+  ContextualisedOrigin,
+  ContextualiserState,
+  ID,
+  isId,
+} from './util';
 
 /**
  * A field represents a key-value pair
@@ -31,7 +34,7 @@ export interface ContextualisedFieldDef {
     | ID;
 
   /** the collection or transform this field can be accessed from */
-  origin: ContextualisedCollection | ContextualisedTransform | DataModel;
+  origin: ContextualisedOrigin;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface

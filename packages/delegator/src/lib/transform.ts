@@ -1,17 +1,18 @@
 import {
-  ContextualisedCollection,
   ContextualisedExpr,
   ContextualisedField,
   ContextualisedFunction,
   ContextualisedParam,
+  ContextualisedQuery,
   ContextualisedTransform,
   ContextualiserState,
   ID,
   isId,
 } from '@arql/contextualiser';
 import { Node, Requirements, TransformDef } from '@arql/models';
-import { delegateCollection, DelegatedCollection } from './collection';
+import { DelegatedCollection } from './collection';
 import { DelegatedResults } from './results';
+import { delegateOrigins } from './util';
 
 export type DelegatedTransformOrigin =
   | DelegatedCollection
@@ -121,63 +122,35 @@ export class DelegatedTransform extends Node<DelegatedTransformDef> {
  */
 export function delegateTransform(
   transform: ContextualisedTransform,
-  queries: (ContextualisedCollection | ContextualisedTransform)[]
+  queries: ContextualisedQuery[]
 ): DelegatedTransform | DelegatedResults {
   if (transform.origin instanceof DelegatedResults) {
     throw new Error('Transform already delegated');
   }
 
-  if (transform.requirements.sources.length > 1) {
-    // if multiple sources are required to resolve the node, recurse down
-    // until nodes are reached that only require one source
-    if (Array.isArray(transform.origin)) {
-      const origins: DelegatedTransformOrigin[] = [];
-      for (const origin of transform.origin) {
-        if (origin instanceof ContextualisedCollection) {
-          origins.push(delegateCollection(origin, queries));
-        } else {
-          origins.push(delegateTransform(origin, queries));
-        }
-      }
-      return new DelegatedTransform(transform, origins);
-    } else {
-      return new DelegatedTransform(
-        transform,
-        transform.origin instanceof ContextualisedCollection
-          ? delegateCollection(transform.origin, queries)
-          : delegateTransform(transform.origin, queries)
-      );
-    }
-  } else if (transform.requirements.sources.length === 1) {
-    const source = transform.requirements.sources[0];
-    if (source.satisfies(transform.requirements)) {
-      // break off this collection into its own query
-      const resultsNode = new DelegatedResults({
-        index: queries.length,
-        id: transform.id,
-        fields: transform.availableFields,
-        name: transform.name,
-      });
-      queries.push(transform);
-      return resultsNode;
-    } else if (Array.isArray(transform.origin)) {
-      return new DelegatedTransform(
-        transform,
-        transform.origin.map((o) =>
-          o instanceof ContextualisedCollection
-            ? delegateCollection(o, queries)
-            : delegateTransform(o, queries)
-        )
-      );
-    } else {
-      return new DelegatedTransform(
-        transform,
-        transform.origin instanceof ContextualisedCollection
-          ? delegateCollection(transform.origin, queries)
-          : delegateTransform(transform.origin, queries)
-      );
-    }
-  } else {
+  const sources = transform.requirements.sources;
+
+  if (!sources.length) {
     throw new Error('Transform should have at least one source');
   }
+
+  if (sources.length === 1 && sources[0].satisfies(transform.requirements)) {
+    // break off this collection into its own query
+    const resultsNode = new DelegatedResults({
+      index: queries.length,
+      id: transform.id,
+      fields: transform.availableFields,
+      name: transform.name,
+    });
+    queries.push(transform);
+    return resultsNode;
+  }
+
+  // if multiple sources are required to resolve the node, or the
+  // one source required cannot satisfy the requirements, recurse
+  // down until nodes are reached that only require one source
+  return new DelegatedTransform(
+    transform,
+    delegateOrigins(transform.origin, queries)
+  );
 }

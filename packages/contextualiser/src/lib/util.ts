@@ -23,11 +23,17 @@ export type ContextualisedNodeType =
   | ContextualisedParam
   | ContextualisedTransform;
 
+export type ContextualisedQuery =
+  | ContextualisedCollection
+  | ContextualisedTransform;
+
+export type ContextualisedOrigin =
+  | ContextualisedCollection
+  | ContextualisedTransform
+  | DataModel;
+
 export class ContextualiserState {
-  aliases: Map<
-    string,
-    ContextualisedCollection | ContextualisedTransform | DataModel
-  > = new Map();
+  aliases: Map<string, ContextualisedOrigin> = new Map();
   items: ContextualisedNodeType[] = [];
   get(id: ID): ContextualisedNodeType {
     return this.items[id];
@@ -86,7 +92,7 @@ export function constituentFields(
  */
 export function selectField(
   field: ContextualisedField | DataField,
-  origin: ContextualisedCollection | ContextualisedTransform,
+  origin: ContextualisedQuery,
   context: ContextualiserState
 ) {
   return new ContextualisedField({

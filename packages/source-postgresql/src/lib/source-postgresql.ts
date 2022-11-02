@@ -1,5 +1,6 @@
 import {
   ContextualisedCollection,
+  ContextualisedQuery,
   ContextualisedTransform,
 } from '@arql/contextualiser';
 import { DataModelDef, DataSource, ModelDefType } from '@arql/models';
@@ -58,10 +59,7 @@ export class PostgreSQL<M extends DataModelDef[]> extends DataSource {
   };
   pool?: pg.Pool;
 
-  buildQuery(
-    query: ContextualisedCollection | ContextualisedTransform,
-    params: Params
-  ) {
+  buildQuery(query: ContextualisedQuery, params: Params) {
     if (!this.sql || !this.sqlModels) {
       throw new Error('Initialisation required');
     }
@@ -86,7 +84,7 @@ export class PostgreSQL<M extends DataModelDef[]> extends DataSource {
   }
 
   async resolve(
-    subquery: ContextualisedCollection | ContextualisedTransform,
+    subquery: ContextualisedQuery,
     params: Params
   ): Promise<Dictionary<unknown>[]> {
     if (!this.pool) {
