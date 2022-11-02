@@ -9,7 +9,13 @@ import { collectCollection } from './collection';
 import { CollectorConfig, CollectorContext } from './context';
 import { collectTransform } from './transform';
 
-// resolve a delegated query
+/**
+ * COLLECTOR
+ *
+ * The Collector's role is to resolve data. It instructs individual sources
+ * to resolve the sub-queries they've been delegated, and then combines and
+ * transforms the results into the format the query demands.
+ */
 export async function collector(
   { delegatedQuery, subQueries }: DelegatorOutput,
   params: unknown[],
