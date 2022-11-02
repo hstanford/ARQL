@@ -47,6 +47,7 @@ export type AliasableNodes =
   | SliceNode
   | TernaryNode;
 
+// convert a contextualised field value to the sql-ts equivalent
 export function buildFieldValue(
   field:
     | ID
@@ -59,22 +60,38 @@ export function buildFieldValue(
 ) {
   let out: AliasableNodes | ParameterNode | undefined;
   if (isId(field)) {
+    // if it just references an underlying field directly, grab that field
     out = constituentFields[field];
   } else if (field instanceof DataField) {
+    // if it's a DataField, grab the column with the same name as the field
     const model = context.models[field.model.name];
     if (!model) {
       throw new Error(`Could not find model ${field.model.name}`);
     }
+
     out = model.columns.find((c) => c.name === field.name);
   } else if (field instanceof ContextualisedParam) {
+    // parameters go from $1 upwards so we need to -1 to get the correct param
     out = context.sql.parameter(context.params[field.index - 1]);
   } else if (field instanceof ContextualisedExpr) {
-    out = context.operators[field.op](
+    const op = context.operators[field.op];
+    if (!op) {
+      throw new Error(`Could not find op ${field.op}`);
+    }
+
+    // recursively build sql-ts nodes for the expression arguments
+    out = op(
       field.args.map((arg) => buildFieldValue(arg, constituentFields, context)),
       context.sql
     );
   } else if (field instanceof ContextualisedFunction) {
-    out = context.functions[field.name](
+    const fn = context.functions[field.name];
+    if (!fn) {
+      throw new Error(`Could not find function ${field.name}`);
+    }
+
+    // recursively build sql-ts nodes for the function arguments
+    out = fn(
       field.args.map((arg) => buildFieldValue(arg, constituentFields, context)),
       context.sql
     );
@@ -86,13 +103,13 @@ export function buildFieldValue(
   return out;
 }
 
-// Each field could be built from one or more models
-// really we want to pass in what each of the fields constituentFields maps to
+// convert a contextualisedField to the sql-ts equivalent
 export function buildField(
   field: ContextualisedField,
   constituentFields: Record<ID, Column>,
   context: SourceContext
 ) {
+  // get the underlying value
   let out: AliasableNodes | ParameterNode | AliasNode = buildFieldValue(
     field.field,
     constituentFields,
@@ -103,7 +120,7 @@ export function buildField(
     throw new Error('Unexpected alias node');
   }
 
-  //console.log(field, out.toQuery());
+  // alias the field if possible
   if (field.name) {
     // typescript is weird about differentiating these
     // due to varying `this` values that the methods support

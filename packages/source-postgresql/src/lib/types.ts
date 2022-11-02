@@ -5,6 +5,7 @@ import {
   TableWithColumns as BaseTableWithColumns,
 } from 'sql-ts';
 
+// type helpers to avoid writing <unknown> everywhere
 export type Query = BaseQuery<unknown>;
 export type SubQuery = BaseSubQuery<unknown, Record<string, unknown>>;
 export type Column = BaseColumn<unknown>;
