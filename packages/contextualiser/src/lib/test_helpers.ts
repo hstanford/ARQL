@@ -21,8 +21,8 @@ class TestSource extends DataSource {
     return [];
   }
 }
-export const testSource = new TestSource(
-  [
+export const testSource = new TestSource({
+  models: [
     {
       name: 'test',
       fields: [
@@ -37,10 +37,10 @@ export const testSource = new TestSource(
       ],
     },
   ],
-  {},
-  {},
-  {}
-);
+  functions: {},
+  transforms: {},
+  operators: {},
+});
 
 export const testModel = testSource.models.find(
   (m) => m.name === 'test'

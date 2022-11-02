@@ -8,7 +8,6 @@ describe('contextualiser', () => {
       testSource.models.map((model) => [model.name, model])
     );
     const filter = {
-      type: 'transformdef' as const,
       name: 'filter',
       nArgs: 1,
     };

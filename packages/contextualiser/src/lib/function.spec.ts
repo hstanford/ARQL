@@ -13,7 +13,6 @@ describe('function', () => {
       context,
       function: {
         name: 'equals',
-        type: 'transformdef',
         nArgs: 2,
       },
       modifier: [],
@@ -36,7 +35,6 @@ describe('function', () => {
       context,
       function: {
         name: 'equals',
-        type: 'transformdef',
         nArgs: 2,
       },
       modifier: [],
@@ -63,7 +61,6 @@ describe('function', () => {
       context,
       function: {
         name: 'equals',
-        type: 'transformdef',
         nArgs: 2,
       },
       modifier: [],
@@ -90,7 +87,6 @@ describe('function', () => {
       context,
       function: {
         name: 'equals',
-        type: 'transformdef',
         nArgs: 2,
       },
       modifier: [],
@@ -106,7 +102,6 @@ describe('function', () => {
       context,
       function: {
         name: 'equals',
-        type: 'transformdef',
         nArgs: 2,
       },
       modifier: [],

@@ -17,9 +17,9 @@ export const models = [
   },
 ];
 
-export const testSource = new PostgreSQL(
+export const testSource = new PostgreSQL({
   models,
-  {
+  operators: {
     equals: (args, sql) => {
       if (args.length !== 2) {
         throw new Error('Expect two arguments to compute equality');
@@ -33,7 +33,7 @@ export const testSource = new PostgreSQL(
       return sql.binaryOperator('OR')(args[0], args[1]);
     },
   },
-  {
+  transforms: {
     filter: (modifier, queries, args) => {
       if (queries.length !== 1) {
         throw new Error('Single origin required for filter transform');
@@ -59,8 +59,8 @@ export const testSource = new PostgreSQL(
       );
     },
   },
-  {}
-);
+  functions: {},
+});
 
 export const testModel = testSource.models.find(
   (m) => m.name === 'test'

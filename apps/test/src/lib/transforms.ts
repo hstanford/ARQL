@@ -8,4 +8,4 @@ export const transforms = [
     nArgs: '1+',
     modifiers: ['desc'],
   },
-].map((o) => ({ ...o, type: 'transformdef' as const }));
+];

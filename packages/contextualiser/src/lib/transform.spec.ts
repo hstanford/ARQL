@@ -14,7 +14,6 @@ describe('transform', () => {
       modifier: [],
       transform: {
         name: 'foo',
-        type: 'transformdef',
         nArgs: 1,
       },
       origin: testCollection,
@@ -49,7 +48,6 @@ describe('transform', () => {
       modifier: [],
       transform: {
         name: 'foo',
-        type: 'transformdef',
         nArgs: 1,
       },
       origin: testCollection,
@@ -83,7 +81,6 @@ describe('transform', () => {
       modifier: [],
       transform: {
         name: 'foo',
-        type: 'transformdef',
         nArgs: 1,
       },
       origin: testCollection,

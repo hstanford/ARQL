@@ -7,7 +7,7 @@ import { DataModelDef, DataSource, ModelDefType } from '@arql/models';
 import { Dictionary } from '@arql/util';
 import { Sql, TableWithColumns } from 'sql-ts';
 import { buildQuery } from './collection';
-import { SourceContext } from './context';
+import { SourceConfig, SourceContext } from './context';
 import { buildTransform } from './transform';
 import { Params, Query } from './types';
 import pg from 'pg';
@@ -30,13 +30,8 @@ export class PostgreSQL<M extends DataModelDef[]> extends DataSource {
   supportsParameters = true;
   subCollectionDepth = Infinity;
 
-  constructor(
-    models: M,
-    operators: SourceContext['operators'],
-    transforms: SourceContext['transforms'],
-    functions: SourceContext['functions']
-  ) {
-    super(models, operators, transforms, functions);
+  constructor(config: SourceConfig & { models: M }) {
+    super(config);
   }
 
   async init(models: M, connectionVariables: Record<string, unknown>) {
