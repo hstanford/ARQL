@@ -66,7 +66,7 @@ export abstract class DataSource extends Flags {
     });
 
     const satisfiesFunctions = requirements.functions.every((f) =>
-      this.implementsTransform(f)
+      this.implementsFunction(f)
     );
 
     const satisfiesTransform = requirements.transforms.every((f) =>

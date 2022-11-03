@@ -105,6 +105,7 @@ export async function collectTransform(
     argsFn,
     constituentFields,
     context,
+    transform.args,
     transform.shape
   );
 }

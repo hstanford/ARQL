@@ -1,5 +1,6 @@
 import {
   ContextualisedCollection,
+  ContextualisedField,
   ContextualisedTransform,
   ID,
 } from '@arql/contextualiser';
@@ -8,6 +9,19 @@ import { buildCollection } from './collection';
 import { SourceContext } from './context';
 import { buildField, buildFieldValue } from './field';
 import { Column, SubQuery } from './types';
+
+export function applyShape(
+  subQuery: SubQuery,
+  name: string,
+  shape: ContextualisedField[],
+  constituentFields: Record<ID, Column>,
+  context: SourceContext
+) {
+  return subQuery.table
+    .subQuery(name)
+    .select(...shape.map((f) => buildField(f, constituentFields, context)))
+    .from(subQuery) as SubQuery;
+}
 
 // build a sql query for a transform
 export function buildTransform(
@@ -45,24 +59,17 @@ export function buildTransform(
   }
 
   // apply the transformation functions to the origin queries
-  let out = transformFn(
+  const out = transformFn(
+    transform.name,
     transform.modifier,
     origins,
     transform.args.map((arg) =>
       buildFieldValue(arg, constituentFields, context)
     ),
-    context.sql
+    transform.shape,
+    constituentFields,
+    context
   );
-
-  // select values from the transformed query if appropriate
-  if (transform.shape) {
-    out = origins[0].table
-      .subQuery(transform.name)
-      .select(
-        ...transform.shape.map((f) => buildField(f, constituentFields, context))
-      )
-      .from(out) as SubQuery;
-  }
 
   if (!(out instanceof Query)) {
     throw new Error(

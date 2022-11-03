@@ -34,8 +34,14 @@ const queries: Query[] = [
     `,
     [],
   ],
+  [
+    `
+    test | group(foo) { foo, maxAge: max(age) }
+    `,
+    [],
+  ],
 ];
 
-const out = await test(...queries[3]);
+const out = await test(...queries[4]);
 console.log(out);
 process.exit(0);

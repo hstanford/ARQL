@@ -1,10 +1,11 @@
-CREATE TABLE test (foo TEXT, bar TEXT);
+CREATE TABLE test (foo TEXT, bar TEXT, age INTEGER);
 
 INSERT INTO
-  test (foo, bar)
+  test (foo, bar, age)
 VALUES
-  ('Joe', 'Blogs'),
-  ('John', 'Doe');
+  ('Joe', 'Blogs', 28),
+  ('Joe', 'Dart', 24),
+  ('John', 'Doe', 54);
 
 CREATE TABLE other_users (first_name TEXT, last_name TEXT);
 
@@ -13,56 +14,3 @@ INSERT INTO
 VALUES
   ('Mary', 'Blogs'),
   ('Jane', 'Doe');
-
-SELECT
-  "join".*
-FROM
-  (
-    SELECT
-      "other_users"."first_name" AS "first_name",
-      "test"."foo" AS "foo",
-      "test"."bar" AS "bar"
-    FROM
-      (
-        SELECT
-        FROM
-          (
-            SELECT
-              "test"."foo" AS "foo",
-              "test"."bar" AS "bar"
-            FROM
-              (
-                SELECT
-                  "test"."foo" AS "foo",
-                  "test"."bar" AS "bar"
-                FROM
-                  (
-                    SELECT
-                      "test"."foo" AS "foo",
-                      "test"."bar" AS "bar"
-                    FROM
-                      "test"
-                  ) "test"
-              ) "test"
-          ) "test"
-          INNER JOIN (
-            SELECT
-              "other_users"."first_name" AS "first_name",
-              "other_users"."last_name" AS "last_name"
-            FROM
-              (
-                SELECT
-                  "other_users"."first_name" AS "first_name",
-                  "other_users"."last_name" AS "last_name"
-                FROM
-                  (
-                    SELECT
-                      "other_users"."first_name" AS "first_name",
-                      "other_users"."last_name" AS "last_name"
-                    FROM
-                      "other_users"
-                  ) "other_users"
-              ) "other_users"
-          ) "other_users" ON ("test"."bar" = "other_users"."last_name")
-      ) "test"
-  ) "join"

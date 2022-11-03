@@ -1,4 +1,9 @@
-import { ContextualisedField } from '@arql/contextualiser';
+import {
+  ContextualisedExpr,
+  ContextualisedField,
+  ContextualisedFunction,
+  ContextualisedParam,
+} from '@arql/contextualiser';
 import { DataModelDef } from '@arql/models';
 
 // an individual data value
@@ -16,20 +21,28 @@ export function isResultMaps(items: Row[] | ResultMap[]): items is ResultMap[] {
 // general exposed data type
 export type Records = Row[] | ResultMap[];
 
+export type TransformFn = (
+  modifier: string[],
+  origin: Row[] | Record<string, Records>,
+  args: (record: Row | ResultMap) => Field[],
+  constituentFields: ContextualisedField[],
+  context: SourceContext,
+  argFields: (
+    | number
+    | ContextualisedParam
+    | ContextualisedExpr
+    | ContextualisedFunction
+  )[],
+  shape?: ContextualisedField[]
+) => Records;
+
+export type FunctionFn = (args: Field[]) => Field;
+export type OperatorFn = (args: Field[]) => Field;
+
 export interface SourceConfig {
-  transforms: Record<
-    string,
-    (
-      modifier: string[],
-      origin: Row[] | Record<string, Records>,
-      args: (record: Row | ResultMap) => Field[],
-      constituentFields: ContextualisedField[],
-      context: SourceContext,
-      shape?: ContextualisedField[]
-    ) => Records
-  >;
-  functions: Record<string, (args: Field[]) => Field>;
-  operators: Record<string, (args: Field[]) => Field>;
+  transforms: Record<string, TransformFn>;
+  functions: Record<string, FunctionFn>;
+  operators: Record<string, OperatorFn>;
   data: Map<string, Row[]>;
 }
 

@@ -94,6 +94,7 @@ export async function resolveTransform(
     argsFn,
     constituentFields,
     context,
+    transform.args,
     transform.shape
   );
 }

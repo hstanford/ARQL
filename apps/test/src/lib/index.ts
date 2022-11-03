@@ -1,11 +1,16 @@
 import { runner } from '@arql/core';
-import { collectorConfig } from './collector/config';
-import { contextualiserConfig } from './contextualiser/config';
-import { sources } from './data';
+import { collectorConfig } from '@arql/stdlib-collector';
+import { transforms, functions, opMap } from '@arql/stdlib-definitions';
+import { sources, models } from './sources';
 
 const run = runner({
-  contextualiserConfig,
-  collectorConfig,
+  contextualiserConfig: {
+    models: new Map(models.map((m) => [m.name, m])),
+    transforms,
+    functions,
+    opMap,
+  },
+  collectorConfig: collectorConfig,
 });
 
 export async function test(query: string, params: unknown[]) {
