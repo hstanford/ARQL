@@ -18,6 +18,12 @@ import {
   selectField,
 } from './util';
 
+export function isMultiOrigin(
+  origin: ContextualisedQuery | ContextualisedQuery[]
+): origin is ContextualisedQuery[] {
+  return Array.isArray(origin);
+}
+
 /**
  * Transforms represent functions that act on entire collections.
  * examples might include `filter` and `union`

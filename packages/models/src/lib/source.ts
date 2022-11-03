@@ -32,6 +32,10 @@ export abstract class DataSource extends Flags {
     params: any[] // eslint-disable-line @typescript-eslint/no-explicit-any
   ): Promise<Dictionary[]>;
 
+  async init() {
+    return;
+  }
+
   implementsOp(opName: string) {
     return this.operators[opName];
   }

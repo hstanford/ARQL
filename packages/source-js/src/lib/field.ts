@@ -6,7 +6,7 @@ import {
   isId,
 } from '@arql/contextualiser';
 import { DataField } from '@arql/models';
-import { CollectorContext, Row, ResultMap } from './context';
+import { SourceContext, Row, ResultMap } from './context';
 
 // resolve a field value from a record
 // e.g. get `(id + foo)` from {id: 1, foo: 2} should resolve to 3
@@ -14,7 +14,7 @@ export function buildFieldValue(
   field: ContextualisedField['field'],
   record: Row | ResultMap,
   constituentFields: ContextualisedField[],
-  context: CollectorContext
+  context: SourceContext
 ): unknown {
   if (isId(field)) {
     // identify the field on the record we're trying to access
@@ -41,7 +41,12 @@ export function buildFieldValue(
 
     return origin[underlyingField.name];
   } else if (field instanceof DataField) {
-    throw new Error('DataField should be resolved by the underlying source');
+    if (record instanceof Map) {
+      // datafields should be resolved directly from the underlying
+      // model data which should just be rows
+      throw new Error('Unexpected multi-collection when resolving DataField');
+    }
+    return record[field.name];
   } else if (field instanceof ContextualisedParam) {
     // a parameter value will be retrieved directly from the parameter array
     return context.params[field.index - 1];

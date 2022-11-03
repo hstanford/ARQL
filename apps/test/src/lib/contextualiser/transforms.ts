@@ -8,4 +8,8 @@ export const transforms = [
     nArgs: '1+',
     modifiers: ['desc'],
   },
+  {
+    name: 'join',
+    nArgs: '1',
+  },
 ];

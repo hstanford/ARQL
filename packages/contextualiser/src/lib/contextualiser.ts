@@ -350,7 +350,25 @@ export class Contextualiser {
         field = fields.find((f) => f.name === part);
         if (field) break;
       }
+
+      // allow referring to the model by the first part of the alphachain
       if (!field) {
+        for (const baseModel of [model].flat()) {
+          if (baseModel.name !== expr.root) {
+            continue;
+          }
+          const part = expr.parts[0];
+          const fields = baseModel.availableFields;
+          field = fields.find((f) => f.name === part);
+          if (field) break;
+        }
+      }
+
+      if (!field) {
+        console.log(
+          [model].flat().map((m) => m.availableFields),
+          expr
+        );
         throw new Error(`Can't find subfield for ${expr.root}`);
       }
 

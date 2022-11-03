@@ -30,26 +30,35 @@ export class PostgreSQL<M extends DataModelDef[]> extends DataSource {
   supportsParameters = true;
   subCollectionDepth = Infinity;
 
-  constructor(config: SourceConfig & { models: M }) {
+  constructor(
+    config: SourceConfig & {
+      models: M;
+      connectionVariables: Record<string, unknown>;
+    }
+  ) {
     super(config);
+    this.connectionVariables = config.connectionVariables;
   }
 
   // connect to the database and create sql-ts table object that
   // correspond to the configured models
-  async init(models: M, connectionVariables: Record<string, unknown>) {
-    const sql = (this.sql = new Sql('postgres', connectionVariables));
-    // really need HKT to do this better
-    this.sqlModels = models.reduce((acc, m) => {
-      const def = sql.define<ModelDefType<typeof m>>({
+  override async init() {
+    const sql = (this.sql = new Sql('postgres', this.connectionVariables));
+
+    // really need HKT to type this better
+    this.sqlModels = this.models.reduce((acc, m) => {
+      const def = sql.define({
         name: m.name,
         columns: m.fields.map((f) => f.name),
       });
       acc[m.name] = def;
       return acc;
     }, {} as any); // eslint-disable-line @typescript-eslint/no-explicit-any
-    this.pool = new pg.Pool(connectionVariables);
+
+    this.pool = new pg.Pool(this.connectionVariables);
   }
 
+  connectionVariables: Record<string, unknown>;
   sql?: Sql;
   sqlModels?: {
     [K in M[number] as K['name']]: TableWithColumns<ModelDefType<K>>;

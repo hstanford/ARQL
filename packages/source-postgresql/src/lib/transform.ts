@@ -3,6 +3,7 @@ import {
   ContextualisedTransform,
   ID,
 } from '@arql/contextualiser';
+import { Query } from 'sql-ts';
 import { buildCollection } from './collection';
 import { SourceContext } from './context';
 import { buildField, buildFieldValue } from './field';
@@ -12,7 +13,7 @@ import { Column, SubQuery } from './types';
 export function buildTransform(
   transform: ContextualisedTransform,
   context: SourceContext
-) {
+): SubQuery {
   const transformFn = context.transforms[transform.transform.name];
   if (!transformFn) {
     throw new Error(`Could not find transform ${transform.transform.name}`);
@@ -55,12 +56,18 @@ export function buildTransform(
 
   // select values from the transformed query if appropriate
   if (transform.shape) {
-    out = out.table
+    out = origins[0].table
       .subQuery(transform.name)
       .select(
         ...transform.shape.map((f) => buildField(f, constituentFields, context))
       )
       .from(out) as SubQuery;
+  }
+
+  if (!(out instanceof Query)) {
+    throw new Error(
+      'Expected a query - perhaps a failed multi-origin transform'
+    );
   }
 
   return out;

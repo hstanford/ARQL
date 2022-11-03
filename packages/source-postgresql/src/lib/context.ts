@@ -1,4 +1,4 @@
-import type { ParameterNode, Sql } from 'sql-ts';
+import type { FromNode, JoinNode, ParameterNode, Sql } from 'sql-ts';
 import { AliasableNodes } from './field';
 import { Params, SubQuery, TableWithColumns } from './types';
 
@@ -10,7 +10,7 @@ export type SourceConfig = {
       origin: SubQuery[],
       args: (AliasableNodes | ParameterNode)[],
       sql: Sql
-    ) => SubQuery
+    ) => SubQuery | JoinNode | FromNode
   >;
   functions: Record<
     string,
