@@ -5,7 +5,12 @@ import Editor from 'react-simple-code-editor';
 import { useArqlQuery } from './adapters/sources';
 
 export function Query() {
-  const [code, setCode] = useState('users | filter(firstName = $1) {lastName}');
+  const [code, setCode] =
+    useState(`test | filter(foo = \${Joe}) | sort.desc(bar) {
+  bar,
+  input: \${1},
+  foo
+}`);
   const mutation = useArqlQuery();
 
   return (
