@@ -92,12 +92,6 @@ export async function resolveTransform(
     throw new Error(`Missing transform implementation for ${transform.name}`);
   }
 
-  // function to resolve arguments from any particular record
-  const argsFn = (record: Row | ResultMap) =>
-    transform.args.map((arg) =>
-      buildFieldValue(arg, record, constituentFields, context)
-    );
-
   // run the transform over the data
   return transformFn(transform, origin, constituentFields, context);
 }

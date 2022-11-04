@@ -36,7 +36,7 @@ export function buildTransform(
   const origins: SubQuery[] = [];
   const constituentFields: Record<ID, Column> = {};
 
-  // build queries for all origins, and keep track of the fields they expose (consistuentFields)
+  // build queries for all origins
   for (const orig of [transform.origin].flat()) {
     let origin: SubQuery;
     if (orig instanceof ContextualisedCollection) {
@@ -47,6 +47,7 @@ export function buildTransform(
       throw new Error('Unrecognised transform origin');
     }
 
+    // keep track of the fields the origins expose (consistuentFields)
     for (const rf of orig.requiredFields) {
       const col = origin.columns.find((c) => (c.alias ?? c.name) === rf.name);
       if (!col) {

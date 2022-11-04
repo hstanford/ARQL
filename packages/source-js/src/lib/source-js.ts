@@ -1,7 +1,3 @@
-export function sourceJs(): string {
-  return 'source-js';
-}
-
 import {
   ContextualisedCollection,
   ContextualisedQuery,
@@ -13,9 +9,6 @@ import { resolveCollection } from './collection';
 import { isResultMaps, Row, SourceConfig, SourceContext } from './context';
 import { resolveTransform } from './transform';
 
-export function sourcePostgresql(): string {
-  return 'source-postgresql';
-}
 export class JsSource<M extends DataModelDef[]> extends DataSource {
   supportsExpressionFields = true;
   supportsExpressions = true;

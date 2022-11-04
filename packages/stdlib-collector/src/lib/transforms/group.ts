@@ -34,6 +34,7 @@ export const group: TransformFn = (
   }
 
   // convert the aggregate {key: row[]} to {fieldKey: value, nonFieldKey: value[]}[]
+  // default aggregation method is array aggregation
   let out: Row[] = [];
   for (const [, value] of lookup.entries()) {
     const grouped: Row = {};

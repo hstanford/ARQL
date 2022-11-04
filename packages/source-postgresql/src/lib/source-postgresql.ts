@@ -12,9 +12,6 @@ import { buildTransform } from './transform';
 import { Params, Query } from './types';
 import pg from 'pg';
 
-export function sourcePostgresql(): string {
-  return 'source-postgresql';
-}
 export class PostgreSQL<M extends DataModelDef[]> extends DataSource {
   supportsExpressionFields = true;
   supportsExpressions = true;
