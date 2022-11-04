@@ -3,7 +3,12 @@ import {
   ContextualisedQuery,
   ContextualisedTransform,
 } from '@arql/contextualiser';
-import { DataModelDef, DataSource, ModelDefType } from '@arql/models';
+import {
+  DataModel,
+  DataModelDef,
+  DataSource,
+  ModelDefType,
+} from '@arql/models';
 import { Dictionary } from '@arql/util';
 import { Sql, TableWithColumns } from 'sql-ts';
 import { buildCollection } from './collection';
@@ -11,8 +16,10 @@ import { SourceConfig, SourceContext } from './context';
 import { buildTransform } from './transform';
 import { Params, Query } from './types';
 import pg from 'pg';
+import { readFile } from 'fs/promises';
+import { fileURLToPath, URL } from 'url';
 
-export class PostgreSQL<M extends DataModelDef[]> extends DataSource {
+export class PostgreSQL extends DataSource {
   supportsExpressionFields = true;
   supportsExpressions = true;
   supportsFieldAliasing = true;
@@ -29,7 +36,7 @@ export class PostgreSQL<M extends DataModelDef[]> extends DataSource {
 
   constructor(
     config: SourceConfig & {
-      models: M;
+      models: DataModelDef[];
       connectionVariables: Record<string, unknown>;
     }
   ) {
@@ -40,25 +47,46 @@ export class PostgreSQL<M extends DataModelDef[]> extends DataSource {
   // connect to the database and create sql-ts table object that
   // correspond to the configured models
   override async init() {
-    const sql = (this.sql = new Sql('postgres', this.connectionVariables));
+    this.sql = new Sql('postgres', this.connectionVariables);
 
+    this.pool = new pg.Pool(this.connectionVariables);
+
+    if (!this.models.length) {
+      await this.dumpModels();
+    }
+    this.setModels();
+  }
+
+  // produce model definitions from the structure of the connected database
+  async dumpModels() {
+    const __dirname = fileURLToPath(new URL('.', import.meta.url));
+    const schema = await readFile(__dirname + '/data_schema.sql', {
+      encoding: 'utf8',
+    });
+    const response = await this.pool?.query(schema);
+    const data = response?.rows;
+    if (!data) {
+      throw new Error('Could not produce model schema');
+    }
+    this.models = data.map((m) => new DataModel(m, this));
+  }
+
+  setModels() {
     // really need HKT to type this better
     this.sqlModels = this.models.reduce((acc, m) => {
-      const def = sql.define({
+      const def = this.sql?.define({
         name: m.name,
         columns: m.fields.map((f) => f.name),
       });
       acc[m.name] = def;
       return acc;
     }, {} as any); // eslint-disable-line @typescript-eslint/no-explicit-any
-
-    this.pool = new pg.Pool(this.connectionVariables);
   }
 
   connectionVariables: Record<string, unknown>;
   sql?: Sql;
   sqlModels?: {
-    [K in M[number] as K['name']]: TableWithColumns<ModelDefType<K>>;
+    [K in DataModelDef as K['name']]: TableWithColumns<ModelDefType<K>>;
   };
   pool?: pg.Pool;
 

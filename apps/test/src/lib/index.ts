@@ -1,11 +1,22 @@
 import { runner } from '@arql/core';
 import { collectorConfig } from '@arql/stdlib-collector';
 import { transforms, functions, opMap } from '@arql/stdlib-definitions';
-import { sources, models } from './sources';
+import { sources } from './sources';
+
+for (const source of sources) {
+  await source.init();
+}
+
+const models = new Map(
+  sources
+    .map((s) => s.models)
+    .flat()
+    .map((m) => [m.name, m])
+);
 
 const run = runner({
   contextualiserConfig: {
-    models: new Map(models.map((m) => [m.name, m])),
+    models,
     transforms,
     functions,
     opMap,
@@ -14,10 +25,5 @@ const run = runner({
 });
 
 export async function test(query: string, params: unknown[]) {
-  for (const source of sources) {
-    await source.init();
-  }
-
-  const out = run(query, params);
-  return out;
+  return run(query, params);
 }
