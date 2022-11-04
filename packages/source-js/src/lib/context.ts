@@ -3,6 +3,7 @@ import {
   ContextualisedField,
   ContextualisedFunction,
   ContextualisedParam,
+  ContextualisedTransform,
 } from '@arql/contextualiser';
 import { DataModelDef } from '@arql/models';
 
@@ -22,18 +23,10 @@ export function isResultMaps(items: Row[] | ResultMap[]): items is ResultMap[] {
 export type Records = Row[] | ResultMap[];
 
 export type TransformFn = (
-  modifier: string[],
+  transform: ContextualisedTransform,
   origin: Row[] | Record<string, Records>,
-  args: (record: Row | ResultMap) => Field[],
   constituentFields: ContextualisedField[],
-  context: SourceContext,
-  argFields: (
-    | number
-    | ContextualisedParam
-    | ContextualisedExpr
-    | ContextualisedFunction
-  )[],
-  shape?: ContextualisedField[]
+  context: SourceContext
 ) => Records;
 
 export type FunctionFn = (args: Field[]) => Field;

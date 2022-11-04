@@ -1,4 +1,10 @@
-import { applyShape, Records, ResultMap, TransformFn } from '@arql/collector';
+import {
+  applyShape,
+  Records,
+  resolveArgs,
+  ResultMap,
+  TransformFn,
+} from '@arql/collector';
 
 function* getPermutation(
   entries: [string, Records][]
@@ -30,13 +36,10 @@ function* getPermutation(
 }
 
 export const join: TransformFn = (
-  modifier,
+  transform,
   origin,
-  args,
   constituentFields,
-  context,
-  argFields,
-  shape
+  context
 ) => {
   if (Array.isArray(origin)) {
     throw new Error('Multiple origins expected');
@@ -47,7 +50,7 @@ export const join: TransformFn = (
   // inner join
   const entries = Object.entries(origin);
   for (const entry of getPermutation(entries)) {
-    const [matches] = args(entry);
+    const [matches] = resolveArgs(transform, entry, constituentFields, context);
     if (matches) {
       out.push(entry);
     }
@@ -55,8 +58,8 @@ export const join: TransformFn = (
 
   // TODO: left, right, outer etc joins
 
-  if (shape) {
-    return applyShape(shape, out, constituentFields, context);
+  if (transform.shape) {
+    return applyShape(transform.shape, out, constituentFields, context);
   }
   return out;
 };

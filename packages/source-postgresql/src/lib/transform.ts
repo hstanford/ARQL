@@ -60,13 +60,11 @@ export function buildTransform(
 
   // apply the transformation functions to the origin queries
   const out = transformFn(
-    transform.name,
-    transform.modifier,
+    transform,
     origins,
     transform.args.map((arg) =>
       buildFieldValue(arg, constituentFields, context)
     ),
-    transform.shape,
     constituentFields,
     context
   );

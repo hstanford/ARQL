@@ -1,22 +1,21 @@
-import { applyShape, TransformFn } from '@arql/collector';
+import { applyShape, resolveArgs, TransformFn } from '@arql/collector';
 
 export const filter: TransformFn = (
-  modifier,
+  transform,
   origin,
-  args,
   constituentFields,
-  context,
-  argFields,
-  shape
+  context
 ) => {
   if (!Array.isArray(origin)) {
     throw new Error('Directly filtering multi-origin is not supported');
   }
 
-  let out = origin.filter((record) => args(record)[0]);
+  let out = origin.filter(
+    (record) => resolveArgs(transform, record, constituentFields, context)[0]
+  );
 
-  if (shape) {
-    out = applyShape(shape, out, constituentFields, context);
+  if (transform.shape) {
+    out = applyShape(transform.shape, out, constituentFields, context);
   }
 
   return out;

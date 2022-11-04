@@ -1,21 +1,18 @@
 import { ContextualisedField, isId } from '@arql/contextualiser';
-import { applyShape, Row, TransformFn } from '@arql/source-js';
+import { applyShape, Row, TransformFn, resolveArgs } from '@arql/source-js';
 
 export const group: TransformFn = (
-  modifier,
+  transform,
   origin,
-  args,
   constituentFields,
-  context,
-  argFields,
-  shape
+  context
 ) => {
   if (!Array.isArray(origin)) {
     throw new Error('Grouping multi-origin is not supported');
   }
 
   // get field names that we are grouping by
-  const fieldKeys = argFields
+  const fieldKeys = transform.args
     .filter(isId)
     .map((id) => constituentFields.find((f) => f.id === id))
     .filter(
@@ -26,7 +23,9 @@ export const group: TransformFn = (
   // aggregate rows with bucket keys as the transform arguments
   const lookup = new Map<string, Row[]>();
   for (const record of origin) {
-    const key = JSON.stringify(args(record));
+    const key = JSON.stringify(
+      resolveArgs(transform, record, constituentFields, context)
+    );
     if (!lookup.has(key)) {
       lookup.set(key, [record]);
     } else {
@@ -50,8 +49,8 @@ export const group: TransformFn = (
   }
 
   // reshape if applicable
-  if (shape) {
-    out = applyShape(shape, out, constituentFields, context);
+  if (transform.shape) {
+    out = applyShape(transform.shape, out, constituentFields, context);
   }
 
   return out;

@@ -4,6 +4,7 @@ import {
   ContextualisedFunction,
   ContextualisedParam,
 } from '@arql/contextualiser';
+import { DelegatedTransform } from '@arql/delegator';
 
 // an individual data value
 export type Field = unknown;
@@ -21,18 +22,10 @@ export function isResultMaps(items: Row[] | ResultMap[]): items is ResultMap[] {
 export type Records = Row[] | ResultMap[];
 
 export type TransformFn = (
-  modifier: string[],
+  transform: DelegatedTransform,
   origin: Row[] | Record<string, Records>,
-  args: (record: Row | ResultMap) => Field[],
   constituentFields: ContextualisedField[],
-  context: CollectorContext,
-  argFields: (
-    | number
-    | ContextualisedParam
-    | ContextualisedExpr
-    | ContextualisedFunction
-  )[],
-  shape?: ContextualisedField[]
+  context: CollectorContext
 ) => Records;
 
 export type FunctionFn = (args: Field[]) => Field;

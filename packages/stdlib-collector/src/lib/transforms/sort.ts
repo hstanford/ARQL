@@ -1,17 +1,18 @@
-import { applyShape, TransformFn } from '@arql/collector';
+import { applyShape, resolveArgs, Row, TransformFn } from '@arql/collector';
 import { compare } from '../util';
 
 export const sort: TransformFn = (
-  modifier,
+  transform,
   origin,
-  args,
   constituentFields,
-  context,
-  argFields,
-  shape
+  context
 ) => {
   if (!Array.isArray(origin)) {
     throw new Error('Directly sorting multi-origin is not supported');
+  }
+
+  function args(record: Row) {
+    return resolveArgs(transform, record, constituentFields, context);
   }
 
   let out = origin.sort((record1, record2) => {
@@ -20,14 +21,14 @@ export const sort: TransformFn = (
     const argList2 = args(record2);
     for (const idx in argList1) {
       const val = compare(argList1[idx], argList2[idx]);
-      init = modifier.includes('desc') ? init - val : init + val;
+      init = transform.modifier.includes('desc') ? init - val : init + val;
       if (init) break;
     }
     return init;
   });
 
-  if (shape) {
-    out = applyShape(shape, out, constituentFields, context);
+  if (transform.shape) {
+    out = applyShape(transform.shape, out, constituentFields, context);
   }
 
   return out;

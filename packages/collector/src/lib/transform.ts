@@ -20,6 +20,17 @@ type OriginResult<T> = {
   constituentFields: ContextualisedField[];
 };
 
+export function resolveArgs(
+  transform: DelegatedTransform,
+  record: Row | ResultMap,
+  constituentFields: ContextualisedField[],
+  context: CollectorContext
+) {
+  return transform.args.map((arg) =>
+    buildFieldValue(arg, record, constituentFields, context)
+  );
+}
+
 // resolve the data of the origin(s) of a transform and the
 // fields that are exposed by that data
 async function getOrigins<T extends DelegatedTransformOrigins>(
@@ -92,20 +103,6 @@ export async function collectTransform(
     throw new Error(`Missing transform implementation for ${transform.name}`);
   }
 
-  // function to resolve arguments from any particular record
-  const argsFn = (record: Row | ResultMap) =>
-    transform.args.map((arg) =>
-      buildFieldValue(arg, record, constituentFields, context)
-    );
-
   // run the transform over the data
-  return transformFn(
-    transform.modifier,
-    origin,
-    argsFn,
-    constituentFields,
-    context,
-    transform.args,
-    transform.shape
-  );
+  return transformFn(transform, origin, constituentFields, context);
 }
