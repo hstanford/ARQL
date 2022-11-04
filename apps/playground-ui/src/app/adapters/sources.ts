@@ -15,14 +15,37 @@ export function useSources() {
   });
 }
 
-type ArqlPayload = { query: string; params: unknown[] };
-
 export function useArqlQuery() {
   return useMutation({
-    mutationFn: async (payload: ArqlPayload) => {
+    mutationFn: async (query: string) => {
+      const params: unknown[] = [];
+      let newQuery = '';
+      let matching = false;
+      let justSawDollar = false;
+      let variable = '';
+      for (const char of query) {
+        if (matching && char !== '}') {
+          variable += char;
+        } else if (matching && char === '}') {
+          matching = false;
+          params.push(variable);
+          variable = '';
+          newQuery += params.length;
+        } else if (justSawDollar && char === '{') {
+          matching = true;
+          justSawDollar = false;
+        } else if (justSawDollar) {
+          throw new Error('Invalid use of "$"');
+        } else if (char === '$') {
+          justSawDollar = true;
+          newQuery += char;
+        } else {
+          newQuery += char;
+        }
+      }
       const res = await fetch(BASE_URL + '/query', {
         method: 'POST',
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ query: newQuery, params }),
         headers: {
           'Content-Type': 'application/json',
         },

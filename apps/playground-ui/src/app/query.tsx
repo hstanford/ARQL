@@ -6,7 +6,6 @@ import { useArqlQuery } from './adapters/sources';
 
 export function Query() {
   const [code, setCode] = useState('users | filter(firstName = $1) {lastName}');
-  const [params] = useState<unknown[]>([]);
   const mutation = useArqlQuery();
 
   return (
@@ -47,7 +46,7 @@ export function Query() {
             <Fab
               sx={{ position: 'absolute', bottom: 0, margin: 1, right: 0 }}
               onClick={() => {
-                mutation.mutate({ query: code, params });
+                mutation.mutate(code);
               }}
             >
               <PlayArrow />
