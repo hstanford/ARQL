@@ -3,13 +3,29 @@ import {
   ContextualisedQuery,
   ContextualisedTransform,
 } from '@arql/contextualiser';
-import { DataModelDef, DataSource } from '@arql/models';
+import { DataModel, DataModelDef, DataSource, DataType } from '@arql/models';
 import { Dictionary } from '@arql/util';
 import { resolveCollection } from './collection';
 import { isResultMaps, Row, SourceConfig, SourceContext } from './context';
 import { resolveTransform } from './transform';
 
-export class JsSource<M extends DataModelDef[]> extends DataSource {
+function dataTypeForValue(value: unknown): DataType {
+  if (typeof value === 'string') {
+    return 'string';
+  } else if (typeof value === 'number') {
+    return 'number';
+  } else if (value instanceof Date) {
+    return 'date';
+  } else if (Array.isArray(value) || value?.constructor === Object) {
+    return 'json';
+  } else if (typeof value === 'boolean') {
+    return 'boolean';
+  } else {
+    throw new Error('Could not determine datatype');
+  }
+}
+
+export class JsSource extends DataSource {
   supportsExpressionFields = true;
   supportsExpressions = true;
   supportsFieldAliasing = true;
@@ -27,13 +43,36 @@ export class JsSource<M extends DataModelDef[]> extends DataSource {
   data: Map<string, Row[]>;
   dataModels: Record<string, DataModelDef>;
 
-  constructor(config: SourceConfig & { models: M }) {
+  constructor(config: SourceConfig & { models: DataModelDef[] }) {
     super(config);
     this.data = config.data;
-    this.dataModels = config.models.reduce((acc, item) => {
+    this.dataModels = this.getDataModels(config.models);
+    if (!this.models.length) {
+      this.dumpModels();
+    }
+  }
+
+  getDataModels(models: DataModelDef[]) {
+    return models.reduce((acc, item) => {
       acc[item.name] = item;
       return acc;
     }, {} as Record<string, DataModelDef>);
+  }
+
+  dumpModels() {
+    const models: DataModelDef[] = [];
+    for (const [name, rows] of this.data.entries()) {
+      if (!rows.length) continue;
+      models.push({
+        name,
+        fields: Object.entries(rows[0]).map(([name, value]) => ({
+          name,
+          datatype: dataTypeForValue(value),
+        })),
+      });
+    }
+    this.models = models.map((m) => new DataModel(m, this));
+    this.dataModels = this.getDataModels(models);
   }
 
   // retrieve values from an in-memory js structure

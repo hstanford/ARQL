@@ -4,12 +4,12 @@ import { Requirements } from './requirements';
 
 // valid data types - to be used to build expected output types and possibly
 // also to restrict the data types of function or operation arguments
-export type dataType = 'string' | 'number' | 'boolean' | 'json' | 'date';
+export type DataType = 'string' | 'number' | 'boolean' | 'json' | 'date';
 
 // the configuration that can be used to instantiate a new data field
 export interface DataFieldDef {
   name: string;
-  datatype: dataType;
+  datatype: DataType;
   fields?: DataFieldDef[];
 }
 
@@ -26,7 +26,7 @@ export class DataField extends Node {
   // the "key" for this field
   name: string;
 
-  datatype: dataType;
+  datatype: DataType;
 
   // any subfields this field contains (not currently supported)
   fields: DataField[];

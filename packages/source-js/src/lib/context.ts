@@ -1,8 +1,5 @@
 import {
-  ContextualisedExpr,
   ContextualisedField,
-  ContextualisedFunction,
-  ContextualisedParam,
   ContextualisedTransform,
 } from '@arql/contextualiser';
 import { DataModelDef } from '@arql/models';
