@@ -3,10 +3,11 @@ import styled from '@emotion/styled';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Route, Routes } from 'react-router-dom';
 import { Layout } from './layout';
+import { Query } from './query';
 import { Source } from './source';
 
 const StyledApp = styled.div`
-  // Your style here
+  height: 100%;
 `;
 
 const queryClient = new QueryClient();
@@ -18,7 +19,7 @@ export function App() {
         <Layout>
           <Routes>
             <Route path="/" element={<div>Welcome</div>} />
-            <Route path="/query" element={<div>QUERY</div>} />
+            <Route path="/query" element={<Query />} />
             <Route path="/sources/:name" element={<Source />} />
           </Routes>
         </Layout>

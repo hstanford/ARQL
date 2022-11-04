@@ -5,7 +5,9 @@ import {
   Drawer,
   List,
   ListItemButton,
+  ListSubheader,
   Skeleton,
+  Typography,
 } from '@mui/material';
 import { ComponentProps } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -17,7 +19,7 @@ export function Layout({ children }: ComponentProps<'div'>) {
   const { isLoading, isError, data } = useSources();
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: 'flex', height: '100%' }}>
       <Drawer
         anchor="left"
         variant="permanent"
@@ -28,26 +30,25 @@ export function Layout({ children }: ComponentProps<'div'>) {
         </Box>
         <List sx={{ minWidth: '200px' }}>
           <ListItemButton
-            sx={{ marginBottom: 1 }}
+            sx={{
+              marginBottom: 1,
+            }}
             onClick={() => {
               navigate('/query');
             }}
           >
-            Run query
+            <Typography fontFamily='"Fira code", "Fira Mono", monospace'>
+              Queries
+            </Typography>
           </ListItemButton>
-          <Divider />
+          <Divider sx={{ margin: 1 }} />
+          <ListSubheader>
+            <Typography fontFamily='"Fira code", "Fira Mono", monospace'>
+              Sources
+            </Typography>
+          </ListSubheader>
           {isError || isLoading ? (
             <Box>
-              <Skeleton
-                variant="rectangular"
-                height="40px"
-                sx={{ marginBlock: 1 }}
-              />
-              <Skeleton
-                variant="rectangular"
-                height="40px"
-                sx={{ marginBlock: 1 }}
-              />
               <Skeleton
                 variant="rectangular"
                 height="40px"
@@ -58,10 +59,11 @@ export function Layout({ children }: ComponentProps<'div'>) {
             Object.keys(data).map((name: string, idx: number) => (
               <ListItemButton
                 key={idx}
-                sx={{ marginBlock: 1 }}
                 onClick={() => navigate(`/sources/${name}`)}
               >
-                {name}
+                <Typography fontFamily='"Fira code", "Fira Mono", monospace'>
+                  {name}
+                </Typography>
               </ListItemButton>
             ))
           )}
