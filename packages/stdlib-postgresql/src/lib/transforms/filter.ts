@@ -15,6 +15,7 @@ export const filter: TransformFn = (
     throw new Error('Single argument expected for filter transform');
   }
 
+  // alter the origin: ...origin WHERE args[0]
   const query = queries[0];
   let out = query.where(args[0]);
 

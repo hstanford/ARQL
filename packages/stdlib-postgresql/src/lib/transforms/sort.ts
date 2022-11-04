@@ -15,6 +15,7 @@ export const sort: TransformFn = (
     throw new Error('At least one argument expected for sort transform');
   }
 
+  // alter the existing query: ...query ORDER BY ...args
   const query = queries[0];
   let out = query.order(
     ...args.map((arg) =>

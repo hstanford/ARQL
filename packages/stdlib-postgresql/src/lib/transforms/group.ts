@@ -17,6 +17,7 @@ export const group: TransformFn = (
 
   const query = queries[0];
 
+  // produce a subquery: SELECT ...shape FROM origin GROUP BY ...args
   let out = query.table
     .subQuery(transform.name)
     .from(query)

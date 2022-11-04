@@ -10,6 +10,7 @@ import { SourceContext } from './context';
 import { buildField, buildFieldValue } from './field';
 import { Column, SubQuery } from './types';
 
+// select a set of columns from a subquery as a new subquery
 export function applyShape(
   subQuery: SubQuery,
   name: string,
