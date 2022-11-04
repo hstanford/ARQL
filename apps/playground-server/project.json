@@ -1,0 +1,57 @@
+{
+  "name": "playground-server",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/playground-server/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/webpack:webpack",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "target": "node",
+        "compiler": "tsc",
+        "outputPath": "dist/apps/playground-server",
+        "main": "apps/playground-server/src/main.ts",
+        "tsConfig": "apps/playground-server/tsconfig.app.json",
+        "assets": ["apps/playground-server/src/assets"],
+        "webpackConfig": "apps/playground-server/webpack.config.cjs"
+      },
+      "configurations": {
+        "production": {
+          "optimization": true,
+          "extractLicenses": true,
+          "inspect": false,
+          "fileReplacements": [
+            {
+              "replace": "apps/playground-server/src/environments/environment.ts",
+              "with": "apps/playground-server/src/environments/environment.prod.ts"
+            }
+          ]
+        }
+      }
+    },
+    "serve": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "./apps/playground-server",
+        "command": "TS_NODE_PROJECT=./tsconfig.app.json NX_BASE_TSCONFIG=../../tsconfig.base.json node --loader nx-ts-esm-loader -r tsconfig-paths/register src/main.ts"
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/playground-server/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "apps/playground-server/jest.config.ts",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}

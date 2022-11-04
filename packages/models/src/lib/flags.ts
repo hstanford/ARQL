@@ -1,3 +1,5 @@
+// eslint-disable-next-line
+// @ts-nocheck
 export abstract class Flags {
   // these will be used by the contextualiser/delegator to work out if
   // we need to reject the query or where to break the node off the tree
