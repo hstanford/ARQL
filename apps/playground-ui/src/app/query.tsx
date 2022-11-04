@@ -6,7 +6,7 @@ import { useArqlQuery } from './adapters/sources';
 
 export function Query() {
   const [code, setCode] =
-    useState(`test | filter(foo = \${Joe}) | sort.desc(bar) {
+    useState(`test | filter(foo = \${"Joe"}) | sort.desc(bar) {
   bar,
   input: \${1},
   foo
