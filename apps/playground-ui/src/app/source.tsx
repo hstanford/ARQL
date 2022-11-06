@@ -1,25 +1,85 @@
-import { Box, Typography, Stack, Skeleton } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Stack,
+  Skeleton,
+  ToggleButton,
+  ToggleButtonGroup,
+} from '@mui/material';
 import { useParams } from 'react-router-dom';
 import { useSources } from './adapters/sources';
+import { useState } from 'react';
+import { SourceIcon } from './icon';
+
+function RawModels({ source }: { source: { models: unknown } }) {
+  return (
+    <Box
+      sx={{
+        width: '100%',
+        overflow: 'auto',
+      }}
+    >
+      <Typography
+        fontFamily='"Fira code", "Fira Mono", monospace'
+        sx={{
+          whiteSpace: 'pre-wrap',
+          margin: 1,
+        }}
+      >
+        {JSON.stringify(source.models, null, 2)}
+      </Typography>
+    </Box>
+  );
+}
 
 export function Source() {
   const params = useParams();
   const { isLoading, isError, data: sources } = useSources();
 
-  console.log(params);
+  const [view, setView] = useState<'raw' | 'pretty' | 'edit'>('raw');
+
   const sourceName = params['name'];
+
+  if (!sourceName || isLoading || isError) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          width: 'calc(100% - 16px)',
+          height: 'calc(100% - 16px)',
+          padding: 1,
+          overflow: 'hidden',
+        }}
+      >
+        Loading...
+      </Box>
+    );
+  }
+
+  const source = sources[sourceName];
+
   return (
     <Box
       sx={{
         display: 'flex',
-        width: 'calc(100% - 16px)',
-        height: 'calc(100% - 16px)',
-        padding: 1,
+        width: 'calc(100% - 32px)',
+        height: 'calc(100% - 32px)',
+        padding: 2,
+        overflow: 'hidden',
       }}
     >
-      <Stack sx={{ width: '100%', height: '100%', paddingInline: 1 }}>
-        <Stack direction="row" sx={{ paddingTop: 1 }}>
-          <Box sx={{ height: '50px', width: '100%' }}>
+      <Stack sx={{ width: '100%', height: '100%' }}>
+        <Stack direction="row" sx={{ border: '1px #efefef solid' }}>
+          <Box sx={{ marginBlock: 'auto', marginInline: 2 }}>
+            <SourceIcon sourceType={source.type} />
+          </Box>
+          <Typography
+            fontFamily='"Fira code", "Fira Mono", monospace'
+            sx={{ margin: 'auto' }}
+          >
+            {sourceName}
+          </Typography>
+          <Box sx={{ height: '50px', width: '100%', marginLeft: 2 }}>
             <Skeleton width="100%" height="100%" sx={{ transform: 'none' }} />
           </Box>
         </Stack>
@@ -27,22 +87,26 @@ export function Source() {
           direction="row"
           sx={{
             marginTop: 1,
-            width: '100%',
+            position: 'relative',
+            overflow: 'hidden',
             border: '1px #efefef solid',
-            overflow: 'auto',
+            height: '100%',
           }}
         >
-          <Typography
-            fontFamily='"Fira code", "Fira Mono", monospace'
-            sx={{
-              whiteSpace: 'pre-wrap',
-              margin: 1,
+          <ToggleButtonGroup
+            value={view}
+            exclusive
+            onChange={(e, value) => {
+              setView(value);
             }}
+            aria-label="text alignment"
+            sx={{ position: 'absolute', right: 0, margin: 1 }}
           >
-            {isLoading || isError || !sourceName
-              ? '<Loading...>'
-              : JSON.stringify(sources[sourceName]?.models, null, 2)}
-          </Typography>
+            <ToggleButton value="raw">Raw</ToggleButton>
+            <ToggleButton value="pretty">Pretty</ToggleButton>
+            <ToggleButton value="edit">Edit</ToggleButton>
+          </ToggleButtonGroup>
+          {view === 'raw' ? <RawModels source={source} /> : ''}
         </Stack>
       </Stack>
     </Box>

@@ -17,18 +17,18 @@ export function Query() {
     <Box
       sx={{
         display: 'flex',
-        width: 'calc(100% - 16px)',
-        height: 'calc(100% - 16px)',
-        padding: 1,
+        width: 'calc(100% - 32px)',
+        height: 'calc(100% - 32px)',
+        padding: 2,
       }}
     >
-      <Stack sx={{ width: '100%', height: '100%', paddingInline: 1 }}>
-        <Stack direction="row" sx={{ paddingTop: 1 }}>
+      <Stack sx={{ width: '100%', height: '100%' }}>
+        <Stack direction="row">
           <Box sx={{ height: '50px', width: '100%' }}>
             <Skeleton width="100%" height="100%" sx={{ transform: 'none' }} />
           </Box>
         </Stack>
-        <Stack direction="row" sx={{ paddingBlock: 1, height: '100%' }}>
+        <Stack direction="row" sx={{ paddingTop: 1, height: '100%' }}>
           <Box
             sx={{
               position: 'relative',
