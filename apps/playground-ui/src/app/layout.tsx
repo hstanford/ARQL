@@ -1,22 +1,27 @@
+import { Add } from '@mui/icons-material';
 import {
   Box,
   Button,
   Divider,
   Drawer,
+  IconButton,
   List,
   ListItemButton,
   ListSubheader,
   Skeleton,
+  Stack,
   Typography,
 } from '@mui/material';
 import { ComponentProps } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useSources } from './adapters/sources';
+import { SourceIcon } from './icon';
 
 export function Layout({ children }: ComponentProps<'div'>) {
   const navigate = useNavigate();
 
   const { isLoading, isError, data } = useSources();
+  const { pathname } = useLocation();
 
   return (
     <Box sx={{ display: 'flex', height: '100%' }}>
@@ -36,6 +41,7 @@ export function Layout({ children }: ComponentProps<'div'>) {
             onClick={() => {
               navigate('/query');
             }}
+            selected={pathname === '/query'}
           >
             <Typography fontFamily='"Fira code", "Fira Mono", monospace'>
               Queries
@@ -43,9 +49,17 @@ export function Layout({ children }: ComponentProps<'div'>) {
           </ListItemButton>
           <Divider sx={{ margin: 1 }} />
           <ListSubheader>
-            <Typography fontFamily='"Fira code", "Fira Mono", monospace'>
-              Sources
-            </Typography>
+            <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
+              <Typography
+                fontFamily='"Fira code", "Fira Mono", monospace'
+                sx={{ lineHeight: '40px' }}
+              >
+                Sources
+              </Typography>
+              <IconButton>
+                <Add />
+              </IconButton>
+            </Stack>
           </ListSubheader>
           {isError || isLoading ? (
             <Box>
@@ -60,10 +74,13 @@ export function Layout({ children }: ComponentProps<'div'>) {
               <ListItemButton
                 key={idx}
                 onClick={() => navigate(`/sources/${name}`)}
+                selected={pathname === `/sources/${name}`}
+                sx={{ display: 'flex', justifyContent: 'space-between' }}
               >
                 <Typography fontFamily='"Fira code", "Fira Mono", monospace'>
                   {name}
                 </Typography>
+                <SourceIcon sourceType={data[name]['type']} />
               </ListItemButton>
             ))
           )}
