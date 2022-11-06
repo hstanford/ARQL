@@ -10,33 +10,14 @@ import { useParams } from 'react-router-dom';
 import { useSources } from './adapters/sources';
 import { useState } from 'react';
 import { SourceIcon } from './icon';
-
-function RawModels({ source }: { source: { models: unknown } }) {
-  return (
-    <Box
-      sx={{
-        width: '100%',
-        overflow: 'auto',
-      }}
-    >
-      <Typography
-        fontFamily='"Fira code", "Fira Mono", monospace'
-        sx={{
-          whiteSpace: 'pre-wrap',
-          margin: 1,
-        }}
-      >
-        {JSON.stringify(source.models, null, 2)}
-      </Typography>
-    </Box>
-  );
-}
+import { RawModels } from './components/sources/raw';
+import { PrettyModels } from './components/sources/pretty';
 
 export function Source() {
   const params = useParams();
   const { isLoading, isError, data: sources } = useSources();
 
-  const [view, setView] = useState<'raw' | 'pretty' | 'edit'>('raw');
+  const [view, setView] = useState<'raw' | 'pretty' | 'edit'>('pretty');
 
   const sourceName = params['name'];
 
@@ -100,13 +81,19 @@ export function Source() {
               setView(value);
             }}
             aria-label="text alignment"
-            sx={{ position: 'absolute', right: 0, margin: 1 }}
+            sx={{ position: 'absolute', right: 0, margin: 1, zIndex: 1 }}
           >
             <ToggleButton value="raw">Raw</ToggleButton>
             <ToggleButton value="pretty">Pretty</ToggleButton>
             <ToggleButton value="edit">Edit</ToggleButton>
           </ToggleButtonGroup>
-          {view === 'raw' ? <RawModels source={source} /> : ''}
+          {view === 'raw' ? (
+            <RawModels source={source} />
+          ) : view === 'pretty' ? (
+            <PrettyModels source={source} />
+          ) : (
+            ''
+          )}
         </Stack>
       </Stack>
     </Box>
