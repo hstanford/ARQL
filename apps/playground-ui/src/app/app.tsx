@@ -2,6 +2,7 @@ import styled from '@emotion/styled';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Route, Routes } from 'react-router-dom';
+import { Welcome } from './components/welcome';
 import { Layout } from './layout';
 import { Query } from './query';
 import { Source } from './source';
@@ -18,7 +19,7 @@ export function App() {
       <QueryClientProvider client={queryClient}>
         <Layout>
           <Routes>
-            <Route path="/" element={<div>Welcome</div>} />
+            <Route path="/" element={<Welcome />} />
             <Route path="/query" element={<Query />} />
             <Route path="/sources/:name" element={<Source />} />
           </Routes>

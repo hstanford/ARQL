@@ -10,12 +10,14 @@ import {
   ListSubheader,
   Skeleton,
   Stack,
+  SvgIcon,
   Typography,
 } from '@mui/material';
 import { ComponentProps } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useSources } from './adapters/sources';
 import { SourceIcon } from './icon';
+import { ReactComponent as ARQLIcon } from '../assets/ARQL.svg';
 
 export function Layout({ children }: ComponentProps<'div'>) {
   const navigate = useNavigate();
@@ -28,10 +30,27 @@ export function Layout({ children }: ComponentProps<'div'>) {
       <Drawer
         anchor="left"
         variant="permanent"
-        sx={{ minWidth: '200px', display: 'flex' }}
+        sx={{ minWidth: '200px', display: 'flex', position: 'inherit' }}
+        PaperProps={{ sx: { position: 'inherit' } }}
       >
-        <Box sx={{ padding: 2 }}>
-          <Button onClick={() => navigate('/')}>ARQL Playground</Button>
+        <Box
+          sx={{
+            padding: 2,
+            display: 'flex',
+            flexDirection: 'row',
+          }}
+        >
+          <Box sx={{ marginBlock: 'auto' }}>
+            <SvgIcon component={ARQLIcon} />
+          </Box>
+          <Button onClick={() => navigate('/')}>
+            <Typography
+              fontFamily='"Fira code", "Fira Mono", monospace'
+              sx={{ whiteSpace: 'pre-wrap', margin: 1 }}
+            >
+              ARQL Playground
+            </Typography>
+          </Button>
         </Box>
         <List sx={{ minWidth: '200px' }}>
           <ListItemButton

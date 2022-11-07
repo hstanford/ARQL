@@ -1,8 +1,9 @@
-import { Box, Fab, Skeleton, Stack, Typography } from '@mui/material';
+import { Box, Fab, Skeleton, Stack, SvgIcon, Typography } from '@mui/material';
 import { PlayArrow } from '@mui/icons-material';
 import { useState } from 'react';
 import Editor from 'react-simple-code-editor';
 import { useArqlQuery } from './adapters/sources';
+import { ReactComponent as ARQLIcon } from '../assets/ARQL.svg';
 
 export function Query() {
   const [code, setCode] =
@@ -23,8 +24,17 @@ export function Query() {
       }}
     >
       <Stack sx={{ width: '100%', height: '100%' }}>
-        <Stack direction="row">
-          <Box sx={{ height: '50px', width: '100%' }}>
+        <Stack direction="row" sx={{ border: '1px #efefef solid' }}>
+          <Box sx={{ marginBlock: 'auto', marginInline: 2 }}>
+            <SvgIcon component={ARQLIcon} />
+          </Box>
+          <Typography
+            fontFamily='"Fira code", "Fira Mono", monospace'
+            sx={{ margin: 'auto' }}
+          >
+            Queries
+          </Typography>
+          <Box sx={{ height: '50px', width: '100%', marginLeft: 2 }}>
             <Skeleton width="100%" height="100%" sx={{ transform: 'none' }} />
           </Box>
         </Stack>

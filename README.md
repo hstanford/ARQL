@@ -1,4 +1,4 @@
-# ARQL
+# ![ARQL Logo](./ARQL.svg) ARQL
 
 ## Run manual test app
 
