@@ -1,4 +1,4 @@
-# ![ARQL Logo](./ARQL.svg | width=30) ARQL
+# ![ARQL Logo](./ARQL.svg) ARQL
 
 ARQL (Abstract Relational Query Language) is an abstraction layer that reads data from multiple databases and external APIs, providing a uniform but flexible query interface.
 
