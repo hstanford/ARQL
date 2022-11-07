@@ -6,3 +6,10 @@ export const equals: OperatorFn = (args, sql) => {
   }
   return sql.binaryOperator('=')(args[0], args[1]);
 };
+
+export const notEquals: OperatorFn = (args, sql) => {
+  if (args.length !== 2) {
+    throw new Error('Expect two arguments to compute inequality');
+  }
+  return sql.binaryOperator('<>')(args[0], args[1]);
+};

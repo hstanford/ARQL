@@ -6,3 +6,10 @@ export const or: OperatorFn = (args, sql) => {
   }
   return sql.binaryOperator('OR')(args[0], args[1]);
 };
+
+export const and: OperatorFn = (args, sql) => {
+  if (args.length !== 2) {
+    throw new Error('Expect two arguments to compute "AND"');
+  }
+  return sql.binaryOperator('AND')(args[0], args[1]);
+};
