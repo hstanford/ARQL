@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 
 import { AppService } from './app.service';
 
@@ -33,6 +33,11 @@ export class AppController {
       data.name,
       new Map(Object.entries(data.data))
     );
+  }
+
+  @Post('/sources/:name/refresh')
+  async refreshSource(@Param('name') name: string) {
+    await this.appService.updateSourceModels(name);
   }
 
   @Post('/query')

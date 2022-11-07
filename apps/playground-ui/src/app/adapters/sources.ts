@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 const BASE_URL = 'http://localhost:3333/api';
 
@@ -68,6 +68,74 @@ export function useArqlQuery() {
         throw new Error('Failed to fetch');
       }
       return await res.json();
+    },
+  });
+}
+
+export function useAddPgSource() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: {
+      name: string;
+      connectionVariables: Record<string, unknown>;
+    }) => {
+      const res = await fetch(BASE_URL + '/sources/pg', {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!res.ok) {
+        throw new Error('Failed to fetch');
+      }
+      return;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['sources'] });
+    },
+  });
+}
+
+export function useAddLocalSource() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: { name: string; data: unknown }) => {
+      const res = await fetch(BASE_URL + '/sources/local', {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!res.ok) {
+        throw new Error('Failed to fetch');
+      }
+      return;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['sources'] });
+    },
+  });
+}
+
+export function useRefreshSource() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (name: string) => {
+      const res = await fetch(BASE_URL + `/sources/${name}/refresh`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!res.ok) {
+        throw new Error('Failed to fetch');
+      }
+      return;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['sources'] });
     },
   });
 }

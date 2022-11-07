@@ -66,6 +66,7 @@ export class AppService {
   ) {
     const source = await createPgSource(connectionVariables);
     this.sources[name] = source;
+    this.refreshRun();
     return source;
   }
 
@@ -75,6 +76,7 @@ export class AppService {
   ) {
     const source = await createLocalSource(data);
     this.sources[name] = source;
+    this.refreshRun();
     return source;
   }
 

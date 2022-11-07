@@ -5,19 +5,23 @@ import {
   Skeleton,
   ToggleButton,
   ToggleButtonGroup,
+  IconButton,
 } from '@mui/material';
-import { useParams } from 'react-router-dom';
-import { useSources } from './adapters/sources';
+import { Navigate, useParams } from 'react-router-dom';
+import { useRefreshSource, useSources } from './adapters/sources';
 import { useState } from 'react';
 import { SourceIcon } from './icon';
 import { RawModels } from './components/sources/raw';
 import { PrettyModels } from './components/sources/pretty';
+import { Refresh } from '@mui/icons-material';
 
 export function Source() {
   const params = useParams();
   const { isLoading, isError, data: sources } = useSources();
 
   const [view, setView] = useState<'raw' | 'pretty' | 'edit'>('pretty');
+
+  const refreshSource = useRefreshSource();
 
   const sourceName = params['name'];
 
@@ -38,6 +42,10 @@ export function Source() {
   }
 
   const source = sources[sourceName];
+
+  if (!source) {
+    return <Navigate to="/" />;
+  }
 
   return (
     <Box
@@ -60,6 +68,9 @@ export function Source() {
           >
             {sourceName}
           </Typography>
+          <IconButton onClick={() => refreshSource.mutate(sourceName)}>
+            <Refresh />
+          </IconButton>
           <Box sx={{ height: '50px', width: '100%', marginLeft: 2 }}>
             <Skeleton width="100%" height="100%" sx={{ transform: 'none' }} />
           </Box>

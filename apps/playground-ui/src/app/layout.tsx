@@ -13,17 +13,19 @@ import {
   SvgIcon,
   Typography,
 } from '@mui/material';
-import { ComponentProps } from 'react';
+import { ComponentProps, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useSources } from './adapters/sources';
 import { SourceIcon } from './icon';
 import { ReactComponent as ARQLIcon } from '../assets/ARQL.svg';
+import { NewSourceModal } from './components/newSource';
 
 export function Layout({ children }: ComponentProps<'div'>) {
   const navigate = useNavigate();
 
   const { isLoading, isError, data } = useSources();
   const { pathname } = useLocation();
+  const [sourceModalOpen, setSourceModalOpen] = useState(false);
 
   return (
     <Box sx={{ display: 'flex', height: '100%' }}>
@@ -75,7 +77,7 @@ export function Layout({ children }: ComponentProps<'div'>) {
               >
                 Sources
               </Typography>
-              <IconButton>
+              <IconButton onClick={() => setSourceModalOpen(true)}>
                 <Add />
               </IconButton>
             </Stack>
@@ -105,6 +107,10 @@ export function Layout({ children }: ComponentProps<'div'>) {
           )}
         </List>
       </Drawer>
+      <NewSourceModal
+        open={sourceModalOpen}
+        setOpen={(val: boolean) => setSourceModalOpen(val)}
+      />
       {children}
     </Box>
   );

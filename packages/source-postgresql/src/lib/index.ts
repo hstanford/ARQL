@@ -69,6 +69,7 @@ export class PostgreSQL extends DataSource {
       throw new Error('Could not produce model schema');
     }
     this.models = data.map((m) => new DataModel(m, this));
+    this.setModels();
   }
 
   setModels() {
