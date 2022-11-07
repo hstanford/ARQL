@@ -1,9 +1,4 @@
-import {
-  ContextualisedExpr,
-  ContextualisedField,
-  ContextualisedFunction,
-  ContextualisedParam,
-} from '@arql/contextualiser';
+import { ContextualisedField } from '@arql/contextualiser';
 import { DelegatedTransform } from '@arql/delegator';
 
 // an individual data value
@@ -28,14 +23,14 @@ export type TransformFn = (
   context: CollectorContext
 ) => Records;
 
-export type FunctionFn = (args: Field[]) => Field;
+export type FunctionFn = (args: Field[], modifier: string[]) => Field;
 export type OperatorFn = (args: Field[]) => Field;
 
 // expected configuration format for the collector
 export interface CollectorConfig {
   transforms: Record<string, TransformFn>;
-  functions: Record<string, (args: Field[]) => Field>;
-  operators: Record<string, (args: Field[]) => Field>;
+  functions: Record<string, FunctionFn>;
+  operators: Record<string, OperatorFn>;
 }
 
 // the interface of a context object that is accessible

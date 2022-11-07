@@ -13,7 +13,8 @@ export type TransformFn = (
 
 export type FunctionFn = (
   args: (AliasableNodes | ParameterNode)[],
-  sql: Sql
+  sql: Sql,
+  modifier: string[]
 ) => AliasableNodes;
 
 export type OperatorFn = (

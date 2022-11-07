@@ -12,7 +12,7 @@ export const group: TransformFn = (
   }
 
   if (args.length < 1) {
-    throw new Error('At least one argument expected for filter transform');
+    throw new Error('At least one argument expected for group transform');
   }
 
   const query = queries[0];

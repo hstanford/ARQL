@@ -47,6 +47,9 @@ export function buildCollection(
   // match up columns on the collection's origin to the fields available on the subquery
   const constituentFields = collection.origin.requiredFields.reduce(
     (acc, rf) => {
+      if (!rf.name) {
+        throw new Error(`Column should be named - perhaps needs aliasing`);
+      }
       const col = columns.find((c) => (c.alias ?? c.name) === rf.name);
       if (!col) {
         throw new Error(`Could not find column ${rf.name}`);

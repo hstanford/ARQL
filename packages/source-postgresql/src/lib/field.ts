@@ -93,7 +93,8 @@ export function buildFieldValue(
     // recursively build sql-ts nodes for the function arguments
     out = fn(
       field.args.map((arg) => buildFieldValue(arg, constituentFields, context)),
-      context.sql
+      context.sql,
+      field.modifier
     );
   }
 

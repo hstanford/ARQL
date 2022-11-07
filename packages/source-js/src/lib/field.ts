@@ -75,7 +75,7 @@ export function buildFieldValue(
       buildFieldValue(arg, record, constituentFields, context)
     );
 
-    return fn(args);
+    return fn(args, field.modifier);
   } else {
     throw new Error('Unexpected field value');
   }

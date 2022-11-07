@@ -1,17 +1,16 @@
 import { Box, Fab, Skeleton, Stack, SvgIcon, Typography } from '@mui/material';
 import { PlayArrow } from '@mui/icons-material';
-import { useState } from 'react';
 import Editor from 'react-simple-code-editor';
 import { useArqlQuery } from './adapters/sources';
 import { ReactComponent as ARQLIcon } from '../assets/ARQL.svg';
 
-export function Query() {
-  const [code, setCode] =
-    useState(`test | filter(foo = \${"Joe"}) | sort.desc(bar) {
-  bar,
-  input: \${1},
-  foo
-}`);
+export function Query({
+  code,
+  setCode,
+}: {
+  code: string;
+  setCode: (val: string) => void;
+}) {
   const mutation = useArqlQuery();
 
   return (

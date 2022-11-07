@@ -26,7 +26,7 @@ export type TransformFn = (
   context: SourceContext
 ) => Records;
 
-export type FunctionFn = (args: Field[]) => Field;
+export type FunctionFn = (args: Field[], modifier: string[]) => Field;
 export type OperatorFn = (args: Field[]) => Field;
 
 export interface SourceConfig {
