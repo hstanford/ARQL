@@ -1,12 +1,15 @@
-import {
-  combineRequirements,
-  Node,
-  Requirements,
-  TransformDef,
-} from '@arql/models';
-import { ContextualisedExpr } from './expr';
+import { combineRequirements, Node, Requirements } from '@arql/models';
+import { Transform } from '@arql/parser';
+import { FunctionDef, Type } from '@arql/types';
+import { ContextualisedExpr, getExpression } from './expr';
 import { ContextualisedParam } from './param';
-import { constituentFields, ContextualiserState, ID, isId } from './util';
+import {
+  constituentFields,
+  ContextualisedQuery,
+  ContextualiserState,
+  ID,
+  isId,
+} from './util';
 
 /**
  * Functions can operate over collections,
@@ -17,7 +20,7 @@ export interface ContextualisedFunctionDef {
   context: ContextualiserState;
 
   /** the interface definition of the function that resolves this node */
-  function: TransformDef;
+  function: FunctionDef;
 
   /** flags that change the behaviour of the function, e.g. "left" for a join */
   modifier: string[];
@@ -29,6 +32,12 @@ export interface ContextualisedFunctionDef {
     | ContextualisedFunction
     | ID
   )[];
+
+  /** the data type for the collector */
+  dataType: Type;
+
+  /** the data type for the source */
+  sourceDataType?: string;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -82,4 +91,39 @@ export class ContextualisedFunction extends Node<ContextualisedFunctionDef> {
       )
     );
   }
+}
+
+/**
+ * Contextualises an inline function
+ * @param func a transform object from @arql/parser
+ * @param model the collection(s) that this function acts within
+ * @param context contains which models/collections are available at this level of the query
+ * @returns a contextualised function node
+ */
+export function getFunction(
+  func: Transform,
+  model: ContextualisedQuery | ContextualisedQuery[],
+  context: ContextualiserState
+): ContextualisedFunction {
+  const match = context.functions.find((f) => f.name === func.description.root);
+  if (!match) throw new Error(`Unrecognised function ${func.description.root}`);
+
+  const contextualisedFunction = new ContextualisedFunction({
+    context,
+    function: match,
+    modifier: func.description.parts.filter(
+      (part) => match.modifiers && match.modifiers.indexOf(part) !== -1
+    ),
+    args: [],
+    dataType: match.signature.return,
+  });
+
+  contextualisedFunction.args = func.args.map((arg) => {
+    if (!Array.isArray(arg) && arg.type === 'shape') {
+      throw new Error('Cannot pass shape to inline function');
+    }
+    return getExpression(arg, model, context);
+  });
+
+  return contextualisedFunction;
 }

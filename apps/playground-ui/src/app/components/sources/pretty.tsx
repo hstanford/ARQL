@@ -1,4 +1,4 @@
-import { DataType } from '@arql/models';
+import { DataType } from '@arql/types';
 import { ExpandMore } from '@mui/icons-material';
 import {
   Accordion,
@@ -16,7 +16,7 @@ export function PrettyModels({
   source,
 }: {
   source: {
-    models: { name: string; fields: { name: string; datatype: DataType }[] }[];
+    models: { name: string; fields: { name: string; dataType: DataType }[] }[];
   };
 }) {
   return (
@@ -56,7 +56,7 @@ export function PrettyModels({
                         </Typography>
                         <Chip
                           variant="outlined"
-                          label={f.datatype}
+                          label={f.dataType}
                           sx={{
                             marginBlock: 'auto',
                             backgroundColor:
@@ -66,7 +66,7 @@ export function PrettyModels({
                                 boolean: 'grey',
                                 date: 'blue',
                                 json: 'none',
-                              }[f.datatype] ?? 'none',
+                              }[f.dataType] ?? 'none',
                           }}
                         />
                       </Stack>

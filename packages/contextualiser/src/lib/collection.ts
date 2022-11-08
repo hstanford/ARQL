@@ -4,10 +4,14 @@ import {
   Node,
   Requirements,
 } from '@arql/models';
+import { Collection, getAlias } from '@arql/parser';
 import { uniq } from '@arql/util';
-import { ContextualisedField } from './field';
+import { ContextualisedField, getField } from './field';
+import { getModel } from './model';
+import { getTransform } from './transform';
 import {
   ContextualisedOrigin,
+  ContextualisedQuery,
   ContextualiserState,
   ID,
   selectField,
@@ -152,4 +156,89 @@ export class ContextualisedCollection extends Node<ContextualisedCollectionDef> 
       ...this.requiredFields.map((rf) => rf.requirements)
     );
   }
+}
+
+/**
+ * Contextualises a collection
+ * @param collection a collection from @arql/parser
+ * @param context contains which models/collections are available at this level of the query
+ * @returns a contextualised collection
+ */
+export function handleCollection(
+  collection: Collection,
+  context: ContextualiserState
+): ContextualisedQuery {
+  let value: ContextualisedQuery | ContextualisedQuery[];
+
+  // recursively handle collection values, so the tree is contextualised
+  // from the leaves upwards
+  if (Array.isArray(collection.value)) {
+    value = collection.value.map((s) => handleCollection(s, context));
+  } else if (collection.value?.type === 'collection') {
+    value = handleCollection(collection.value, context);
+  } else if (collection.value?.type === 'alphachain') {
+    const model = getModel(collection.value, context);
+    if (!model) {
+      throw new Error(`Could not find model ${getAlias(collection.value)}`);
+    }
+
+    value = new ContextualisedCollection({
+      context,
+      origin: model,
+      name: collection.alias ?? model.name,
+    });
+  } else {
+    throw new Error(`Could not handle ${collection.value}`);
+  }
+
+  // make the collection's constituent collections available to
+  // retrieve fields from
+  for (const coll of [value].flat()) {
+    if (coll.name) {
+      context.aliases.set(coll.name, coll);
+    }
+  }
+
+  // apply transformations to the collection
+  if (collection.transforms.length) {
+    for (const transform of collection.transforms) {
+      value = getTransform(transform, value, context);
+    }
+  }
+
+  if (Array.isArray(value)) {
+    throw new Error('Cannot handle an untransformed multi-collection');
+  }
+
+  // Narrowed to single collection
+  let out: ContextualisedQuery = value;
+
+  // Apply the shape
+  if (collection.shape) {
+    if (Array.isArray(collection.shape)) {
+      throw new Error('Multi-shapes are not currently supported');
+    }
+    out.shape = uniq(
+      collection.shape.fields
+        .map((field) =>
+          field.type === 'wildcard'
+            ? out.availableFields.map((f) => selectField(f, out, context))
+            : getField(field, out, context)
+        )
+        .flat()
+    );
+    out._requirements.flags.supportsShaping = true;
+  }
+
+  // alias the collection if needed
+  if (collection.alias) {
+    out = new ContextualisedCollection({
+      context,
+      name: collection.alias,
+      origin: value,
+    });
+    context.aliases.set(collection.alias, value);
+  }
+
+  return out;
 }

@@ -3,12 +3,7 @@ import {
   ContextualisedQuery,
   ContextualisedTransform,
 } from '@arql/contextualiser';
-import {
-  DataModel,
-  DataModelDef,
-  DataSource,
-  ModelDefType,
-} from '@arql/models';
+import { DataModel, DataModelDef, DataSource } from '@arql/models';
 import { Dictionary } from '@arql/util';
 import { Sql, TableWithColumns } from 'sql-ts';
 import { buildCollection } from './collection';
@@ -18,6 +13,7 @@ import { Params, Query } from './types';
 import pg from 'pg';
 import { readFile } from 'fs/promises';
 import { fileURLToPath, URL } from 'url';
+import { DataType, dataTypes } from '@arql/types';
 
 export class PostgreSQL extends DataSource {
   supportsExpressionFields = true;
@@ -64,11 +60,31 @@ export class PostgreSQL extends DataSource {
       encoding: 'utf8',
     });
     const response = await this.pool?.query(schema);
-    const data = response?.rows;
+    const data = response?.rows as {
+      name: string;
+      fields: {
+        name: string;
+        dataType: DataType;
+        sourceDataType: string;
+      }[];
+    }[];
     if (!data) {
       throw new Error('Could not produce model schema');
     }
-    this.models = data.map((m) => new DataModel(m, this));
+    this.models = data.map(
+      (m) =>
+        new DataModel(
+          {
+            name: m.name,
+            fields: m.fields.map((f) => ({
+              name: f.name,
+              dataType: dataTypes[f.dataType],
+              sourceDataType: f.sourceDataType,
+            })),
+          },
+          this
+        )
+    );
     this.setModels();
   }
 
@@ -87,7 +103,7 @@ export class PostgreSQL extends DataSource {
   connectionVariables: Record<string, unknown>;
   sql?: Sql;
   sqlModels?: {
-    [K in DataModelDef as K['name']]: TableWithColumns<ModelDefType<K>>;
+    [K in DataModelDef as K['name']]: TableWithColumns<unknown>;
   };
   pool?: pg.Pool;
 

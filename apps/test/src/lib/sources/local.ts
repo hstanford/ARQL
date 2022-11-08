@@ -1,5 +1,6 @@
 import { JsSource } from '@arql/source-js';
 import { functions, operators, transforms } from '@arql/stdlib-js';
+import { dataTypes } from '@arql/types';
 
 export const localTestSource = new JsSource({
   models: [
@@ -8,11 +9,13 @@ export const localTestSource = new JsSource({
       fields: [
         {
           name: 'name',
-          datatype: 'string' as const,
+          dataType: dataTypes.string,
+          sourceDataType: 'string',
         },
         {
           name: 'alias',
-          datatype: 'string' as const,
+          dataType: dataTypes.string,
+          sourceDataType: 'string',
         },
       ],
     },

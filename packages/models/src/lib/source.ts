@@ -5,10 +5,11 @@
  * - how to resolve a query tree
  */
 
+import { FunctionDef, TransformDef } from '@arql/types';
 import { Dictionary } from '@arql/util';
 import { Flags } from './flags';
 import { DataModel } from './model';
-import { Requirements, TransformDef } from './requirements';
+import { Requirements } from './requirements';
 import { operatorOp, SourceConfig, transformFn } from './util';
 
 export abstract class DataSource extends Flags {
@@ -44,7 +45,7 @@ export abstract class DataSource extends Flags {
     return this.transforms[transform.name]; // TODO: make it check modifiers and args
   }
 
-  implementsFunction(fn: TransformDef) {
+  implementsFunction(fn: FunctionDef) {
     return this.functions[fn.name]; // TODO: make it check modifiers and args
   }
 

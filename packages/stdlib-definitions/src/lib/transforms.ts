@@ -1,4 +1,4 @@
-import { TransformDef } from '@arql/models';
+import { array, dataTypes, TransformDef, UnknownType } from '@arql/types';
 
 export const transforms: TransformDef[] = [
   {
@@ -6,14 +6,18 @@ export const transforms: TransformDef[] = [
     // return a subset of rows that satisfy the predicate
     // e.g. test | filter(foo = $1)
     name: 'filter',
-    nArgs: '1',
+    signature: {
+      args: array(dataTypes.boolean),
+    },
   },
   {
     // a transformation that is passed one or more fields
     // return the rows in an order based on the value of the fields
     // e.g. test | filter(foo = $1)
     name: 'sort',
-    nArgs: '1+',
+    signature: {
+      args: array(new UnknownType({})),
+    },
     modifiers: ['desc'],
   },
   {
@@ -21,7 +25,9 @@ export const transforms: TransformDef[] = [
     // return all sets containing a row from each origin where the set satisfies the predicate
     // e.g. (test, other) | join(test.id = other.testId)
     name: 'join',
-    nArgs: '1',
+    signature: {
+      args: array(dataTypes.boolean),
+    },
   },
   {
     // a transformation that is passed one or more fields
@@ -29,6 +35,8 @@ export const transforms: TransformDef[] = [
     // those fields are available as-is, whereas unspecified fields must be aggregated in the output
     // e.g. test | group(foo) {max: max(foo)}
     name: 'group',
-    nArgs: '1+',
+    signature: {
+      args: array(new UnknownType({})),
+    },
   },
 ];

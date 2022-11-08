@@ -1,5 +1,3 @@
-import { PickByNotValue } from '@arql/util';
-import { DataField } from './field';
 import { DataModel, DataModelDef } from './model';
 
 // expected input interface to configure a source
@@ -23,7 +21,7 @@ export type transformFn = (...args: any[]) => any;
 export type ModelsDeclaration = {
   [key: string]: DataModel;
 };
-
+/*
 // A "map" type to look up the typescript type from any valid datatype
 export type DataTypes = {
   number: number;
@@ -39,7 +37,7 @@ export type DataTypeDef<
   M extends ModelsDeclaration,
   T extends keyof M,
   U extends keyof M[T]['fields']
-> = M[T]['fields'][U] extends DataField ? M[T]['fields'][U]['datatype'] : never;
+> = M[T]['fields'][U] extends DataField ? M[T]['fields'][U]['dataType'] : never;
 
 // given a set of models, the model name, and a field name
 // return the corresponding typescript type for that field
@@ -71,3 +69,4 @@ export type ModelsDeclarationTypes<M extends ModelsDeclaration> = {
 export type ModelDefType<M extends DataModelDef> = {
   [F in M['fields'][number] as F['name']]: DataTypes[F['datatype']];
 };
+*/

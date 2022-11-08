@@ -3,7 +3,8 @@ import {
   ContextualisedQuery,
   ContextualisedTransform,
 } from '@arql/contextualiser';
-import { DataModel, DataModelDef, DataSource, DataType } from '@arql/models';
+import { DataModel, DataModelDef, DataSource } from '@arql/models';
+import { dataTypes, DataType } from '@arql/types';
 import { Dictionary } from '@arql/util';
 import { resolveCollection } from './collection';
 import { isResultMaps, Row, SourceConfig, SourceContext } from './context';
@@ -67,7 +68,8 @@ export class JsSource extends DataSource {
         name,
         fields: Object.entries(rows[0]).map(([name, value]) => ({
           name,
-          datatype: dataTypeForValue(value),
+          dataType: dataTypes[dataTypeForValue(value)],
+          sourceDataType: dataTypeForValue(value),
         })),
       });
     }

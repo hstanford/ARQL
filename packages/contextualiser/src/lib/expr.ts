@@ -1,7 +1,17 @@
 import { combineRequirements, Node, Requirements } from '@arql/models';
-import { ContextualisedFunction } from './function';
+import { Expr } from '@arql/parser';
+import { Type } from '@arql/types';
+import { ContextualisedField } from './field';
+import { ContextualisedFunction, getFunction } from './function';
+import { resolve } from './operators';
 import { ContextualisedParam } from './param';
-import { constituentFields, ContextualiserState, ID, isId } from './util';
+import {
+  constituentFields,
+  ContextualisedQuery,
+  ContextualiserState,
+  ID,
+  isId,
+} from './util';
 
 /**
  * An expression is a tree-like representation of a mathematical expression
@@ -34,6 +44,12 @@ export interface ContextualisedExprDef {
     | ContextualisedFunction
     | ID
   )[];
+
+  /** the data type for the collector */
+  dataType: Type;
+
+  /** the data type for the source */
+  sourceDataType?: string;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -89,5 +105,70 @@ export class ContextualisedExpr extends Node<ContextualisedExprDef> {
         isId(a) ? this.context.get(a).requirements : a.requirements
       )
     );
+  }
+}
+
+/**
+ * Contextualises an expression
+ * @param expr an expression from @arql/parser
+ * @param model the collection(s) we're acting within
+ * @param context contains which models/collections are available at this level of the query
+ * @returns a contextualised field, expression, parameter or function
+ */
+export function getExpression(
+  expr: Expr,
+  model: ContextualisedQuery | ContextualisedQuery[],
+  context: ContextualiserState
+): ID | ContextualisedExpr | ContextualisedParam | ContextualisedFunction {
+  if (Array.isArray(expr)) {
+    return resolve(expr, model, context);
+  }
+  if (expr.type === 'alphachain') {
+    // a simple foo.bar should resolve to a plain field
+    // accessed from the available fields of the collection
+    let field: ContextualisedField | undefined;
+    for (const baseModel of [model].flat()) {
+      const part = expr.root;
+      const fields = baseModel.availableFields;
+      field = fields.find((f) => f.name === part);
+      if (field) break;
+    }
+
+    // allow referring to the model by the first part of the alphachain
+    if (!field) {
+      for (const baseModel of [model].flat()) {
+        if (baseModel.name !== expr.root) {
+          continue;
+        }
+        const part = expr.parts[0];
+        const fields = baseModel.availableFields;
+        field = fields.find((f) => f.name === part);
+        if (field) break;
+      }
+    }
+
+    if (!field) {
+      console.log(
+        [model].flat().map((m) => m.availableFields),
+        expr
+      );
+      throw new Error(`Can't find subfield for ${expr.root}`);
+    }
+
+    return field.id;
+  } else if (expr.type === 'param') {
+    return new ContextualisedParam({ index: expr.index });
+  } else if (expr.type === 'function') {
+    if (expr.name.type !== 'alphachain') {
+      // no support for something that looks like (a + b)(x)
+      throw new Error('Unhandled function call on complex sub-expression');
+    }
+    return getFunction(
+      { type: 'transform', description: expr.name, args: expr.args },
+      model,
+      context
+    );
+  } else {
+    throw new Error(`Invalid expression type ${expr.type}`);
   }
 }

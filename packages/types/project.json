@@ -1,31 +1,31 @@
 {
-  "name": "operators",
+  "name": "types",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "packages/operators/src",
+  "sourceRoot": "packages/types/src",
   "projectType": "library",
   "targets": {
     "build": {
       "executor": "@nrwl/js:tsc",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "outputPath": "dist/packages/operators",
-        "main": "packages/operators/src/index.ts",
-        "tsConfig": "packages/operators/tsconfig.lib.json",
-        "assets": ["packages/operators/*.md"]
+        "outputPath": "dist/packages/types",
+        "main": "packages/types/src/index.ts",
+        "tsConfig": "packages/types/tsconfig.lib.json",
+        "assets": ["packages/types/*.md"]
       }
     },
     "lint": {
       "executor": "@nrwl/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["packages/operators/**/*.ts"]
+        "lintFilePatterns": ["packages/types/**/*.ts"]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "jestConfig": "packages/operators/jest.config.ts",
+        "jestConfig": "packages/types/jest.config.ts",
         "passWithNoTests": true
       }
     }

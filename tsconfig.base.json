@@ -21,7 +21,6 @@
       "@arql/core": ["packages/core/src/index.ts"],
       "@arql/delegator": ["packages/delegator/src/index.ts"],
       "@arql/models": ["packages/models/src/index.ts"],
-      "@arql/operators": ["packages/operators/src/index.ts"],
       "@arql/parser": ["packages/parser/src/index.ts"],
       "@arql/source-js": ["packages/source-js/src/index.ts"],
       "@arql/source-postgresql": ["packages/source-postgresql/src/index.ts"],
@@ -29,6 +28,7 @@
       "@arql/stdlib-definitions": ["packages/stdlib-definitions/src/index.ts"],
       "@arql/stdlib-js": ["packages/stdlib-js/src/index.ts"],
       "@arql/stdlib-postgresql": ["packages/stdlib-postgresql/src/index.ts"],
+      "@arql/types": ["packages/types/src/index.ts"],
       "@arql/util": ["packages/util/src/index.ts"]
     }
   },

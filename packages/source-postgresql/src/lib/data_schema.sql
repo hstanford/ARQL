@@ -2,7 +2,7 @@ SELECT
   table_name as name,
   JSON_AGG(
     JSON_BUILD_OBJECT(
-      'datatype',
+      'dataType',
       CASE
         WHEN left(udt_name :: TEXT, 1) = '_' THEN 'array'
         ELSE (
@@ -24,7 +24,9 @@ SELECT
         )
       END,
       'name',
-      column_name :: TEXT
+      column_name :: TEXT,
+      'sourceDataType',
+      udt_name :: TEXT
     )
   ) as fields
 FROM

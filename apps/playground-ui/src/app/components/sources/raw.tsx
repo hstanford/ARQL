@@ -1,11 +1,11 @@
-import { DataType } from '@arql/models';
+import { DataType } from '@arql/types';
 import { Box, Typography } from '@mui/material';
 
 export function RawModels({
   source,
 }: {
   source: {
-    models: { name: string; fields: { name: string; datatype: DataType }[] };
+    models: { name: string; fields: { name: string; dataType: DataType }[] };
   };
 }) {
   return (

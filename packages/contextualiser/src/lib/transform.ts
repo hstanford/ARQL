@@ -1,12 +1,9 @@
-import {
-  combineRequirements,
-  Node,
-  Requirements,
-  TransformDef,
-} from '@arql/models';
+import { combineRequirements, Node, Requirements } from '@arql/models';
+import { Transform } from '@arql/parser';
+import { TransformDef } from '@arql/types';
 import { uniq } from '@arql/util';
-import { ContextualisedExpr } from './expr';
-import { ContextualisedField } from './field';
+import { ContextualisedExpr, getExpression } from './expr';
+import { ContextualisedField, getField } from './field';
 import { ContextualisedFunction } from './function';
 import { ContextualisedParam } from './param';
 import {
@@ -179,4 +176,63 @@ export class ContextualisedTransform extends Node<ContextualisedTransformDef> {
       )
     );
   }
+}
+
+/**
+ * Contextualises a transform
+ * @param transform a transform object from @arql/parser
+ * @param model the collection(s) that this transform acts on
+ * @param context contains which models/collections are available at this level of the query
+ * @returns a contextualised transform node
+ */
+export function getTransform(
+  transform: Transform,
+  model: ContextualisedQuery | ContextualisedQuery[],
+  context: ContextualiserState
+): ContextualisedTransform {
+  const match = context.transforms.find(
+    (tr) => tr.name === transform.description.root
+  );
+  if (!match)
+    throw new Error(`Unrecognised transform ${transform.description.root}`);
+
+  const contextualisedTransform = new ContextualisedTransform({
+    context,
+    transform: match,
+    modifier: transform.description.parts.filter(
+      (part) => match.modifiers && match.modifiers.includes(part)
+    ),
+    args: [],
+    origin: model,
+  });
+
+  // handle transform arguments
+  for (const arg of transform.args) {
+    if (!Array.isArray(arg) && arg.type === 'shape') {
+      // the last shape mentioned as a transform argument
+      // becomes the external interface of the transform
+      contextualisedTransform.shape = arg.fields
+        .map((f) =>
+          f.type === 'wildcard'
+            ? [model]
+                .flat()
+                .map((m) =>
+                  m.availableFields.map((f) =>
+                    selectField(f, contextualisedTransform, context)
+                  )
+                )
+                .flat()
+            : getField(f, contextualisedTransform, context)
+        )
+        .flat();
+      contextualisedTransform._requirements.flags.supportsShaping = true;
+      continue;
+    }
+    if (!Array.isArray(arg) && arg.type === 'collection') {
+      throw new Error('Collection as transform arg not supported');
+    }
+    contextualisedTransform.args.push(getExpression(arg, model, context));
+  }
+
+  return contextualisedTransform;
 }

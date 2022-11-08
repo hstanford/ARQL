@@ -36,7 +36,7 @@ export class DataModel extends Node<DataModelDef> {
   }
 
   /** serialisation getter for testing */
-  get def(): DataModelDef {
+  get def() {
     return {
       name: this.name,
       fields: this.fields.map((f) => f.def),

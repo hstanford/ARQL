@@ -1,21 +1,22 @@
-import { EXPR } from '@arql/operators';
 import { Contextualiser } from './contextualiser';
 import { testSource } from './test_helpers';
+import { functions, transforms } from '@arql/stdlib-definitions';
+import { EXPR } from '@arql/types';
 
 describe('contextualiser', () => {
   it('should work', () => {
     const models = new Map(
       testSource.models.map((model) => [model.name, model])
     );
-    const filter = {
-      name: 'filter',
-      nArgs: 1,
-    };
+    const filter = transforms.find((t) => t.name === 'filter');
+    const equals = functions.find((f) => f.name === 'equals');
+
+    if (!filter || !equals) throw new Error('Stdlib implementations not found');
 
     const cxr = new Contextualiser({
       models,
       transforms: [filter],
-      functions: [],
+      functions: [equals],
       opMap: new Map([
         [
           '=',
@@ -74,8 +75,9 @@ describe('contextualiser', () => {
     const contextualisedFoo = {
       id: 3,
       field: {
-        datatype: 'string',
+        dataType: 'string',
         name: 'foo',
+        sourceDataType: 'string',
       },
       name: 'foo',
       origin: {
@@ -85,8 +87,9 @@ describe('contextualiser', () => {
     const contextualisedBar = {
       id: 4,
       field: {
-        datatype: 'string',
+        dataType: 'string',
         name: 'bar',
+        sourceDataType: 'string',
       },
       name: 'bar',
       origin: {
@@ -106,7 +109,8 @@ describe('contextualiser', () => {
                 index: 0,
               },
             ],
-            op: 'equals',
+            name: 'equals',
+            modifier: [],
           },
         ],
         modifier: [],

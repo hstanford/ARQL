@@ -1,11 +1,19 @@
+import { dataTypes } from '@arql/types';
 import { ContextualisedCollection } from './collection';
 import { ContextualisedField } from './field';
 import { testModel } from './test_helpers';
 import { ContextualiserState } from './util';
 
+const emptyConfig = {
+  functions: [],
+  transforms: [],
+  models: new Map(),
+  opMap: new Map(),
+};
+
 describe('collection', () => {
   it('should expose the available fields of data model', () => {
-    const context = new ContextualiserState();
+    const context = new ContextualiserState(emptyConfig);
     const coll = new ContextualisedCollection({
       context,
       name: 'alpha',
@@ -15,7 +23,8 @@ describe('collection', () => {
     expect(coll.availableFields.map((af) => af.def)).toEqual([
       {
         field: {
-          datatype: 'string',
+          dataType: 'string',
+          sourceDataType: 'string',
           name: 'foo',
         },
         id: 1,
@@ -26,7 +35,8 @@ describe('collection', () => {
       },
       {
         field: {
-          datatype: 'string',
+          dataType: 'string',
+          sourceDataType: 'string',
           name: 'bar',
         },
         id: 2,
@@ -39,7 +49,7 @@ describe('collection', () => {
   });
 
   it('should expose the available fields of a nested collection', () => {
-    const context = new ContextualiserState();
+    const context = new ContextualiserState(emptyConfig);
     const coll = new ContextualisedCollection({
       context,
       name: 'alpha',
@@ -72,7 +82,7 @@ describe('collection', () => {
   });
 
   it('should propagate required changes down to nested collections', () => {
-    const context = new ContextualiserState();
+    const context = new ContextualiserState(emptyConfig);
     const coll = new ContextualisedCollection({
       context,
       name: 'alpha',
@@ -92,7 +102,8 @@ describe('collection', () => {
     expect(coll.requiredFields.map((af) => af.def)).toEqual([
       {
         field: {
-          datatype: 'string',
+          dataType: 'string',
+          sourceDataType: 'string',
           name: 'foo',
         },
         id: 2,
@@ -115,7 +126,7 @@ describe('collection', () => {
   });
 
   it('should respect selecting an aliased field', () => {
-    const context = new ContextualiserState();
+    const context = new ContextualiserState(emptyConfig);
     const coll = new ContextualisedCollection({
       context,
       name: 'alpha',
@@ -138,6 +149,7 @@ describe('collection', () => {
         name: 'baz',
         origin: coll2,
         field: fooField.id,
+        dataType: dataTypes.string,
       }),
     ];
 

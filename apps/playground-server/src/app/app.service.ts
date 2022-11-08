@@ -1,5 +1,5 @@
 import { runner } from '@arql/core';
-import { DataModelDef, DataSource } from '@arql/models';
+import { DataSource } from '@arql/models';
 import { JsSource } from '@arql/source-js';
 import { PostgreSQL } from '@arql/source-postgresql';
 import { collectorConfig } from '@arql/stdlib-collector';
@@ -57,7 +57,7 @@ export class AppService {
         models: source.models.map((v) => v.def),
       };
       return acc;
-    }, {} as Record<string, { type: string; models: DataModelDef[] }>);
+    }, {} as Record<string, { type: string; models: unknown[] }>);
   }
 
   async addPgSource(

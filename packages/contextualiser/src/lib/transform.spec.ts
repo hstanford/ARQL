@@ -3,19 +3,31 @@ import { testObjects } from './test_helpers';
 import { ContextualisedParam } from './param';
 import { ContextualisedTransform } from './transform';
 import { ContextualiserState } from './util';
+import { array, dataTypes, TransformDef, unknown } from '@arql/types';
+
+const emptyConfig = {
+  functions: [],
+  transforms: [],
+  models: new Map(),
+  opMap: new Map(),
+};
+
+const fooTransform: TransformDef = {
+  name: 'foo',
+  signature: {
+    args: array(unknown),
+  },
+};
 
 describe('transform', () => {
   it('can get the available fields from the origin collection', () => {
-    const context = new ContextualiserState();
+    const context = new ContextualiserState(emptyConfig);
     const { testCollection } = testObjects(context);
     const transform = new ContextualisedTransform({
       context,
       args: [],
       modifier: [],
-      transform: {
-        name: 'foo',
-        nArgs: 1,
-      },
+      transform: fooTransform,
       origin: testCollection,
     });
     expect(transform.id).toBe(3);
@@ -40,16 +52,13 @@ describe('transform', () => {
   });
 
   it('can get available fields when shaped', () => {
-    const context = new ContextualiserState();
+    const context = new ContextualiserState(emptyConfig);
     const { testCollection, fooField } = testObjects(context);
     const transform = new ContextualisedTransform({
       context,
       args: [],
       modifier: [],
-      transform: {
-        name: 'foo',
-        nArgs: 1,
-      },
+      transform: fooTransform,
       origin: testCollection,
     });
     transform.shape = [
@@ -58,6 +67,7 @@ describe('transform', () => {
         field: fooField.id,
         origin: transform,
         name: 'foo',
+        dataType: dataTypes.number,
       }),
     ];
     expect(transform.availableFields.map((af) => af.def)).toEqual([
@@ -73,16 +83,13 @@ describe('transform', () => {
   });
 
   it('can get fields mentioned in args as constituent fields', () => {
-    const context = new ContextualiserState();
+    const context = new ContextualiserState(emptyConfig);
     const { testCollection } = testObjects(context);
     const transform = new ContextualisedTransform({
       context,
       args: [new ContextualisedParam({ index: 0 })],
       modifier: [],
-      transform: {
-        name: 'foo',
-        nArgs: 1,
-      },
+      transform: fooTransform,
       origin: testCollection,
     });
     transform.args.push(testCollection.availableFields[0]?.id);

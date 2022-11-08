@@ -15,8 +15,10 @@ export default {
   moduleNameMapper: {
     '@arql/models': '<rootDir>/../../packages/models/src/index.ts',
     '@arql/operations': '<rootDir>/../../packages/operations/src/index.ts',
-    '@arql/operators': '<rootDir>/../../packages/operators/src/index.ts',
     '@arql/parser': '<rootDir>/../../packages/parser/src/index.ts',
     '@arql/util': '<rootDir>/../../packages/util/src/index.ts',
+    '@arql/types': '<rootDir>/../../packages/types/src/index.ts',
+    '@arql/stdlib-definitions':
+      '<rootDir>/../../packages/stdlib-definitions/src/index.ts',
   },
 };

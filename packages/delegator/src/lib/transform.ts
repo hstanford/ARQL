@@ -9,7 +9,8 @@ import {
   ID,
   isId,
 } from '@arql/contextualiser';
-import { Node, Requirements, TransformDef } from '@arql/models';
+import { Node, Requirements } from '@arql/models';
+import { TransformDef } from '@arql/types';
 import { DelegatedCollection } from './collection';
 import { DelegatedResults } from './results';
 import { delegateOrigins } from './util';

@@ -1,5 +1,5 @@
-import { DataField, DataModel, TransformDef } from '@arql/models';
-import { RankedOperator } from '@arql/operators';
+import { DataField, DataModel } from '@arql/models';
+import { FunctionDef, RankedOperator, TransformDef } from '@arql/types';
 import { ContextualisedCollection } from './collection';
 import { ContextualisedExpr } from './expr';
 import { ContextualisedField } from './field';
@@ -32,19 +32,23 @@ export type ContextualisedOrigin =
   | ContextualisedTransform
   | DataModel;
 
+export interface ContextualiserConfig {
+  models: Map<string, DataModel>;
+  transforms: TransformDef[];
+  functions: FunctionDef[];
+  opMap: Map<string, RankedOperator>;
+}
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface ContextualiserState extends ContextualiserConfig {}
 export class ContextualiserState {
   aliases: Map<string, ContextualisedOrigin> = new Map();
   items: ContextualisedNodeType[] = [];
   get(id: ID): ContextualisedNodeType {
     return this.items[id];
   }
-}
-
-export interface ContextualiserConfig {
-  models: Map<string, DataModel>;
-  transforms: TransformDef[];
-  functions: TransformDef[];
-  opMap: Map<string, RankedOperator>;
+  constructor(config: ContextualiserConfig) {
+    Object.assign(this, config);
+  }
 }
 
 /**
@@ -100,5 +104,7 @@ export function selectField(
     name: field.name,
     origin,
     field: field instanceof ContextualisedField ? field.id : field,
+    sourceDataType: field.sourceDataType,
+    dataType: field.dataType,
   });
 }

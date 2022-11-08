@@ -1,4 +1,4 @@
-import { EXPR, getOperatorLookup, Operator } from '@arql/operators';
+import { EXPR, getOperatorLookup, Operator } from '@arql/types';
 
 export const operators: Operator[] = [
   {

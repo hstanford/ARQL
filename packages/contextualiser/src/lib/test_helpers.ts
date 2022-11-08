@@ -1,4 +1,5 @@
 import { DataModel, DataSource } from '@arql/models';
+import { dataTypes } from '@arql/types';
 import { ContextualisedCollection } from './collection';
 import { ContextualisedField } from './field';
 import { ContextualiserState } from './util';
@@ -28,11 +29,13 @@ export const testSource = new TestSource({
       fields: [
         {
           name: 'foo',
-          datatype: 'string',
+          dataType: dataTypes.string,
+          sourceDataType: 'string',
         },
         {
           name: 'bar',
-          datatype: 'string',
+          dataType: dataTypes.string,
+          sourceDataType: 'string',
         },
       ],
     },
@@ -58,6 +61,7 @@ export function testObjects(context: ContextualiserState) {
     field: testModel.fields[0],
     name: 'foo',
     origin: testCollection,
+    dataType: dataTypes.string,
   });
 
   const barField = new ContextualisedField({
@@ -65,6 +69,7 @@ export function testObjects(context: ContextualiserState) {
     field: testModel.fields[1],
     name: 'bar',
     origin: testCollection,
+    dataType: dataTypes.string,
   });
 
   return {
