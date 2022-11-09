@@ -6,6 +6,7 @@ import { ContextualisedParam } from './param.js';
 import { ContextualiserState } from './util.js';
 import { functions } from '@arql/stdlib-definitions';
 import { dataTypes } from '@arql/types';
+import { ID } from './id.js';
 
 const emptyConfig = {
   functions: [],
@@ -26,7 +27,7 @@ describe('function', () => {
       function: equals,
       modifier: [],
       args: [
-        fooField.id,
+        new ID({ id: fooField.id, dataType: fooField.dataType }),
         new ContextualisedParam({
           index: 0,
         }),
@@ -34,7 +35,9 @@ describe('function', () => {
       dataType: dataTypes.boolean,
     });
 
-    expect(fn.constituentFields).toEqual([fooField.id]);
+    expect(fn.constituentFields.map((f) => f.def)).toEqual([
+      { id: fooField.id, dataType: 'string' },
+    ]);
   });
 
   it('can list the fields that constitute the function with multiple fields', () => {
@@ -45,11 +48,17 @@ describe('function', () => {
       context,
       function: equals,
       modifier: [],
-      args: [fooField.id, barField.id],
+      args: [
+        new ID({ id: fooField.id, dataType: fooField.dataType }),
+        new ID({ id: barField.id, dataType: barField.dataType }),
+      ],
       dataType: dataTypes.boolean,
     });
 
-    expect(fn.constituentFields).toEqual([fooField.id, barField.id]);
+    expect(fn.constituentFields.map((f) => f.def)).toEqual([
+      { id: fooField.id, dataType: 'string' },
+      { id: barField.id, dataType: 'string' },
+    ]);
   });
 
   it('can list the fields that constitute the function with nested fields', () => {
@@ -57,7 +66,7 @@ describe('function', () => {
     const { fooField } = testObjects(context);
     const field = new ContextualisedField({
       context,
-      field: fooField.id,
+      field: new ID({ id: fooField.id, dataType: fooField.dataType }),
       name: 'foo',
       origin: new ContextualisedCollection({
         context,
@@ -70,11 +79,16 @@ describe('function', () => {
       context,
       function: equals,
       modifier: [],
-      args: [field.id, new ContextualisedParam({ index: 0 })],
+      args: [
+        new ID({ id: field.id, dataType: field.dataType }),
+        new ContextualisedParam({ index: 0 }),
+      ],
       dataType: dataTypes.boolean,
     });
 
-    expect(fn.constituentFields).toEqual([field.id]);
+    expect(fn.constituentFields.map((f) => f.def)).toEqual([
+      { id: field.id, dataType: 'number' },
+    ]);
   });
 
   it('can list the sources that constitute the function with nested fields', () => {
@@ -82,7 +96,7 @@ describe('function', () => {
     const { fooField } = testObjects(context);
     const field = new ContextualisedField({
       context,
-      field: fooField.id,
+      field: new ID({ id: fooField.id, dataType: fooField.dataType }),
       name: 'foo',
       origin: new ContextualisedCollection({
         context,
@@ -95,7 +109,10 @@ describe('function', () => {
       context,
       function: equals,
       modifier: [],
-      args: [field.id, new ContextualisedParam({ index: 0 })],
+      args: [
+        new ID({ id: field.id, dataType: field.dataType }),
+        new ContextualisedParam({ index: 0 }),
+      ],
       dataType: dataTypes.boolean,
     });
 

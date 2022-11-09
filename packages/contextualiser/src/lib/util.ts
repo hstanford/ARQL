@@ -1,21 +1,16 @@
 import { DataField, DataModel } from '@arql/models';
-import { FunctionDef, RankedOperator, TransformDef, Type } from '@arql/types';
+import { FunctionDef, RankedOperator, TransformDef } from '@arql/types';
 import { ContextualisedCollection } from './collection.js';
 import { ContextualisedField } from './field.js';
 import { ContextualisedFunction } from './function.js';
+import { ID } from './id.js';
 import { ContextualisedParam } from './param.js';
 import { ContextualisedTransform } from './transform.js';
-
-export type ID = {
-  type: 'ID';
-  id: number;
-  dataType?: Type;
-};
 
 export function isId(
   item: ContextualisedNodeType | DataField | ID
 ): item is ID {
-  return !(item instanceof DataField) && item.type === 'ID';
+  return item instanceof ID;
 }
 
 export type ContextualisedNodeType =
@@ -74,7 +69,7 @@ export function constituentFields(
   if (item instanceof ContextualisedParam) {
     // params have no field requirements
   } else if (item instanceof ContextualisedField) {
-    fields.push(item.id);
+    fields.push(new ID({ id: item.id, dataType: item.dataType }));
   } else if (item instanceof ContextualisedFunction) {
     fields.push(...item.constituentFields);
   } else if (item instanceof DataField) {
@@ -102,7 +97,10 @@ export function selectField(
     context,
     name: field.name,
     origin,
-    field: field instanceof ContextualisedField ? field.id : field,
+    field:
+      field instanceof ContextualisedField
+        ? new ID({ id: field.id, dataType: field.dataType })
+        : field,
     sourceDataType: field.sourceDataType,
     dataType: field.dataType,
   });

@@ -70,14 +70,6 @@
       "options": {
         "lintFilePatterns": ["apps/playground-ui/**/*.{ts,tsx,js,jsx}"]
       }
-    },
-    "test": {
-      "executor": "@nrwl/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
-      "options": {
-        "jestConfig": "apps/playground-ui/jest.config.ts",
-        "passWithNoTests": true
-      }
     }
   },
   "tags": []

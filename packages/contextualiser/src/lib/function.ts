@@ -3,12 +3,12 @@ import { Transform } from '@arql/parser';
 import { FunctionDef, tuple, Type } from '@arql/types';
 import { ContextualisedCollection } from './collection.js';
 import { ContextualisedFieldValue, getExpression } from './expr.js';
+import { ID } from './id.js';
 import { ContextualisedTransform } from './transform.js';
 import {
   constituentFields,
   ContextualisedQuery,
   ContextualiserState,
-  ID,
   isId,
 } from './util.js';
 
@@ -71,7 +71,7 @@ export class ContextualisedFunction extends Node<ContextualisedFunctionDef> {
     return {
       name: this.name,
       modifier: this.modifier,
-      args: this.args.map((a) => (isId(a) ? a : a.def)),
+      args: this.args.map((a) => a.def),
     };
   }
 

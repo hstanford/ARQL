@@ -4,6 +4,7 @@ import { ContextualisedParam } from './param.js';
 import { ContextualisedTransform } from './transform.js';
 import { ContextualiserState } from './util.js';
 import { array, dataTypes, TransformDef, unknown } from '@arql/types';
+import { ID } from './id.js';
 
 const emptyConfig = {
   functions: [],
@@ -33,7 +34,10 @@ describe('transform', () => {
     expect(transform.id).toBe(3);
     expect(transform.availableFields.map((af) => af.def)).toEqual([
       {
-        field: 4,
+        field: {
+          id: 4,
+          dataType: 'string',
+        },
         id: 6,
         dataType: 'string',
         name: 'foo',
@@ -42,7 +46,10 @@ describe('transform', () => {
         },
       },
       {
-        field: 5,
+        field: {
+          id: 5,
+          dataType: 'string',
+        },
         id: 7,
         dataType: 'string',
         name: 'bar',
@@ -66,7 +73,7 @@ describe('transform', () => {
     transform.shape = [
       new ContextualisedField({
         context,
-        field: fooField.id,
+        field: new ID({ id: fooField.id, dataType: fooField.dataType }),
         origin: transform,
         name: 'foo',
         dataType: dataTypes.number,
@@ -74,7 +81,10 @@ describe('transform', () => {
     ];
     expect(transform.availableFields.map((af) => af.def)).toEqual([
       {
-        field: 1,
+        field: {
+          id: 1,
+          dataType: 'string',
+        },
         id: 4,
         dataType: 'number',
         name: 'foo',
@@ -95,9 +105,13 @@ describe('transform', () => {
       transform: fooTransform,
       origin: testCollection,
     });
-    transform.args.push(testCollection.availableFields[0]?.id);
-    expect(transform.constituentFields).toEqual([
-      testCollection.availableFields[0]?.id,
+    const field = testCollection.availableFields[0];
+    transform.args.push(new ID({ id: field.id, dataType: field.dataType }));
+    expect(transform.constituentFields.map((f) => f.def)).toEqual([
+      {
+        id: testCollection.availableFields[0]?.id,
+        dataType: 'string',
+      },
     ]);
   });
 });

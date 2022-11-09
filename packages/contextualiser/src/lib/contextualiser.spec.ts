@@ -106,7 +106,10 @@ describe('contextualiser', () => {
         args: [
           {
             args: [
-              5,
+              {
+                id: 5,
+                dataType: 'string',
+              },
               {
                 index: 0,
               },
@@ -130,7 +133,10 @@ describe('contextualiser', () => {
           },
           requiredFields: [
             {
-              field: contextualisedFoo.id,
+              field: {
+                id: contextualisedFoo.id,
+                dataType: 'string',
+              },
               id: 5,
               dataType: 'string',
               name: 'foo',
@@ -139,7 +145,10 @@ describe('contextualiser', () => {
               },
             },
             {
-              field: contextualisedBar.id,
+              field: {
+                id: contextualisedBar.id,
+                dataType: 'string',
+              },
               id: 6,
               dataType: 'string',
               name: 'bar',
@@ -152,7 +161,10 @@ describe('contextualiser', () => {
         },
         requiredFields: [
           {
-            field: 6,
+            field: {
+              id: 6,
+              dataType: 'string',
+            },
             id: 7,
             dataType: 'string',
             name: 'bar',
@@ -164,7 +176,10 @@ describe('contextualiser', () => {
         shape: [
           {
             id: 7,
-            field: 6,
+            field: {
+              id: 6,
+              dataType: 'string',
+            },
             dataType: 'string',
             name: 'bar',
             origin: {
@@ -175,7 +190,10 @@ describe('contextualiser', () => {
       },
       requiredFields: [
         {
-          field: 7,
+          field: {
+            id: 7,
+            dataType: 'string',
+          },
           id: 10,
           dataType: 'string',
           name: 'bar',

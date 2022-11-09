@@ -3,6 +3,7 @@ import { dataTypes } from '@arql/types';
 import { ContextualisedCollection } from './collection.js';
 import { ContextualisedField } from './field.js';
 import { ContextualisedFunction } from './function.js';
+import { ID } from './id.js';
 import { testObjects, testSource } from './test_helpers.js';
 import { ContextualiserState } from './util.js';
 
@@ -26,7 +27,7 @@ describe('field', () => {
     const wrappedField = new ContextualisedField({
       context,
       name: 'wrapped',
-      field: fooField.id,
+      field: new ID({ id: fooField.id, dataType: fooField.dataType }),
       origin: new ContextualisedCollection({
         context,
         name: 'other',
@@ -49,7 +50,7 @@ describe('field', () => {
     const wrappedField = new ContextualisedField({
       context,
       name: 'wrapped',
-      field: fooField.id,
+      field: new ID({ id: fooField.id, dataType: fooField.dataType }),
       origin: new ContextualisedCollection({
         context,
         name: 'other',
@@ -57,7 +58,12 @@ describe('field', () => {
       }),
       dataType: dataTypes.number,
     });
-    expect(wrappedField.constituentFields).toEqual([fooField.id]);
+    expect(wrappedField.constituentFields.map((f) => f.def)).toEqual([
+      {
+        id: fooField.id,
+        dataType: 'string',
+      },
+    ]);
   });
 
   it('can list the constituent fields for a field wrapping an expression', () => {
@@ -73,7 +79,10 @@ describe('field', () => {
       field: new ContextualisedFunction({
         context,
         function: equals,
-        args: [fooField.id, barField.id],
+        args: [
+          new ID({ id: fooField.id, dataType: fooField.dataType }),
+          new ID({ id: barField.id, dataType: barField.dataType }),
+        ],
         modifier: [],
         dataType: dataTypes.boolean,
       }),
@@ -84,6 +93,9 @@ describe('field', () => {
       }),
       dataType: dataTypes.boolean,
     });
-    expect(wrappedField.constituentFields).toEqual([fooField.id, barField.id]);
+    expect(wrappedField.constituentFields.map((f) => f.def)).toEqual([
+      { id: fooField.id, dataType: 'string' },
+      { id: barField.id, dataType: 'string' },
+    ]);
   });
 });

@@ -2,9 +2,10 @@ import { DataField } from '@arql/models';
 import { Expr } from '@arql/parser';
 import { ContextualisedField } from './field.js';
 import { ContextualisedFunction, getFunction } from './function.js';
+import { ID } from './id.js';
 import { resolve } from './operators.js';
 import { ContextualisedParam } from './param.js';
-import { ContextualisedQuery, ContextualiserState, ID } from './util.js';
+import { ContextualisedQuery, ContextualiserState } from './util.js';
 
 /**
  * An expression is a tree-like representation of a mathematical expression
@@ -73,7 +74,7 @@ export function getExpression(
       throw new Error(`Can't find subfield for ${expr.root}`);
     }
 
-    return field.id;
+    return new ID({ id: field.id, dataType: field.dataType });
   } else if (expr.type === 'param') {
     return new ContextualisedParam({ index: expr.index });
   } else if (expr.type === 'function') {

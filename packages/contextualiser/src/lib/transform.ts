@@ -4,11 +4,11 @@ import { TransformDef } from '@arql/types';
 import { uniq } from '@arql/util';
 import { ContextualisedFieldValue, getExpression } from './expr.js';
 import { ContextualisedField, getField } from './field.js';
+import { ID } from './id.js';
 import {
   constituentFields,
   ContextualisedQuery,
   ContextualiserState,
-  ID,
   isId,
   selectField,
 } from './util.js';
@@ -48,10 +48,7 @@ export class ContextualisedTransform extends Node<ContextualisedTransformDef> {
 
   constructor(opts: ContextualisedTransformDef) {
     super(opts);
-    this.id = {
-      type: 'ID',
-      id: this.context.items.length,
-    };
+    this.id = this.context.items.length;
     this.context.items.push(this);
 
     this.name = this.transform.name;
@@ -60,7 +57,7 @@ export class ContextualisedTransform extends Node<ContextualisedTransformDef> {
   }
 
   /** a number identifying this transform */
-  id: ID;
+  id: number;
 
   /** the name of the function that resolves this node */
   name: string;
@@ -120,7 +117,7 @@ export class ContextualisedTransform extends Node<ContextualisedTransformDef> {
     // find the required subFields within the origins and mark those as required
     [this.origin].flat().forEach((o) => {
       const requiredFields = o.availableFields.filter((af) => {
-        const found = requiredSubfields.find((rf) => rf === af.id);
+        const found = requiredSubfields.find((rf) => rf.id === af.id);
         if (found) {
           requiredSubfields = requiredSubfields.filter((f) => f !== found);
         }
@@ -149,7 +146,7 @@ export class ContextualisedTransform extends Node<ContextualisedTransformDef> {
       id: this.id,
       name: this.name,
       modifier: this.modifier,
-      args: this.args.map((a) => (isId(a) ? a : a.def)),
+      args: this.args.map((a) => a.def),
       origin: Array.isArray(this.origin)
         ? this.origin.map((o) => o.def)
         : this.origin.def,

@@ -7,12 +7,14 @@ export default {
       tsconfig: '<rootDir>/tsconfig.spec.json',
     },
   },
+  extensionsToTreatAsEsm: ['.ts'],
   transform: {
-    '^.+\\.[tj]s$': 'ts-jest',
+    '^.+\\.[tj]s$': ['ts-jest', { useESM: true }],
   },
   moduleFileExtensions: ['ts', 'js', 'html'],
   coverageDirectory: '../../coverage/packages/contextualiser',
   moduleNameMapper: {
+    '^(\\.{1,2}/.*)\\.js$': '$1',
     '@arql/models': '<rootDir>/../../packages/models/src/index.ts',
     '@arql/operations': '<rootDir>/../../packages/operations/src/index.ts',
     '@arql/parser': '<rootDir>/../../packages/parser/src/index.ts',

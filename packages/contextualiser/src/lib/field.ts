@@ -9,13 +9,13 @@ import { Field } from '@arql/parser';
 import { NeverType, Type } from '@arql/types';
 import { getExpression } from './expr.js';
 import { ContextualisedFunction } from './function.js';
+import { ID } from './id.js';
 import { ContextualisedParam } from './param.js';
 import {
   constituentFields,
   ContextualisedOrigin,
   ContextualisedQuery,
   ContextualiserState,
-  ID,
   isId,
   selectField,
 } from './util.js';
@@ -51,11 +51,7 @@ export class ContextualisedField extends Node<ContextualisedFieldDef> {
 
   constructor(opts: ContextualisedFieldDef) {
     super(opts);
-    this.id = {
-      type: 'ID',
-      id: this.context.items.length,
-      dataType: this.dataType,
-    };
+    this.id = this.context.items.length;
     this.context.items.push(this);
 
     if (this.field instanceof ContextualisedFunction) {
@@ -64,7 +60,7 @@ export class ContextualisedField extends Node<ContextualisedFieldDef> {
   }
 
   /** a number identifying this field */
-  id: ID;
+  id: number;
 
   /**
    * "constituentFields" lists all the core data fields that originate elsewhere
@@ -78,7 +74,7 @@ export class ContextualisedField extends Node<ContextualisedFieldDef> {
     return {
       id: this.id,
       name: this.name,
-      field: isId(this.field) ? this.field : this.field.def,
+      field: this.field.def,
       dataType: this.dataType.toString(),
       origin: Array.isArray(this.origin)
         ? this.origin.map((o) => ({ name: o.name }))

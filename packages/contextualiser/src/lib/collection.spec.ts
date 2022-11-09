@@ -1,6 +1,7 @@
 import { dataTypes } from '@arql/types';
 import { ContextualisedCollection } from './collection.js';
 import { ContextualisedField } from './field.js';
+import { ID } from './id.js';
 import { testModel } from './test_helpers.js';
 import { ContextualiserState } from './util.js';
 
@@ -65,7 +66,10 @@ describe('collection', () => {
 
     expect(coll2.availableFields.map((af) => af.def)).toEqual([
       {
-        field: 2,
+        field: {
+          id: 2,
+          dataType: 'string',
+        },
         id: 4,
         dataType: 'string',
         name: 'foo',
@@ -74,7 +78,10 @@ describe('collection', () => {
         },
       },
       {
-        field: 3,
+        field: {
+          id: 3,
+          dataType: 'string',
+        },
         id: 5,
         dataType: 'string',
         name: 'bar',
@@ -120,7 +127,10 @@ describe('collection', () => {
     ]);
     expect(coll2.requiredFields.map((af) => af.def)).toEqual([
       {
-        field: 2,
+        field: {
+          id: 2,
+          dataType: 'string',
+        },
         id: 4,
         dataType: 'string',
         name: 'foo',
@@ -154,14 +164,17 @@ describe('collection', () => {
         context,
         name: 'baz',
         origin: coll2,
-        field: fooField.id,
+        field: new ID({ id: fooField.id, dataType: fooField.dataType }),
         dataType: dataTypes.string,
       }),
     ];
 
     expect(coll2.availableFields.map((af) => af.def)).toEqual([
       {
-        field: 2,
+        field: {
+          id: 2,
+          dataType: 'string',
+        },
         id: 4,
         dataType: 'string',
         name: 'baz',

@@ -7,13 +7,13 @@ import {
 import { Collection, getAlias } from '@arql/parser';
 import { uniq } from '@arql/util';
 import { ContextualisedField, getField } from './field.js';
+import { ID } from './id.js';
 import { getModel } from './model.js';
 import { getTransform } from './transform.js';
 import {
   ContextualisedOrigin,
   ContextualisedQuery,
   ContextualiserState,
-  ID,
   selectField,
 } from './util.js';
 
@@ -55,15 +55,12 @@ export class ContextualisedCollection extends Node<ContextualisedCollectionDef> 
 
   constructor(opts: ContextualisedCollectionDef) {
     super(opts);
-    this.id = {
-      type: 'ID',
-      id: this.context.items.length,
-    };
+    this.id = this.context.items.length;
     this.context.items.push(this);
   }
 
   /** a number identifying this collection */
-  id: ID;
+  id: number;
 
   /** the override external interface to the collection */
   shape?: ContextualisedField[] = undefined;
@@ -120,7 +117,7 @@ export class ContextualisedCollection extends Node<ContextualisedCollectionDef> 
 
     // find the required subFields within the origin and mark those as required
     const requiredFields = this.origin.availableFields.filter((af) => {
-      const found = requiredSubfields.find((rf) => rf === af.id);
+      const found = requiredSubfields.find((rf) => rf.id === af.id);
       if (found) {
         requiredSubfields = requiredSubfields.filter((f) => f !== found);
       }
