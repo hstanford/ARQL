@@ -8,7 +8,6 @@ Get powerful access to your data with minimal setup:
 import { collectorConfig } from '@arql/stdlib-collector';
 import { transforms, functions, opMap } from '@arql/stdlib-definitions';
 import {
-  operators,
   transforms as pgTransforms,
   functions as pgFunctions,
 } from '@arql/stdlib-postgresql';
@@ -18,7 +17,6 @@ import { PostgreSQL } from '@arql/source-postgresql';
 // create a data source
 const source = new PostgreSQL({
   models: [], // automatically retrieves schema if left empty
-  operators,
   transforms: pgTransforms,
   functions: pgFunctions,
   connectionVariables, //: <POSTGRES CONNECTION SETTINGS>,
@@ -29,8 +27,8 @@ await source.init();
 const run = runner({
   contextualiserConfig: {
     models: new Map(source.models.map((m) => [m.name, m])),
-    transforms,
-    functions,
+    transforms: [...transforms],
+    functions: [...functions],
     opMap,
   },
   collectorConfig,
