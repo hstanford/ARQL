@@ -54,7 +54,7 @@ export function buildCollection(
         throw new Error(`Could not find column ${rf.name}`);
       }
 
-      acc[rf.id.id] = col;
+      acc[rf.id] = col;
       return acc;
     },
     {} as Record<number, Column>

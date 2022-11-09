@@ -14,7 +14,7 @@ export const group: TransformFn = (
   // get field names that we are grouping by
   const fieldKeys = transform.args
     .filter(isId)
-    .map((id) => constituentFields.find((f) => f.id === id))
+    .map((id) => constituentFields.find((f) => f.id === id.id))
     .filter(
       (f: ContextualisedField | undefined): f is ContextualisedField => !!f
     )

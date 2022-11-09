@@ -4,7 +4,6 @@ import {
   ContextualisedQuery,
   ContextualisedTransform,
   ContextualiserState,
-  ID,
   isId,
 } from '@arql/contextualiser';
 import { Node, Requirements } from '@arql/models';
@@ -80,7 +79,7 @@ export class DelegatedTransform extends Node<DelegatedTransformDef> {
   }
 
   /** a number identifying this transform */
-  id: ID;
+  id: number;
 
   /** the name of the function that resolves this node */
   name: string;

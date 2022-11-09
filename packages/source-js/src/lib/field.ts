@@ -17,7 +17,7 @@ export function buildFieldValue(
 ): unknown {
   if (isId(field)) {
     // identify the field on the record we're trying to access
-    const underlyingField = constituentFields.find((f) => f.id === field);
+    const underlyingField = constituentFields.find((f) => f.id === field.id);
     if (!underlyingField) {
       throw new Error('Could not find matching constituent field');
     }

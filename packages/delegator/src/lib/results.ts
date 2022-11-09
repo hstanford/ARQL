@@ -1,4 +1,4 @@
-import { ContextualisedField, ID } from '@arql/contextualiser';
+import { ContextualisedField } from '@arql/contextualiser';
 import { Node, Requirements } from '@arql/models';
 
 /**
@@ -10,7 +10,7 @@ export interface DelegatedResultsDef {
   index: number;
 
   /** the ID of the node that the results node has replaced */
-  id: ID;
+  id: number;
 
   /** the fields exposed by the detatched node */
   fields: ContextualisedField[]; // FIXME: these fields still have an origin pointing to a collection/transform

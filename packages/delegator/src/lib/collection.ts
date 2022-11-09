@@ -52,7 +52,7 @@ export class DelegatedCollection extends Node<DelegatedCollectionDef> {
   }
 
   /** a number identifying this collection */
-  id: ID;
+  id: number;
 
   /** the override external interface to the collection */
   shape?: ContextualisedField[] = undefined;

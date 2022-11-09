@@ -53,7 +53,7 @@ export function buildTransform(
       if (!col) {
         throw new Error(`Could not find column ${rf.name}`);
       }
-      constituentFields[rf.id.id] = col;
+      constituentFields[rf.id] = col;
     }
 
     origins.push(origin);

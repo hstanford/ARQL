@@ -1,4 +1,4 @@
-import { test } from './lib.js';
+import { test } from './lib/index.js';
 
 type Query = [string, unknown[]];
 
