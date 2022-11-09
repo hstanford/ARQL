@@ -24,13 +24,11 @@ export type TransformFn = (
 ) => Records;
 
 export type FunctionFn = (args: Field[], modifier: string[]) => Field;
-export type OperatorFn = (args: Field[]) => Field;
 
 // expected configuration format for the collector
 export interface CollectorConfig {
   transforms: Record<string, TransformFn>;
   functions: Record<string, FunctionFn>;
-  operators: Record<string, OperatorFn>;
 }
 
 // the interface of a context object that is accessible

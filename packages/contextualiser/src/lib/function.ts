@@ -2,8 +2,7 @@ import { combineRequirements, Node, Requirements } from '@arql/models';
 import { Transform } from '@arql/parser';
 import { FunctionDef, tuple, Type } from '@arql/types';
 import { ContextualisedCollection } from './collection';
-import { ContextualisedExpr, getExpression } from './expr';
-import { ContextualisedParam } from './param';
+import { ContextualisedFieldValue, getExpression } from './expr';
 import { ContextualisedTransform } from './transform';
 import {
   constituentFields,
@@ -28,12 +27,7 @@ export interface ContextualisedFunctionDef {
   modifier: string[];
 
   /** arguments passed to the function */
-  args: (
-    | ContextualisedExpr
-    | ContextualisedParam
-    | ContextualisedFunction
-    | ID
-  )[];
+  args: ContextualisedFieldValue[];
 
   /** the data type for the collector */
   dataType: Type;
@@ -131,14 +125,16 @@ export function getFunction(
   });
 }
 
+/**
+ *
+ * @param name function name to find
+ * @param args arguments to provide to the function
+ * @param context contains which models/collections are available at this level of the query
+ * @returns the matched function and its signature (separate because generic params have been given context)
+ */
 export function findMatchingFunction(
   name: string,
-  args: (
-    | number
-    | ContextualisedExpr
-    | ContextualisedParam
-    | ContextualisedFunction
-  )[],
+  args: ContextualisedFieldValue[],
   context: ContextualiserState
 ) {
   const match = context.functions.find((f) => f.name === name);

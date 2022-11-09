@@ -1,6 +1,6 @@
-import { OperatorFn } from '@arql/source-js';
+import { FunctionFn } from '@arql/source-js';
 
-export const add: OperatorFn = ([left, right]) => {
+export const add: FunctionFn = ([left, right]) => {
   if (typeof left === 'number' && typeof right === 'number') {
     return left + right;
   } else {
@@ -8,7 +8,7 @@ export const add: OperatorFn = ([left, right]) => {
   }
 };
 
-export const minus: OperatorFn = ([left, right]) => {
+export const minus: FunctionFn = ([left, right]) => {
   if (typeof left === 'number' && typeof right === 'number') {
     return left - right;
   } else {

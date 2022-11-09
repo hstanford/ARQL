@@ -1,6 +1,6 @@
 import {
-  ContextualisedExpr,
   ContextualisedField,
+  ContextualisedFieldValue,
   ContextualisedFunction,
   ContextualisedParam,
   ID,
@@ -49,12 +49,7 @@ export type AliasableNodes =
 
 // convert a contextualised field value to the sql-ts equivalent
 export function buildFieldValue(
-  field:
-    | ID
-    | DataField
-    | ContextualisedParam
-    | ContextualisedExpr
-    | ContextualisedFunction,
+  field: ContextualisedFieldValue,
   constituentFields: Record<ID, Column>,
   context: SourceContext
 ) {
@@ -73,17 +68,6 @@ export function buildFieldValue(
   } else if (field instanceof ContextualisedParam) {
     // parameters go from $1 upwards so we need to -1 to get the correct param
     out = context.sql.parameter(context.params[field.index - 1]);
-  } else if (field instanceof ContextualisedExpr) {
-    const op = context.operators[field.op];
-    if (!op) {
-      throw new Error(`Could not find op ${field.op}`);
-    }
-
-    // recursively build sql-ts nodes for the expression arguments
-    out = op(
-      field.args.map((arg) => buildFieldValue(arg, constituentFields, context)),
-      context.sql
-    );
   } else if (field instanceof ContextualisedFunction) {
     const fn = context.functions[field.name];
     if (!fn) {

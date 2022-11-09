@@ -2,10 +2,8 @@ import { combineRequirements, Node, Requirements } from '@arql/models';
 import { Transform } from '@arql/parser';
 import { TransformDef } from '@arql/types';
 import { uniq } from '@arql/util';
-import { ContextualisedExpr, getExpression } from './expr';
+import { ContextualisedFieldValue, getExpression } from './expr';
 import { ContextualisedField, getField } from './field';
-import { ContextualisedFunction } from './function';
-import { ContextualisedParam } from './param';
 import {
   constituentFields,
   ContextualisedQuery,
@@ -36,12 +34,7 @@ export interface ContextualisedTransformDef {
   modifier: string[];
 
   /** arguments passed to the transform */
-  args: (
-    | ID
-    | ContextualisedExpr
-    | ContextualisedParam
-    | ContextualisedFunction
-  )[];
+  args: ContextualisedFieldValue[];
 
   /** where the data offered by this transform comes from */
   origin: ContextualisedQuery | ContextualisedQuery[];

@@ -117,7 +117,6 @@ export class PostgreSQL extends DataSource {
       params,
       sql: this.sql,
       transforms: this.transforms,
-      operators: this.operators,
       functions: this.functions,
     };
     let sqlQuery: Query;

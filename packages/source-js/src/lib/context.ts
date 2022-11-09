@@ -27,12 +27,10 @@ export type TransformFn = (
 ) => Records;
 
 export type FunctionFn = (args: Field[], modifier: string[]) => Field;
-export type OperatorFn = (args: Field[]) => Field;
 
 export interface SourceConfig {
   transforms: Record<string, TransformFn>;
   functions: Record<string, FunctionFn>;
-  operators: Record<string, OperatorFn>;
   data: Map<string, Row[]>;
 }
 

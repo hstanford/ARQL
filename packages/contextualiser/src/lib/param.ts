@@ -1,5 +1,5 @@
 import { Node, Requirements } from '@arql/models';
-import { UnknownType } from '@arql/types';
+import { AnyType } from '@arql/types';
 
 /**
  * A parameter represents static data (e.g. strings, numbers, json)
@@ -15,7 +15,7 @@ export interface ContextualisedParam extends ContextualisedParamDef {}
 export class ContextualisedParam extends Node<ContextualisedParamDef> {
   type = 'contextualised_param' as const;
 
-  dataType = new UnknownType({});
+  dataType = new AnyType({}); // TODO: can we narrow this?
 
   /**
    * Requirements that this parameter demands in order for it to be

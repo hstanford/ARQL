@@ -17,8 +17,8 @@ const models = new Map(
 const run = runner({
   contextualiserConfig: {
     models,
-    transforms,
-    functions,
+    transforms: [...transforms],
+    functions: [...functions],
     opMap,
   },
   collectorConfig: collectorConfig,

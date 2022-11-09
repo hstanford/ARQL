@@ -1,6 +1,13 @@
 import { EXPR, getOperatorLookup, Operator } from '@arql/types';
+import { assertType } from '@arql/util';
+import { functions } from './functions';
 
-export const operators: Operator[] = [
+type FunctionName = typeof functions[number]['name'];
+
+// assert that all operators have a matching function declaration
+export const operators = assertType<
+  readonly (Operator & { name: FunctionName })[]
+>()([
   {
     // a binary operator
     // concatenate two strings
@@ -50,6 +57,6 @@ export const operators: Operator[] = [
     name: 'or',
     pattern: [EXPR, '||', EXPR],
   },
-];
+] as const);
 
 export const opMap = getOperatorLookup(operators);

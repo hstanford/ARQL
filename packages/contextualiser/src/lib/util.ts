@@ -1,7 +1,6 @@
 import { DataField, DataModel } from '@arql/models';
 import { FunctionDef, RankedOperator, TransformDef } from '@arql/types';
 import { ContextualisedCollection } from './collection';
-import { ContextualisedExpr } from './expr';
 import { ContextualisedField } from './field';
 import { ContextualisedFunction } from './function';
 import { ContextualisedParam } from './param';
@@ -17,7 +16,6 @@ export function isId(
 
 export type ContextualisedNodeType =
   | ContextualisedCollection
-  | ContextualisedExpr
   | ContextualisedField
   | ContextualisedFunction
   | ContextualisedParam
@@ -61,7 +59,6 @@ export function constituentFields(
     | DataField
     | ContextualisedField
     | ContextualisedParam
-    | ContextualisedExpr
     | ContextualisedFunction
     | ID
 ): ID[] {
@@ -70,9 +67,7 @@ export function constituentFields(
   }
   // propagate required fields down to the arguments
   const fields: ID[] = [];
-  if (item instanceof ContextualisedExpr) {
-    fields.push(...item.constituentFields);
-  } else if (item instanceof ContextualisedParam) {
+  if (item instanceof ContextualisedParam) {
     // params have no field requirements
   } else if (item instanceof ContextualisedField) {
     fields.push(item.id);

@@ -16,3 +16,7 @@ export function uniqBy<T>(arr: T[], key: keyof T) {
     (field, idx, self) => idx === self.findIndex((f2) => f2[key] === field[key])
   );
 }
+
+export function assertType<T>() {
+  return <U extends T>(val: U) => val;
+}

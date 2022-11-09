@@ -1,9 +1,8 @@
 import { Expr } from '@arql/parser';
 import { isEXPR, RankedOperator } from '@arql/types';
-import { ContextualisedExpr, getExpression } from './expr';
+import { ContextualisedFieldValue, getExpression } from './expr';
 import { ContextualisedFunction, findMatchingFunction } from './function';
-import { ContextualisedParam } from './param';
-import { ContextualisedQuery, ContextualiserState, ID } from './util';
+import { ContextualisedQuery, ContextualiserState } from './util';
 
 // an expression that _might_ have hierarchy
 export type ETree = Expr | ContextualisedFunction;
@@ -26,12 +25,7 @@ function match(
   model: ContextualisedQuery | ContextualisedQuery[],
   context: ContextualiserState
 ): void {
-  const args: (
-    | ContextualisedExpr
-    | ContextualisedParam
-    | ContextualisedFunction
-    | ID
-  )[] = [];
+  const args: ContextualisedFieldValue[] = [];
 
   // find the initial OperatorToken
   const initial = op.pattern.find((val) => !isEXPR(val));
@@ -85,7 +79,7 @@ function match(
     args,
     context,
     function: match,
-    modifier: match.modifiers ?? [],
+    modifier: match.modifiers ? [...match.modifiers] : [],
     dataType: fnSignature.return.resolve(),
   });
 

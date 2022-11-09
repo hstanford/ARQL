@@ -17,7 +17,7 @@ export function isEXPR(item: unknown): item is typeof EXPR {
 // the pattern indicates the arity and position of operands
 export interface Operator {
   name: string;
-  pattern: (typeof EXPR | OperatorToken)[];
+  pattern: readonly (typeof EXPR | OperatorToken)[];
 }
 
 // tracks operator precedence as well as the signature
@@ -30,7 +30,7 @@ export type OpMap = Map<OperatorToken, RankedOperator>;
 
 // convert an ordered array of operators to a lookup of
 // <operator token> : <ranked operator definition>
-export function getOperatorLookup(operators: Operator[]): OpMap {
+export function getOperatorLookup(operators: readonly Operator[]): OpMap {
   return operators.reduce((acc, item, idx) => {
     const rankedOp = { ...item, rank: idx };
     for (const token of item.pattern) {

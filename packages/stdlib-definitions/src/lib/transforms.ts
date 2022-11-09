@@ -1,6 +1,7 @@
 import { array, dataTypes, TransformDef, UnknownType } from '@arql/types';
+import { assertType } from '@arql/util';
 
-export const transforms: TransformDef[] = [
+export const transforms = assertType<readonly TransformDef[]>()([
   {
     // a transformation that is passed a predicate
     // return a subset of rows that satisfy the predicate
@@ -39,4 +40,4 @@ export const transforms: TransformDef[] = [
       args: array(new UnknownType({})),
     },
   },
-];
+] as const);

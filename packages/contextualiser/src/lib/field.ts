@@ -7,7 +7,7 @@ import {
 } from '@arql/models';
 import { Field } from '@arql/parser';
 import { NeverType, Type } from '@arql/types';
-import { ContextualisedExpr, getExpression } from './expr';
+import { getExpression } from './expr';
 import { ContextualisedFunction } from './function';
 import { ContextualisedParam } from './param';
 import {
@@ -31,12 +31,7 @@ export interface ContextualisedFieldDef {
   name: string;
 
   /** the value */
-  field:
-    | DataField
-    | ContextualisedParam
-    | ContextualisedExpr
-    | ContextualisedFunction
-    | ID;
+  field: DataField | ContextualisedParam | ContextualisedFunction | ID;
 
   /** the collection or transform this field can be accessed from */
   origin: ContextualisedOrigin;
@@ -59,7 +54,7 @@ export class ContextualisedField extends Node<ContextualisedFieldDef> {
     this.id = this.context.items.length;
     this.context.items.push(this);
 
-    if (this.field instanceof ContextualisedExpr) {
+    if (this.field instanceof ContextualisedFunction) {
       this._requirements.flags.supportsExpressionFields = true;
     }
   }

@@ -1,6 +1,6 @@
-import { OperatorFn } from '@arql/source-js';
+import { FunctionFn } from '@arql/source-js';
 
-export const strConcat: OperatorFn = ([left, right]) => {
+export const strConcat: FunctionFn = ([left, right]) => {
   if (typeof left !== 'string' || typeof right !== 'string') {
     throw new Error('Could not sum values');
   }

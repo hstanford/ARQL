@@ -31,8 +31,8 @@ export class AppService {
     this.run = runner({
       contextualiserConfig: {
         models: this.models,
-        transforms,
-        functions,
+        transforms: [...transforms],
+        functions: [...functions],
         opMap,
       },
       collectorConfig,

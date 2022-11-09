@@ -83,7 +83,6 @@ export class JsSource extends DataSource {
     params: unknown[]
   ): Promise<Dictionary<unknown>[]> {
     const context: SourceContext = {
-      operators: this.operators,
       transforms: this.transforms,
       functions: this.functions,
       models: this.dataModels,

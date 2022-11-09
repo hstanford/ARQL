@@ -1,8 +1,6 @@
 import {
-  ContextualisedExpr,
   ContextualisedField,
-  ContextualisedFunction,
-  ContextualisedParam,
+  ContextualisedFieldValue,
   ContextualisedQuery,
   ContextualisedTransform,
   ContextualiserState,
@@ -44,12 +42,7 @@ export interface DelegatedTransformDef {
   modifier: string[];
 
   /** arguments passed to the transform */
-  args: (
-    | ID
-    | ContextualisedExpr
-    | ContextualisedParam
-    | ContextualisedFunction
-  )[];
+  args: ContextualisedFieldValue[];
 
   /** where the data offered by this transform comes from */
   origin: DelegatedTransformOrigins;

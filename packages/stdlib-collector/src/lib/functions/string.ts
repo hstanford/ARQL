@@ -1,6 +1,6 @@
-import { OperatorFn } from '@arql/collector';
+import { FunctionFn } from '@arql/collector';
 
-export const strConcat: OperatorFn = ([left, right]) => {
+export const strConcat: FunctionFn = ([left, right]) => {
   if (typeof left !== 'string' || typeof right !== 'string') {
     throw new Error('Both arguments must be strings to concatenate');
   }

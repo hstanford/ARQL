@@ -26,7 +26,8 @@ export class PrimitiveType<T extends DataType> extends TypeNode<
   satisfiedBy(type: Type): boolean {
     return (
       (type instanceof PrimitiveType && type.name === this.name) ||
-      (type instanceof LiteralType && typeof type.value === this.name)
+      (type instanceof LiteralType && typeof type.value === this.name) ||
+      type instanceof AnyType
       // TODO: fix for literal Dates etc
     );
   }
@@ -39,6 +40,7 @@ export class PrimitiveType<T extends DataType> extends TypeNode<
 }
 
 export class NeverType extends TypeNode<Record<string, never>> {
+  _type = 'never' as const;
   satisfiedBy(): boolean {
     return false;
   }
@@ -51,6 +53,7 @@ export class NeverType extends TypeNode<Record<string, never>> {
 }
 
 export class UnknownType extends TypeNode<Record<string, never>> {
+  _type = 'unknown' as const;
   satisfiedBy(): boolean {
     return true;
   }
@@ -59,6 +62,19 @@ export class UnknownType extends TypeNode<Record<string, never>> {
   }
   toString(): string {
     return 'unknown';
+  }
+}
+
+export class AnyType extends TypeNode<Record<string, never>> {
+  _type = 'any' as const;
+  satisfiedBy(): boolean {
+    return false;
+  }
+  resolve() {
+    return this;
+  }
+  toString(): string {
+    return 'any';
   }
 }
 
@@ -281,6 +297,7 @@ export type Type =
   | PrimitiveType<DataType>
   | NeverType
   | UnknownType
+  | AnyType
   | ArrayType<Type>
   | UnionType<Type[]>
   | InterfaceType<[string, Type][]>
@@ -375,7 +392,7 @@ export type FunctionDef = {
   signature:
     | FunctionSignature
     | ((generics: FunctionGenericValues) => FunctionSignature);
-  modifiers?: string[];
+  modifiers?: readonly string[];
 };
 
 export type TransformDef = {
@@ -383,7 +400,7 @@ export type TransformDef = {
   signature: {
     args: ArrayType<Type> | TupleType<Type[]>;
   };
-  modifiers?: string[];
+  modifiers?: readonly string[];
 };
 
 // Typescript type inference

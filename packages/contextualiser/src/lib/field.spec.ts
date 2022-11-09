@@ -1,7 +1,8 @@
+import { functions } from '@arql/stdlib-definitions';
 import { dataTypes } from '@arql/types';
 import { ContextualisedCollection } from './collection';
-import { ContextualisedExpr } from './expr';
 import { ContextualisedField } from './field';
+import { ContextualisedFunction } from './function';
 import { testObjects, testSource } from './test_helpers';
 import { ContextualiserState } from './util';
 
@@ -62,13 +63,18 @@ describe('field', () => {
   it('can list the constituent fields for a field wrapping an expression', () => {
     const context = new ContextualiserState(emptyConfig);
     const { fooField, barField, testCollection } = testObjects(context);
+
+    const equals = functions.find((f) => f.name === 'equals');
+    if (!equals) throw new Error('Missing function definition for "equals"');
+
     const wrappedField = new ContextualisedField({
       context,
       name: 'wrapped',
-      field: new ContextualisedExpr({
+      field: new ContextualisedFunction({
         context,
-        op: 'equals',
+        function: equals,
         args: [fooField.id, barField.id],
+        modifier: [],
         dataType: dataTypes.boolean,
       }),
       origin: new ContextualisedCollection({

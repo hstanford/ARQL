@@ -7,8 +7,9 @@ import {
   unknown,
   UnknownType,
 } from '@arql/types';
+import { assertType } from '@arql/util';
 
-export const functions: FunctionDef[] = [
+export const functions = assertType<readonly FunctionDef[]>()([
   {
     // an aggregate function, passed a field name
     // get the maximum value of a field over a set of rows
@@ -58,10 +59,45 @@ export const functions: FunctionDef[] = [
     },
   },
   {
+    name: 'notEquals',
+    signature: {
+      args: tuple(unknown, unknown),
+      return: dataTypes.boolean,
+    },
+  },
+  {
     name: 'add',
     signature: (genericValues) => ({
       args: tuple(generic('T', genericValues), generic('T', genericValues)),
       return: generic('T', genericValues),
     }),
   },
-];
+  {
+    name: 'minus',
+    signature: {
+      args: tuple(dataTypes.number, dataTypes.number),
+      return: dataTypes.number,
+    },
+  },
+  {
+    name: 'and',
+    signature: {
+      args: tuple(dataTypes.boolean, dataTypes.boolean),
+      return: dataTypes.number,
+    },
+  },
+  {
+    name: 'or',
+    signature: {
+      args: tuple(dataTypes.boolean, dataTypes.boolean),
+      return: dataTypes.number,
+    },
+  },
+  {
+    name: 'strConcat',
+    signature: {
+      args: tuple(dataTypes.string, dataTypes.string),
+      return: dataTypes.string,
+    },
+  },
+] as const);

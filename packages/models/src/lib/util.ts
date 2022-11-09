@@ -3,7 +3,6 @@ import { DataModel, DataModelDef } from './model';
 // expected input interface to configure a source
 export interface SourceConfig {
   models: DataModelDef[];
-  operators: Record<string, operatorOp>;
   transforms: Record<string, transformFn>;
   functions: Record<string, transformFn>;
 }

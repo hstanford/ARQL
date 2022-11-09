@@ -17,15 +17,9 @@ export type FunctionFn = (
   modifier: string[]
 ) => AliasableNodes;
 
-export type OperatorFn = (
-  args: (AliasableNodes | ParameterNode)[],
-  sql: Sql
-) => AliasableNodes;
-
 export type SourceConfig = {
   transforms: Record<string, TransformFn>;
   functions: Record<string, FunctionFn>;
-  operators: Record<string, OperatorFn>;
 };
 
 export interface SourceContext extends SourceConfig {

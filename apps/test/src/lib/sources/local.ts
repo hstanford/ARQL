@@ -1,5 +1,5 @@
 import { JsSource } from '@arql/source-js';
-import { functions, operators, transforms } from '@arql/stdlib-js';
+import { functions, transforms } from '@arql/stdlib-js';
 import { dataTypes } from '@arql/types';
 
 export const localTestSource = new JsSource({
@@ -31,6 +31,5 @@ export const localTestSource = new JsSource({
     ],
   ]),
   functions,
-  operators,
   transforms,
 });

@@ -10,18 +10,16 @@ import { Dictionary } from '@arql/util';
 import { Flags } from './flags';
 import { DataModel } from './model';
 import { Requirements } from './requirements';
-import { operatorOp, SourceConfig, transformFn } from './util';
+import { SourceConfig, transformFn } from './util';
 
 export abstract class DataSource extends Flags {
   models: DataModel[];
-  operators: Record<string, operatorOp>;
   transforms: Record<string, transformFn>;
   functions: Record<string, transformFn>;
 
   constructor(config: SourceConfig) {
     super();
     this.models = config.models.map((m) => new DataModel(m, this));
-    this.operators = config.operators;
     this.transforms = config.transforms;
     this.functions = config.functions;
   }
@@ -35,10 +33,6 @@ export abstract class DataSource extends Flags {
 
   async init() {
     return;
-  }
-
-  implementsOp(opName: string) {
-    return this.operators[opName];
   }
 
   implementsTransform(transform: TransformDef) {
@@ -74,16 +68,11 @@ export abstract class DataSource extends Flags {
       this.implementsTransform(f)
     );
 
-    const satisfiesOperations = requirements.operations.every(
-      (opName) => !!this.operators[opName]
-    );
-
     return (
       satisfiesSources &&
       satisfiesFlags &&
       satisfiesFunctions &&
-      satisfiesTransform &&
-      satisfiesOperations
+      satisfiesTransform
     );
   }
 

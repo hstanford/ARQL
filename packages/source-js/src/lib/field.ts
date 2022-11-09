@@ -1,5 +1,4 @@
 import {
-  ContextualisedExpr,
   ContextualisedField,
   ContextualisedFunction,
   ContextualisedParam,
@@ -50,19 +49,6 @@ export function buildFieldValue(
   } else if (field instanceof ContextualisedParam) {
     // a parameter value will be retrieved directly from the parameter array
     return context.params[field.index - 1];
-  } else if (field instanceof ContextualisedExpr) {
-    // assert that the named operator exists
-    const op = context.operators[field.op];
-    if (!op) {
-      throw new Error(`Unsupported operator ${field.op}`);
-    }
-
-    // recursively process expression arguments
-    const args = field.args.map((arg) =>
-      buildFieldValue(arg, record, constituentFields, context)
-    );
-
-    return op(args);
   } else if (field instanceof ContextualisedFunction) {
     // assert that the named function exists
     const fn = context.functions[field.name];

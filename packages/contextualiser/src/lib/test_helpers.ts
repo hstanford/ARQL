@@ -42,7 +42,6 @@ export const testSource = new TestSource({
   ],
   functions: {},
   transforms: {},
-  operators: {},
 });
 
 export const testModel = testSource.models.find(
