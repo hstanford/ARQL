@@ -3,6 +3,7 @@ import {
   dataTypes,
   FunctionDef,
   generic,
+  tuple,
   unknown,
   UnknownType,
 } from '@arql/types';
@@ -14,7 +15,7 @@ export const functions: FunctionDef[] = [
     // e.g. test | group(foo) { foo, bar: max(bar) }
     name: 'max',
     signature: {
-      args: array(dataTypes.number),
+      args: tuple(dataTypes.number),
       return: dataTypes.number,
     },
   },
@@ -24,7 +25,7 @@ export const functions: FunctionDef[] = [
     // e.g. test | group(foo) { foo, bar: min(bar) }
     name: 'min',
     signature: {
-      args: array(dataTypes.number),
+      args: tuple(dataTypes.number),
       return: dataTypes.number,
     },
   },
@@ -34,7 +35,7 @@ export const functions: FunctionDef[] = [
     // e.g. test | group(foo) { foo, nBar: count.distinct(bar) }
     name: 'count',
     signature: {
-      args: array(new UnknownType({})),
+      args: tuple(new UnknownType({})),
       return: dataTypes.number,
     },
     modifiers: ['distinct'], // if "distinct" only count unique values
@@ -44,16 +45,23 @@ export const functions: FunctionDef[] = [
     // get an array aggregation of all the values
     // e.g. test | group(foo) { foo, bar: array(bar) }
     name: 'array',
-    signature: {
-      args: array(generic('T')),
-      return: array(generic('T')),
-    },
+    signature: (genericValues) => ({
+      args: tuple(generic('T', genericValues)),
+      return: array(generic('T', genericValues)),
+    }),
   },
   {
     name: 'equals',
     signature: {
-      args: array(unknown, unknown),
+      args: tuple(unknown, unknown),
       return: dataTypes.boolean,
     },
+  },
+  {
+    name: 'add',
+    signature: (genericValues) => ({
+      args: tuple(generic('T', genericValues), generic('T', genericValues)),
+      return: generic('T', genericValues),
+    }),
   },
 ];

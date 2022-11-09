@@ -1,8 +1,10 @@
 import { combineRequirements, Node, Requirements } from '@arql/models';
 import { Transform } from '@arql/parser';
-import { FunctionDef, Type } from '@arql/types';
+import { FunctionDef, tuple, Type } from '@arql/types';
+import { ContextualisedCollection } from './collection';
 import { ContextualisedExpr, getExpression } from './expr';
 import { ContextualisedParam } from './param';
+import { ContextualisedTransform } from './transform';
 import {
   constituentFields,
   ContextualisedQuery,
@@ -105,25 +107,68 @@ export function getFunction(
   model: ContextualisedQuery | ContextualisedQuery[],
   context: ContextualiserState
 ): ContextualisedFunction {
-  const match = context.functions.find((f) => f.name === func.description.root);
-  if (!match) throw new Error(`Unrecognised function ${func.description.root}`);
-
-  const contextualisedFunction = new ContextualisedFunction({
-    context,
-    function: match,
-    modifier: func.description.parts.filter(
-      (part) => match.modifiers && match.modifiers.indexOf(part) !== -1
-    ),
-    args: [],
-    dataType: match.signature.return,
-  });
-
-  contextualisedFunction.args = func.args.map((arg) => {
+  const args = func.args.map((arg) => {
     if (!Array.isArray(arg) && arg.type === 'shape') {
       throw new Error('Cannot pass shape to inline function');
     }
     return getExpression(arg, model, context);
   });
 
-  return contextualisedFunction;
+  const { match, fnSignature } = findMatchingFunction(
+    func.description.root,
+    args,
+    context
+  );
+
+  return new ContextualisedFunction({
+    context,
+    function: match,
+    modifier: func.description.parts.filter(
+      (part) => match.modifiers && match.modifiers.indexOf(part) !== -1
+    ),
+    args,
+    dataType: fnSignature.return.resolve(),
+  });
+}
+
+export function findMatchingFunction(
+  name: string,
+  args: (
+    | number
+    | ContextualisedExpr
+    | ContextualisedParam
+    | ContextualisedFunction
+  )[],
+  context: ContextualiserState
+) {
+  const match = context.functions.find((f) => f.name === name);
+  if (!match) throw new Error(`Unrecognised function ${name}`);
+
+  const fnSignature =
+    typeof match.signature === 'function'
+      ? match.signature({})
+      : match.signature;
+
+  const argTypes = args.map((arg) => {
+    if (isId(arg)) {
+      const underlyingField = context.get(arg);
+      if (
+        underlyingField instanceof ContextualisedCollection ||
+        underlyingField instanceof ContextualisedTransform
+      ) {
+        throw new Error('Cannot get data type for collection');
+      }
+      return underlyingField.dataType;
+    } else {
+      return arg.dataType;
+    }
+  });
+
+  const compatible = fnSignature.args.satisfiedBy(tuple(...argTypes));
+
+  if (!compatible) {
+    throw new Error('Arguments were not compatible with function signature');
+  }
+
+  return { match, fnSignature };
 }

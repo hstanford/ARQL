@@ -80,6 +80,7 @@ describe('contextualiser', () => {
         sourceDataType: 'string',
       },
       name: 'foo',
+      dataType: 'string',
       origin: {
         name: 'test',
       },
@@ -92,6 +93,7 @@ describe('contextualiser', () => {
         sourceDataType: 'string',
       },
       name: 'bar',
+      dataType: 'string',
       origin: {
         name: 'test',
       },
@@ -130,6 +132,7 @@ describe('contextualiser', () => {
             {
               field: contextualisedFoo.id,
               id: 5,
+              dataType: 'string',
               name: 'foo',
               origin: {
                 name: 'test',
@@ -138,6 +141,7 @@ describe('contextualiser', () => {
             {
               field: contextualisedBar.id,
               id: 6,
+              dataType: 'string',
               name: 'bar',
               origin: {
                 name: 'test',
@@ -150,6 +154,7 @@ describe('contextualiser', () => {
           {
             field: 6,
             id: 7,
+            dataType: 'string',
             name: 'bar',
             origin: {
               name: 'filter',
@@ -160,6 +165,7 @@ describe('contextualiser', () => {
           {
             id: 7,
             field: 6,
+            dataType: 'string',
             name: 'bar',
             origin: {
               name: 'filter',
@@ -171,6 +177,7 @@ describe('contextualiser', () => {
         {
           field: 7,
           id: 10,
+          dataType: 'string',
           name: 'bar',
           origin: {
             name: 'test',

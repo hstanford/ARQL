@@ -1,7 +1,7 @@
 import { Expr } from '@arql/parser';
 import { isEXPR, RankedOperator } from '@arql/types';
 import { ContextualisedExpr, getExpression } from './expr';
-import { ContextualisedFunction } from './function';
+import { ContextualisedFunction, findMatchingFunction } from './function';
 import { ContextualisedParam } from './param';
 import { ContextualisedQuery, ContextualiserState, ID } from './util';
 
@@ -79,19 +79,14 @@ function match(
     throw new Error('No match');
   }
 
-  // TODO: refine by matching function signature with args
-  const fn = context.functions.find((f) => f.name === op.name);
-
-  if (!fn) {
-    throw new Error(`Could not find function definition for ${op.name}`);
-  }
+  const { match, fnSignature } = findMatchingFunction(op.name, args, context);
 
   const newNode = new ContextualisedFunction({
     args,
     context,
-    function: fn,
-    modifier: fn.modifiers ?? [],
-    dataType: fn.signature.return,
+    function: match,
+    modifier: match.modifiers ?? [],
+    dataType: fnSignature.return.resolve(),
   });
 
   // matching pattern, splice the parsed expression into place

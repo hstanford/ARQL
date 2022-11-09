@@ -2,7 +2,14 @@ export abstract class TypeNode<T> {
   constructor(opts: T) {
     Object.assign(this, opts);
   }
+  /** Is this node a superset of the type passed as the argument? */
   abstract satisfiedBy(type: Type): boolean;
+
+  /** return the Type, or the resolved type if generic */
+  abstract resolve(): Type;
+
+  /** serialiser */
+  abstract toString(): string;
 }
 
 export type DataType = 'string' | 'number' | 'boolean' | 'json' | 'date';
@@ -17,10 +24,17 @@ export class PrimitiveType<T extends DataType> extends TypeNode<
 > {
   _type = 'primitive' as const;
   satisfiedBy(type: Type): boolean {
-    return type instanceof PrimitiveType && type.name === this.name;
+    return (
+      (type instanceof PrimitiveType && type.name === this.name) ||
+      (type instanceof LiteralType && typeof type.value === this.name)
+      // TODO: fix for literal Dates etc
+    );
   }
   resolve() {
     return this;
+  }
+  toString(): string {
+    return this.name;
   }
 }
 
@@ -31,6 +45,9 @@ export class NeverType extends TypeNode<Record<string, never>> {
   resolve() {
     return this;
   }
+  toString(): string {
+    return 'never';
+  }
 }
 
 export class UnknownType extends TypeNode<Record<string, never>> {
@@ -40,17 +57,48 @@ export class UnknownType extends TypeNode<Record<string, never>> {
   resolve() {
     return this;
   }
+  toString(): string {
+    return 'unknown';
+  }
 }
 
-export interface IArrayType<M extends Type[]> {
+export interface IArrayType<M extends Type> {
+  member: M;
+}
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface ArrayType<M extends Type> extends IArrayType<M> {}
+export class ArrayType<M extends Type> extends TypeNode<IArrayType<M>> {
+  _type = 'array' as const;
+  satisfiedBy(type: Type): boolean {
+    if (!(type instanceof ArrayType) && !(type instanceof TupleType)) {
+      return false;
+    }
+
+    if (type instanceof ArrayType) {
+      return this.member.satisfiedBy(type.member);
+    } else if (type instanceof TupleType) {
+      return type.members.every((member) => this.member.satisfiedBy(member));
+    } else {
+      return false;
+    }
+  }
+  resolve() {
+    return this;
+  }
+  toString(): string {
+    return `Array<${this.member.toString()}>`;
+  }
+}
+
+export interface ITupleType<M extends Type[]> {
   members: M;
 }
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface ArrayType<M extends Type[]> extends IArrayType<M> {}
-export class ArrayType<M extends Type[]> extends TypeNode<IArrayType<M>> {
-  _type = 'array' as const;
+export interface TupleType<M extends Type[]> extends ITupleType<M> {}
+export class TupleType<M extends Type[]> extends TypeNode<ITupleType<M>> {
+  _type = 'tuple' as const;
   satisfiedBy(type: Type): boolean {
-    if (!(type instanceof ArrayType)) {
+    if (!(type instanceof TupleType)) {
       return false;
     }
 
@@ -62,6 +110,9 @@ export class ArrayType<M extends Type[]> extends TypeNode<IArrayType<M>> {
   }
   resolve() {
     return this;
+  }
+  toString(): string {
+    return `[${this.members.map((m) => m.toString()).join(', ')}]`;
   }
 }
 
@@ -98,6 +149,9 @@ export class UnionType<M extends Type[]> extends TypeNode<IUnionType<M>> {
   }
   resolve() {
     return this;
+  }
+  toString(): string {
+    return this.members.map((m) => m.toString()).join(' | ');
   }
 }
 
@@ -146,19 +200,30 @@ export class InterfaceType<M extends [string, Type][]> extends TypeNode<
   resolve() {
     return this;
   }
+  toString(): string {
+    return (
+      '{' +
+      this.members
+        .map(([key, value]) => `${key}: ${value.toString}`)
+        .join(', ') +
+      '}'
+    );
+  }
 }
 
 export interface IGenericType {
   key: string;
+  genericValues: FunctionGenericValues;
   extends?: Type;
 }
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface GenericType extends IGenericType {}
 export class GenericType extends TypeNode<IGenericType> {
   _type = 'generic' as const;
-  private _candidates: Type[] = [];
   satisfiedBy(type: Type): boolean {
-    this._candidates.push(type);
+    this.genericValues[this.key] = (this.genericValues[this.key] || []).concat([
+      type,
+    ]);
     if (!this.extends) {
       return true;
     }
@@ -166,10 +231,13 @@ export class GenericType extends TypeNode<IGenericType> {
     return this.extends.satisfiedBy(type);
   }
   resolve() {
-    if (this._candidates.length === 1) {
-      return this._candidates[0];
+    if (this.genericValues[this.key].length === 1) {
+      return this.genericValues[this.key][0];
     }
-    return new UnionType({ members: this._candidates });
+    return new UnionType({ members: this.genericValues[this.key] });
+  }
+  toString(): string {
+    return `Unresolved Generic <${this.key}>`;
   }
 }
 
@@ -187,6 +255,9 @@ export class LiteralType<T> extends TypeNode<ILiteralType<T>> {
   }
   resolve() {
     return this;
+  }
+  toString(): string {
+    return `Literal<${this.value}>`;
   }
 }
 
@@ -210,11 +281,12 @@ export type Type =
   | PrimitiveType<DataType>
   | NeverType
   | UnknownType
-  | ArrayType<Type[]>
+  | ArrayType<Type>
   | UnionType<Type[]>
   | InterfaceType<[string, Type][]>
   | GenericType
-  | LiteralType<unknown>;
+  | LiteralType<unknown>
+  | TupleType<Type[]>;
 
 /**
  * string
@@ -258,14 +330,24 @@ export function union(...types: Type[]) {
   });
 }
 
-export function array(...types: Type[]) {
+export function array(type: Type) {
   return new ArrayType({
+    member: type,
+  });
+}
+
+export function tuple(...types: Type[]) {
+  return new TupleType({
     members: types,
   });
 }
 
-export function generic(key: string, ext?: Type) {
-  return new GenericType({ key, extends: ext });
+export function generic(
+  key: string,
+  genericValues: FunctionGenericValues,
+  ext?: Type
+) {
+  return new GenericType({ key, extends: ext, genericValues });
 }
 
 export const unknown = new UnknownType({});
@@ -279,19 +361,27 @@ export const dataTypes: { [K in DataType]: PrimitiveType<K> } = {
   date: new PrimitiveType({ name: 'date' }),
 };
 
+export type FunctionSignature = {
+  args: ArrayType<Type> | TupleType<Type[]>;
+  return: Type;
+};
+
+export type FunctionGenericValues = {
+  [K: string]: Type[];
+};
+
 export type FunctionDef = {
   name: string;
-  signature: {
-    args: ArrayType<Type[]>;
-    return: Type;
-  };
+  signature:
+    | FunctionSignature
+    | ((generics: FunctionGenericValues) => FunctionSignature);
   modifiers?: string[];
 };
 
 export type TransformDef = {
   name: string;
   signature: {
-    args: ArrayType<Type[]>;
+    args: ArrayType<Type> | TupleType<Type[]>;
   };
   modifiers?: string[];
 };
@@ -310,7 +400,9 @@ type UnionForTs<T extends UnionType<Type[]>> = {
   [K in keyof T['members'] & number]: TypeForTs<T['members'][K]>;
 }[number];
 
-type ArrayForTs<T extends ArrayType<Type[]>> = {
+type ArrayForTs<T extends ArrayType<Type>> = Array<TypeForTs<T['member']>>;
+
+type TupleForTs<T extends TupleType<Type[]>> = {
   [K in keyof T['members'] & number]: TypeForTs<T['members'][K]>;
 };
 
@@ -322,8 +414,10 @@ export type TypeForTs<T extends Type> = T extends PrimitiveType<DataType>
   ? PrimitiveMap[T['name']]
   : T extends UnionType<Type[]>
   ? UnionForTs<T>
-  : T extends ArrayType<Type[]>
+  : T extends ArrayType<Type>
   ? ArrayForTs<T>
+  : T extends TupleType<Type[]>
+  ? TupleForTs<T>
   : T extends InterfaceType<[string, Type][]>
   ? InterfaceForTs<T>
   : T extends LiteralType<unknown>

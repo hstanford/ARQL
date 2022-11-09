@@ -35,6 +35,7 @@ describe('transform', () => {
       {
         field: 4,
         id: 6,
+        dataType: 'string',
         name: 'foo',
         origin: {
           name: 'foo',
@@ -43,6 +44,7 @@ describe('transform', () => {
       {
         field: 5,
         id: 7,
+        dataType: 'string',
         name: 'bar',
         origin: {
           name: 'foo',
@@ -74,6 +76,7 @@ describe('transform', () => {
       {
         field: 1,
         id: 4,
+        dataType: 'number',
         name: 'foo',
         origin: {
           name: 'foo',

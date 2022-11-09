@@ -28,6 +28,7 @@ describe('collection', () => {
           name: 'foo',
         },
         id: 1,
+        dataType: 'string',
         name: 'foo',
         origin: {
           name: 'alpha',
@@ -40,6 +41,7 @@ describe('collection', () => {
           name: 'bar',
         },
         id: 2,
+        dataType: 'string',
         name: 'bar',
         origin: {
           name: 'alpha',
@@ -65,6 +67,7 @@ describe('collection', () => {
       {
         field: 2,
         id: 4,
+        dataType: 'string',
         name: 'foo',
         origin: {
           name: 'beta',
@@ -73,6 +76,7 @@ describe('collection', () => {
       {
         field: 3,
         id: 5,
+        dataType: 'string',
         name: 'bar',
         origin: {
           name: 'beta',
@@ -107,6 +111,7 @@ describe('collection', () => {
           name: 'foo',
         },
         id: 2,
+        dataType: 'string',
         name: 'foo',
         origin: {
           name: 'alpha',
@@ -117,6 +122,7 @@ describe('collection', () => {
       {
         field: 2,
         id: 4,
+        dataType: 'string',
         name: 'foo',
         origin: {
           name: 'beta',
@@ -157,6 +163,7 @@ describe('collection', () => {
       {
         field: 2,
         id: 4,
+        dataType: 'string',
         name: 'baz',
         origin: {
           name: 'beta',

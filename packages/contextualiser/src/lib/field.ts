@@ -80,6 +80,7 @@ export class ContextualisedField extends Node<ContextualisedFieldDef> {
       id: this.id,
       name: this.name,
       field: isId(this.field) ? this.field : this.field.def,
+      dataType: this.dataType.toString(),
       origin: Array.isArray(this.origin)
         ? this.origin.map((o) => ({ name: o.name }))
         : { name: this.origin.name },
