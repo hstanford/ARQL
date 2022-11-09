@@ -9,10 +9,10 @@ import {
   recursiveParser,
   sequenceOf,
 } from 'arcsecond';
-import { alphachain, Alphachain } from './alphachain';
-import { collection, Collection } from './collection';
-import { expr, Expr } from './expr';
-import { shape, Shape } from './shape';
+import { alphachain, Alphachain } from './alphachain.js';
+import { collection, Collection } from './collection.js';
+import { expr, Expr } from './expr.js';
+import { shape, Shape } from './shape.js';
 
 export interface Transform {
   type: 'transform';

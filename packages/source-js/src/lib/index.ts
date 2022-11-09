@@ -6,9 +6,9 @@ import {
 import { DataModel, DataModelDef, DataSource } from '@arql/models';
 import { dataTypes, DataType } from '@arql/types';
 import { Dictionary } from '@arql/util';
-import { resolveCollection } from './collection';
-import { isResultMaps, Row, SourceConfig, SourceContext } from './context';
-import { resolveTransform } from './transform';
+import { resolveCollection } from './collection.js';
+import { isResultMaps, Row, SourceConfig, SourceContext } from './context.js';
+import { resolveTransform } from './transform.js';
 
 function dataTypeForValue(value: unknown): DataType {
   if (typeof value === 'string') {

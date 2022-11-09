@@ -1,8 +1,8 @@
-import { ContextualisedField } from './field';
-import { testObjects } from './test_helpers';
-import { ContextualisedParam } from './param';
-import { ContextualisedTransform } from './transform';
-import { ContextualiserState } from './util';
+import { ContextualisedField } from './field.js';
+import { testObjects } from './test_helpers.js';
+import { ContextualisedParam } from './param.js';
+import { ContextualisedTransform } from './transform.js';
+import { ContextualiserState } from './util.js';
 import { array, dataTypes, TransformDef, unknown } from '@arql/types';
 
 const emptyConfig = {

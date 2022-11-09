@@ -24,8 +24,8 @@ import {
   SliceNode,
   TernaryNode,
 } from 'sql-ts';
-import { SourceContext } from './context';
-import { Column, isColumn, Query } from './types';
+import { SourceContext } from './context.js';
+import { Column, isColumn, Query } from './types.js';
 
 export type AliasableNodes =
   | AliasNode

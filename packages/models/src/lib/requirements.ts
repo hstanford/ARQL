@@ -1,7 +1,7 @@
 import { FunctionDef, TransformDef } from '@arql/types';
 import { uniq } from '@arql/util';
-import { combineFlags, Flags } from './flags';
-import { DataSource } from './source';
+import { combineFlags, Flags } from './flags.js';
+import { DataSource } from './source.js';
 
 // a set of stipulations attached to a node that must be met
 // by a source in order to resolve data from that source at that node

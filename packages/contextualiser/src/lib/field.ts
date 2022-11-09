@@ -7,9 +7,9 @@ import {
 } from '@arql/models';
 import { Field } from '@arql/parser';
 import { NeverType, Type } from '@arql/types';
-import { getExpression } from './expr';
-import { ContextualisedFunction } from './function';
-import { ContextualisedParam } from './param';
+import { getExpression } from './expr.js';
+import { ContextualisedFunction } from './function.js';
+import { ContextualisedParam } from './param.js';
 import {
   constituentFields,
   ContextualisedOrigin,
@@ -18,7 +18,7 @@ import {
   ID,
   isId,
   selectField,
-} from './util';
+} from './util.js';
 
 /**
  * A field represents a key-value pair

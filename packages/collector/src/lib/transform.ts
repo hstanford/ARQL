@@ -7,9 +7,9 @@ import {
   DelegatedTransformOrigins,
   isMultiOrigin,
 } from '@arql/delegator';
-import { collectCollection } from './collection';
-import { CollectorContext, Row, ResultMap, Records } from './context';
-import { buildFieldValue } from './field';
+import { collectCollection } from './collection.js';
+import { CollectorContext, Row, ResultMap, Records } from './context.js';
+import { buildFieldValue } from './field.js';
 
 type OriginValue<T> = T extends DelegatedTransformOrigin[]
   ? Record<string, Records>

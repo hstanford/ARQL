@@ -1,6 +1,6 @@
 import { EXPR, getOperatorLookup, Operator } from '@arql/types';
 import { assertType } from '@arql/util';
-import { functions } from './functions';
+import { functions } from './functions.js';
 
 type FunctionName = typeof functions[number]['name'];
 

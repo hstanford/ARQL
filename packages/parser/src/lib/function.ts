@@ -6,8 +6,8 @@ import {
   recursiveParser,
   sequenceOf,
 } from 'arcsecond';
-import { Alphachain, alphachain } from './alphachain';
-import { Expr, exprlist } from './expr';
+import { Alphachain, alphachain } from './alphachain.js';
+import { Expr, exprlist } from './expr.js';
 
 export interface FunctionCall {
   type: 'function';

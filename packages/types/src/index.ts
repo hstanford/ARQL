@@ -1,2 +1,2 @@
-export * from './lib/types';
-export * from './lib/operators';
+export * from './lib/types.js';
+export * from './lib/operators.js';

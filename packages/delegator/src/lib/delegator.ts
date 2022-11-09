@@ -2,9 +2,9 @@ import {
   ContextualisedCollection,
   ContextualisedQuery,
 } from '@arql/contextualiser';
-import { delegateCollection, DelegatedCollection } from './collection';
-import { DelegatedResults } from './results';
-import { DelegatedTransform, delegateTransform } from './transform';
+import { delegateCollection, DelegatedCollection } from './collection.js';
+import { DelegatedResults } from './results.js';
+import { DelegatedTransform, delegateTransform } from './transform.js';
 
 export interface DelegatorOutput {
   /** the top-level query. Can contain DelegatedResults nodes */

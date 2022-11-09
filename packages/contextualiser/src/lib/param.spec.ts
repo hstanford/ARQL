@@ -1,4 +1,4 @@
-import { ContextualisedParam } from './param';
+import { ContextualisedParam } from './param.js';
 
 describe('param', () => {
   it('can store the index of a parameter', () => {

@@ -5,9 +5,9 @@ import {
   DelegatedTransform,
 } from '@arql/delegator';
 import { DataModel } from '@arql/models';
-import { CollectorContext, isResultMaps, Records, Row } from './context';
-import { buildFieldValue } from './field';
-import { collectTransform } from './transform';
+import { CollectorContext, isResultMaps, Records, Row } from './context.js';
+import { buildFieldValue } from './field.js';
+import { collectTransform } from './transform.js';
 
 // transform a set of results ("records") whose interface should
 // match "constituentFields" into the interface matching "shape"

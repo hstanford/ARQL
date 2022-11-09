@@ -1,8 +1,8 @@
 import { dataTypes } from '@arql/types';
-import { ContextualisedCollection } from './collection';
-import { ContextualisedField } from './field';
-import { testModel } from './test_helpers';
-import { ContextualiserState } from './util';
+import { ContextualisedCollection } from './collection.js';
+import { ContextualisedField } from './field.js';
+import { testModel } from './test_helpers.js';
+import { ContextualiserState } from './util.js';
 
 const emptyConfig = {
   functions: [],

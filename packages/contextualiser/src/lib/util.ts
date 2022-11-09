@@ -1,10 +1,10 @@
 import { DataField, DataModel } from '@arql/models';
 import { FunctionDef, RankedOperator, TransformDef, Type } from '@arql/types';
-import { ContextualisedCollection } from './collection';
-import { ContextualisedField } from './field';
-import { ContextualisedFunction } from './function';
-import { ContextualisedParam } from './param';
-import { ContextualisedTransform } from './transform';
+import { ContextualisedCollection } from './collection.js';
+import { ContextualisedField } from './field.js';
+import { ContextualisedFunction } from './function.js';
+import { ContextualisedParam } from './param.js';
+import { ContextualisedTransform } from './transform.js';
 
 export type ID = {
   type: 'ID';

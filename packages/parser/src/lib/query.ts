@@ -5,7 +5,7 @@ import {
   possibly,
   sequenceOf,
 } from 'arcsecond';
-import { collection, Collection, collectionWithShape } from './collection';
+import { collection, Collection, collectionWithShape } from './collection.js';
 
 export interface Query {
   type: 'query';

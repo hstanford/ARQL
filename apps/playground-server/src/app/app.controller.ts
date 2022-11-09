@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 import { catchError, Observable } from 'rxjs';
 
-import { AppService } from './app.service';
+import { AppService } from './app.service.js';
 
 @Injectable()
 export class ErrorInterceptor implements NestInterceptor {

@@ -1,10 +1,10 @@
-import { assertNoError } from './test_helpers';
+import { assertNoError } from './test_helpers.js';
 import {
   transform,
   transformArg,
   transformArgs,
   transforms,
-} from './transform';
+} from './transform.js';
 
 describe('transformarg', () => {
   it('should accept an expression', () => {

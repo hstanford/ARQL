@@ -6,9 +6,9 @@ import {
   ID,
 } from '@arql/contextualiser';
 import { DataModel, Node, Requirements } from '@arql/models';
-import { DelegatedResults } from './results';
-import { DelegatedTransform } from './transform';
-import { delegateOrigin } from './util';
+import { DelegatedResults } from './results.js';
+import { DelegatedTransform } from './transform.js';
+import { delegateOrigin } from './util.js';
 
 export type DelegatedCollectionOrigin =
   | DataModel

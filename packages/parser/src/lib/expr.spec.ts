@@ -1,5 +1,5 @@
-import { expr, exprlist, exprNoOp, exprOp } from './expr';
-import { assertNoError } from './test_helpers';
+import { expr, exprlist, exprNoOp, exprOp } from './expr.js';
+import { assertNoError } from './test_helpers.js';
 
 describe('base expr', () => {
   it('parses an expression successfully', () => {

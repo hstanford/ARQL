@@ -4,10 +4,10 @@ import {
   ContextualisedTransform,
 } from '@arql/contextualiser';
 import { Query } from 'sql-ts';
-import { buildCollection } from './collection';
-import { SourceContext } from './context';
-import { buildField, buildFieldValue } from './field';
-import { Column, SubQuery } from './types';
+import { buildCollection } from './collection.js';
+import { SourceContext } from './context.js';
+import { buildField, buildFieldValue } from './field.js';
+import { Column, SubQuery } from './types.js';
 
 // select a set of columns from a subquery as a new subquery
 export function applyShape(

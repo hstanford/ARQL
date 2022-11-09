@@ -6,16 +6,16 @@ import {
 } from '@arql/models';
 import { Collection, getAlias } from '@arql/parser';
 import { uniq } from '@arql/util';
-import { ContextualisedField, getField } from './field';
-import { getModel } from './model';
-import { getTransform } from './transform';
+import { ContextualisedField, getField } from './field.js';
+import { getModel } from './model.js';
+import { getTransform } from './transform.js';
 import {
   ContextualisedOrigin,
   ContextualisedQuery,
   ContextualiserState,
   ID,
   selectField,
-} from './util';
+} from './util.js';
 
 /**
  * Collections are an intermediate state of data, representing a set

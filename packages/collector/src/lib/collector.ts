@@ -5,9 +5,9 @@ import {
   DelegatorOutput,
 } from '@arql/delegator';
 import { Dictionary } from '@arql/util';
-import { collectCollection } from './collection';
-import { CollectorConfig, CollectorContext } from './context';
-import { collectTransform } from './transform';
+import { collectCollection } from './collection.js';
+import { CollectorConfig, CollectorContext } from './context.js';
+import { collectTransform } from './transform.js';
 
 /**
  * COLLECTOR

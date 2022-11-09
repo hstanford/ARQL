@@ -1,5 +1,5 @@
-import { keyword } from './keyword';
-import { assertNoError } from './test_helpers';
+import { keyword } from './keyword.js';
+import { assertNoError } from './test_helpers.js';
 
 describe('keyword', () => {
   it('parses a single word correctly', () => {

@@ -7,10 +7,10 @@ import {
   sepBy,
   sequenceOf,
 } from 'arcsecond';
-import { alias } from './alias';
-import { Collection } from './collection';
-import { expr, Expr } from './expr';
-import { Wildcard, wildcard } from './wildcard';
+import { alias } from './alias.js';
+import { Collection } from './collection.js';
+import { expr, Expr } from './expr.js';
+import { Wildcard, wildcard } from './wildcard.js';
 
 export interface Field {
   type: 'field';

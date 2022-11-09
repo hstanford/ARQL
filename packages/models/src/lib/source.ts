@@ -7,10 +7,10 @@
 
 import { FunctionDef, TransformDef } from '@arql/types';
 import { Dictionary } from '@arql/util';
-import { Flags } from './flags';
-import { DataModel } from './model';
-import { Requirements } from './requirements';
-import { SourceConfig, transformFn } from './util';
+import { Flags } from './flags.js';
+import { DataModel } from './model.js';
+import { Requirements } from './requirements.js';
+import { SourceConfig, transformFn } from './util.js';
 
 export abstract class DataSource extends Flags {
   models: DataModel[];

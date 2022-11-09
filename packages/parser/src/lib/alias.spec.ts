@@ -1,5 +1,5 @@
-import { alias } from './alias';
-import { assertNoError } from './test_helpers';
+import { alias } from './alias.js';
+import { assertNoError } from './test_helpers.js';
 
 describe('alias', () => {
   it('matches a keyword followed by a colon', () => {

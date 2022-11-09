@@ -5,8 +5,8 @@ import { PostgreSQL } from '@arql/source-postgresql';
 import { collectorConfig } from '@arql/stdlib-collector';
 import { transforms, functions, opMap } from '@arql/stdlib-definitions';
 import { Injectable } from '@nestjs/common';
-import { createLocalSource } from './sources/local';
-import { createPgSource } from './sources/postgresql';
+import { createLocalSource } from './sources/local.js';
+import { createPgSource } from './sources/postgresql.js';
 
 @Injectable()
 export class AppService {

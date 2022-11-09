@@ -1,5 +1,5 @@
-import { shape } from './shape';
-import { assertNoError } from './test_helpers';
+import { shape } from './shape.js';
+import { assertNoError } from './test_helpers.js';
 
 describe('shape', () => {
   it('should match a simple field in curly braces', () => {

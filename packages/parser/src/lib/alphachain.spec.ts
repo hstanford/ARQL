@@ -1,5 +1,5 @@
-import { alphachain, dotSequence } from './alphachain';
-import { assertNoError } from './test_helpers';
+import { alphachain, dotSequence } from './alphachain.js';
+import { assertNoError } from './test_helpers.js';
 
 describe('dotSequence', () => {
   it('does not match an empty string', () => {

@@ -1,5 +1,5 @@
-import { Contextualiser } from './contextualiser';
-import { testSource } from './test_helpers';
+import { Contextualiser } from './contextualiser.js';
+import { testSource } from './test_helpers.js';
 import { functions, transforms } from '@arql/stdlib-definitions';
 import { EXPR } from '@arql/types';
 

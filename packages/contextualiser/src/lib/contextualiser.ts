@@ -1,8 +1,8 @@
 import { DataModel } from '@arql/models';
 import { Query } from '@arql/parser';
 import { FunctionDef, RankedOperator, TransformDef } from '@arql/types';
-import { handleCollection } from './collection';
-import { ContextualiserConfig, ContextualiserState } from './util';
+import { handleCollection } from './collection.js';
+import { ContextualiserConfig, ContextualiserState } from './util.js';
 
 /**
  * CONTEXTUALISER

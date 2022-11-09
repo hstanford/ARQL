@@ -8,10 +8,10 @@ import {
   recursiveParser,
   sequenceOf,
 } from 'arcsecond';
-import { alias } from './alias';
-import { alphachain, Alphachain } from './alphachain';
-import { multiShape, shape, Shape } from './shape';
-import { possiblyTransforms, Transform, transforms } from './transform';
+import { alias } from './alias.js';
+import { alphachain, Alphachain } from './alphachain.js';
+import { multiShape, shape, Shape } from './shape.js';
+import { possiblyTransforms, Transform, transforms } from './transform.js';
 
 export interface Collection {
   type: 'collection';

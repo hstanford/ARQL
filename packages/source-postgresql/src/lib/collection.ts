@@ -3,10 +3,10 @@ import {
   ContextualisedTransform,
 } from '@arql/contextualiser';
 import { DataModel } from '@arql/models';
-import { SourceContext } from './context';
-import { buildField } from './field';
-import { buildTransform } from './transform';
-import { Column, Query, SubQuery } from './types';
+import { SourceContext } from './context.js';
+import { buildField } from './field.js';
+import { buildTransform } from './transform.js';
+import { Column, Query, SubQuery } from './types.js';
 
 // build a sql query for a collection
 export function buildCollection(

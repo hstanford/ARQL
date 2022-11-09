@@ -1,7 +1,7 @@
-import { DataField, DataFieldDef } from './field';
-import { Node } from './node';
-import { Requirements } from './requirements';
-import { DataSource } from './source';
+import { DataField, DataFieldDef } from './field.js';
+import { Node } from './node.js';
+import { Requirements } from './requirements.js';
+import { DataSource } from './source.js';
 
 // the configuration that can be used to instantiate a new data model
 export interface DataModelDef {

@@ -1,5 +1,5 @@
 import { char, many, optionalWhitespace, Parser, sequenceOf } from 'arcsecond';
-import { keyword } from './keyword';
+import { keyword } from './keyword.js';
 
 export interface Alphachain {
   type: 'alphachain';

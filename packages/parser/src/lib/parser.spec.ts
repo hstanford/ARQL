@@ -1,4 +1,4 @@
-import { parse } from './parser';
+import { parse } from './parser.js';
 
 describe('holistic parser tests', () => {
   it('should be able to parse a basic query', () => {

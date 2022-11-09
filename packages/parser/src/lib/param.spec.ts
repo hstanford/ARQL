@@ -1,5 +1,5 @@
-import { param } from './param';
-import { assertNoError } from './test_helpers';
+import { param } from './param.js';
+import { assertNoError } from './test_helpers.js';
 
 describe('param', () => {
   it('matches "$" followed by a single digit', () => {

@@ -6,10 +6,10 @@ import {
 import { DataModel, DataModelDef, DataSource } from '@arql/models';
 import { Dictionary } from '@arql/util';
 import { Sql, TableWithColumns } from 'sql-ts';
-import { buildCollection } from './collection';
-import { SourceConfig, SourceContext } from './context';
-import { buildTransform } from './transform';
-import { Params, Query } from './types';
+import { buildCollection } from './collection.js';
+import { SourceConfig, SourceContext } from './context.js';
+import { buildTransform } from './transform.js';
+import { Params, Query } from './types.js';
 import pg from 'pg';
 import { readFile } from 'fs/promises';
 import { fileURLToPath, URL } from 'url';

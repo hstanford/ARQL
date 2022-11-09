@@ -5,7 +5,7 @@ import {
   isId,
 } from '@arql/contextualiser';
 import { DataField } from '@arql/models';
-import { CollectorContext, Row, ResultMap } from './context';
+import { CollectorContext, Row, ResultMap } from './context.js';
 
 // resolve a field value from a record
 // e.g. get `(id + foo)` from {id: 1, foo: 2} should resolve to 3

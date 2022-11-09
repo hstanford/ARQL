@@ -34,7 +34,7 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "./apps/playground-server",
-        "command": "TS_NODE_PROJECT=./tsconfig.app.json NX_BASE_TSCONFIG=../../tsconfig.base.json node --loader nx-ts-esm-loader -r tsconfig-paths/register src/main.ts"
+        "command": "TS_NODE_PROJECT=./tsconfig.app.json NX_BASE_TSCONFIG=../../tsconfig.base.json node --loader ../../ts-loader.mjs -r tsconfig-paths/register src/main.ts"
       }
     },
     "lint": {

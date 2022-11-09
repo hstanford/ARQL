@@ -9,9 +9,9 @@ import {
 } from '@arql/contextualiser';
 import { Node, Requirements } from '@arql/models';
 import { TransformDef } from '@arql/types';
-import { DelegatedCollection } from './collection';
-import { DelegatedResults } from './results';
-import { delegateOrigins } from './util';
+import { DelegatedCollection } from './collection.js';
+import { DelegatedResults } from './results.js';
+import { delegateOrigins } from './util.js';
 
 export type DelegatedTransformOrigin =
   | DelegatedCollection

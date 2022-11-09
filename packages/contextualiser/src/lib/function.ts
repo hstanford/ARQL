@@ -1,16 +1,16 @@
 import { combineRequirements, Node, Requirements } from '@arql/models';
 import { Transform } from '@arql/parser';
 import { FunctionDef, tuple, Type } from '@arql/types';
-import { ContextualisedCollection } from './collection';
-import { ContextualisedFieldValue, getExpression } from './expr';
-import { ContextualisedTransform } from './transform';
+import { ContextualisedCollection } from './collection.js';
+import { ContextualisedFieldValue, getExpression } from './expr.js';
+import { ContextualisedTransform } from './transform.js';
 import {
   constituentFields,
   ContextualisedQuery,
   ContextualiserState,
   ID,
   isId,
-} from './util';
+} from './util.js';
 
 /**
  * Functions can operate over collections,

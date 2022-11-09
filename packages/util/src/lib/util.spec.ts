@@ -1,4 +1,4 @@
-import { uniq, uniqBy } from './util';
+import { uniq, uniqBy } from './util.js';
 
 describe('uniq', () => {
   it('should deduplicate an array by reference', () => {

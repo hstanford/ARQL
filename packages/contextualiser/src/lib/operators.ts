@@ -1,8 +1,8 @@
 import { Expr } from '@arql/parser';
 import { isEXPR, RankedOperator } from '@arql/types';
-import { ContextualisedFieldValue, getExpression } from './expr';
-import { ContextualisedFunction, findMatchingFunction } from './function';
-import { ContextualisedQuery, ContextualiserState } from './util';
+import { ContextualisedFieldValue, getExpression } from './expr.js';
+import { ContextualisedFunction, findMatchingFunction } from './function.js';
+import { ContextualisedQuery, ContextualiserState } from './util.js';
 
 // an expression that _might_ have hierarchy
 export type ETree = Expr | ContextualisedFunction;

@@ -1,10 +1,10 @@
 import { DataField } from '@arql/models';
 import { Expr } from '@arql/parser';
-import { ContextualisedField } from './field';
-import { ContextualisedFunction, getFunction } from './function';
-import { resolve } from './operators';
-import { ContextualisedParam } from './param';
-import { ContextualisedQuery, ContextualiserState, ID } from './util';
+import { ContextualisedField } from './field.js';
+import { ContextualisedFunction, getFunction } from './function.js';
+import { resolve } from './operators.js';
+import { ContextualisedParam } from './param.js';
+import { ContextualisedQuery, ContextualiserState, ID } from './util.js';
 
 /**
  * An expression is a tree-like representation of a mathematical expression

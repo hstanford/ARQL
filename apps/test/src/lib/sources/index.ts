@@ -1,4 +1,4 @@
-import { localTestSource } from './local';
-import { pgTestSource } from './postgresql';
+import { localTestSource } from './local.js';
+import { pgTestSource } from './postgresql.js';
 
 export const sources = [localTestSource, pgTestSource];

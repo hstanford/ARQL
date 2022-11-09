@@ -2,12 +2,12 @@ import {
   ContextualisedCollection,
   ContextualisedQuery,
 } from '@arql/contextualiser';
-import { delegateCollection } from './collection';
+import { delegateCollection } from './collection.js';
 import {
   DelegatedTransformOrigin,
   DelegatedTransformOrigins,
   delegateTransform,
-} from './transform';
+} from './transform.js';
 
 /**
  * Delegate a node in the contextualised query tree

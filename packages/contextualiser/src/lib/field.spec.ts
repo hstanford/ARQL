@@ -1,10 +1,10 @@
 import { functions } from '@arql/stdlib-definitions';
 import { dataTypes } from '@arql/types';
-import { ContextualisedCollection } from './collection';
-import { ContextualisedField } from './field';
-import { ContextualisedFunction } from './function';
-import { testObjects, testSource } from './test_helpers';
-import { ContextualiserState } from './util';
+import { ContextualisedCollection } from './collection.js';
+import { ContextualisedField } from './field.js';
+import { ContextualisedFunction } from './function.js';
+import { testObjects, testSource } from './test_helpers.js';
+import { ContextualiserState } from './util.js';
 
 const emptyConfig = {
   functions: [],

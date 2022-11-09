@@ -1,5 +1,9 @@
-import { collection, collectionlist, collectionWithShape } from './collection';
-import { assertNoError } from './test_helpers';
+import {
+  collection,
+  collectionlist,
+  collectionWithShape,
+} from './collection.js';
+import { assertNoError } from './test_helpers.js';
 
 describe('collection', () => {
   it('should consist of "[base collection or model] [transforms] [shape]"', () => {

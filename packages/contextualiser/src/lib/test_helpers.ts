@@ -1,8 +1,8 @@
 import { DataModel, DataSource } from '@arql/models';
 import { dataTypes } from '@arql/types';
-import { ContextualisedCollection } from './collection';
-import { ContextualisedField } from './field';
-import { ContextualiserState } from './util';
+import { ContextualisedCollection } from './collection.js';
+import { ContextualisedField } from './field.js';
+import { ContextualiserState } from './util.js';
 
 class TestSource extends DataSource {
   supportsExpressionFields = false;

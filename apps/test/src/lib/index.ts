@@ -1,7 +1,7 @@
 import { runner } from '@arql/core';
 import { collectorConfig } from '@arql/stdlib-collector';
 import { transforms, functions, opMap } from '@arql/stdlib-definitions';
-import { sources } from './sources';
+import { sources } from './sources.js';
 
 for (const source of sources) {
   await source.init();

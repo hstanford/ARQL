@@ -6,8 +6,8 @@ import {
   sepBy,
   sequenceOf,
 } from 'arcsecond';
-import { Field, fieldList } from './field';
-import { Wildcard } from './wildcard';
+import { Field, fieldList } from './field.js';
+import { Wildcard } from './wildcard.js';
 
 export interface Shape {
   type: 'shape';

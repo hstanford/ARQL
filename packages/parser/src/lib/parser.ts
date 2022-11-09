@@ -1,25 +1,25 @@
 import { Parser } from 'arcsecond';
-import { alias } from './alias';
-import { alphachain, dotSequence } from './alphachain';
+import { alias } from './alias.js';
+import { alphachain, dotSequence } from './alphachain.js';
 import {
   collection,
   collectionlist,
   collectionWithShape,
   collectionWithTransforms,
-} from './collection';
-import { expr, exprlist, exprNoOp, exprOp } from './expr';
-import { field, fieldList } from './field';
-import { keyword } from './keyword';
-import { opchar } from './op';
-import { param } from './param';
-import { query } from './query';
-import { shape } from './shape';
+} from './collection.js';
+import { expr, exprlist, exprNoOp, exprOp } from './expr.js';
+import { field, fieldList } from './field.js';
+import { keyword } from './keyword.js';
+import { opchar } from './op.js';
+import { param } from './param.js';
+import { query } from './query.js';
+import { shape } from './shape.js';
 import {
   transform,
   transformArg,
   transformArgs,
   transforms,
-} from './transform';
+} from './transform.js';
 
 export class MultiCollection extends Map {}
 

@@ -1,7 +1,7 @@
 import { PrimitiveType, Type } from '@arql/types';
-import { DataModel } from './model';
-import { Node } from './node';
-import { Requirements } from './requirements';
+import { DataModel } from './model.js';
+import { Node } from './node.js';
+import { Requirements } from './requirements.js';
 
 // the configuration that can be used to instantiate a new data field
 export interface DataFieldDef {

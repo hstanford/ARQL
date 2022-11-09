@@ -3,8 +3,8 @@ import {
   ContextualisedTransform,
 } from '@arql/contextualiser';
 import type { ParameterNode, Sql } from 'sql-ts';
-import { AliasableNodes } from './field';
-import { Column, Params, SubQuery, TableWithColumns } from './types';
+import { AliasableNodes } from './field.js';
+import { Column, Params, SubQuery, TableWithColumns } from './types.js';
 
 export type TransformFn = (
   transform: ContextualisedTransform,

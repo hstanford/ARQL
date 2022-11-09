@@ -1,9 +1,9 @@
-import { ContextualisedCollection } from './collection';
-import { ContextualisedField } from './field';
-import { ContextualisedFunction } from './function';
-import { testObjects, testModel, testSource } from './test_helpers';
-import { ContextualisedParam } from './param';
-import { ContextualiserState } from './util';
+import { ContextualisedCollection } from './collection.js';
+import { ContextualisedField } from './field.js';
+import { ContextualisedFunction } from './function.js';
+import { testObjects, testModel, testSource } from './test_helpers.js';
+import { ContextualisedParam } from './param.js';
+import { ContextualiserState } from './util.js';
 import { functions } from '@arql/stdlib-definitions';
 import { dataTypes } from '@arql/types';
 

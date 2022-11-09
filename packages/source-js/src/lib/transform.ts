@@ -5,9 +5,9 @@ import {
   ContextualisedTransform,
   isMultiOrigin,
 } from '@arql/contextualiser';
-import { resolveCollection } from './collection';
-import { SourceContext, Row, ResultMap, Records } from './context';
-import { buildFieldValue } from './field';
+import { resolveCollection } from './collection.js';
+import { SourceContext, Row, ResultMap, Records } from './context.js';
+import { buildFieldValue } from './field.js';
 
 type OriginValue<T> = T extends ContextualisedQuery[]
   ? Record<string, Records>

@@ -1,2 +1,2 @@
-export * from './lib/functions';
-export * from './lib/transforms';
+export * from './lib/functions.js';
+export * from './lib/transforms.js';

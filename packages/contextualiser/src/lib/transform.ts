@@ -2,8 +2,8 @@ import { combineRequirements, Node, Requirements } from '@arql/models';
 import { Transform } from '@arql/parser';
 import { TransformDef } from '@arql/types';
 import { uniq } from '@arql/util';
-import { ContextualisedFieldValue, getExpression } from './expr';
-import { ContextualisedField, getField } from './field';
+import { ContextualisedFieldValue, getExpression } from './expr.js';
+import { ContextualisedField, getField } from './field.js';
 import {
   constituentFields,
   ContextualisedQuery,
@@ -11,7 +11,7 @@ import {
   ID,
   isId,
   selectField,
-} from './util';
+} from './util.js';
 
 export function isMultiOrigin(
   origin: ContextualisedQuery | ContextualisedQuery[]

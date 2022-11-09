@@ -1,7 +1,7 @@
 import { DataModel } from '@arql/models';
 import { Alphachain } from '@arql/parser';
-import { ContextualisedCollection } from './collection';
-import { ContextualisedQuery, ContextualiserState } from './util';
+import { ContextualisedCollection } from './collection.js';
+import { ContextualisedQuery, ContextualiserState } from './util.js';
 
 /**
  * Retrieves a model or collection

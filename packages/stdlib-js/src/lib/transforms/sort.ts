@@ -1,5 +1,5 @@
 import { applyShape, TransformFn, resolveArgs, Row } from '@arql/source-js';
-import { compare } from '../util';
+import { compare } from '../util.js';
 
 export const sort: TransformFn = (
   transform,

@@ -1,5 +1,5 @@
-import { opchar } from './op';
-import { assertNoError } from './test_helpers';
+import { opchar } from './op.js';
+import { assertNoError } from './test_helpers.js';
 
 describe('opchar', () => {
   it('matches "&"', () => {

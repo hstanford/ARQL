@@ -9,15 +9,15 @@ import {
   recursiveParser,
   sequenceOf,
 } from 'arcsecond';
-import { Alphachain, alphachain } from './alphachain';
+import { Alphachain, alphachain } from './alphachain.js';
 import {
   Collection,
   collectionWithShape,
   collectionWithTransforms,
-} from './collection';
-import { func, FunctionCall } from './function';
-import { op, Op } from './op';
-import { Param, param } from './param';
+} from './collection.js';
+import { func, FunctionCall } from './function.js';
+import { op, Op } from './op.js';
+import { Param, param } from './param.js';
 
 export type BaseExpr = Param | Alphachain | Collection | FunctionCall | Op;
 export type Expr = BaseExpr | Expr[];

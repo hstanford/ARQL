@@ -1,4 +1,4 @@
-import { DataModel, DataModelDef } from './model';
+import { DataModel, DataModelDef } from './model.js';
 
 // expected input interface to configure a source
 export interface SourceConfig {

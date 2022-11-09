@@ -1,4 +1,4 @@
-import { Requirements } from './requirements';
+import { Requirements } from './requirements.js';
 
 // abstract syntax tree node - every node in the trees produced
 // by the contextualiser/delegator should inherit from this

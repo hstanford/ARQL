@@ -4,9 +4,9 @@ import {
   ContextualisedTransform,
 } from '@arql/contextualiser';
 import { DataModel } from '@arql/models';
-import { SourceContext, isResultMaps, Records, Row } from './context';
-import { buildFieldValue } from './field';
-import { resolveTransform } from './transform';
+import { SourceContext, isResultMaps, Records, Row } from './context.js';
+import { buildFieldValue } from './field.js';
+import { resolveTransform } from './transform.js';
 
 // transform a set of results ("records") whose interface should
 // match "constituentFields" into the interface matching "shape"
