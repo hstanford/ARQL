@@ -48,7 +48,10 @@ export class ContextualisedTransform extends Node<ContextualisedTransformDef> {
 
   constructor(opts: ContextualisedTransformDef) {
     super(opts);
-    this.id = this.context.items.length;
+    this.id = {
+      type: 'ID',
+      id: this.context.items.length,
+    };
     this.context.items.push(this);
 
     this.name = this.transform.name;

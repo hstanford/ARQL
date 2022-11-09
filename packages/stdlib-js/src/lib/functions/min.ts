@@ -1,6 +1,8 @@
 import { FunctionFn } from '@arql/source-js';
+import { FuncDef } from '@arql/stdlib-definitions';
 
-export const min: FunctionFn = ([values]) => {
+type MinSignature = FunctionFn<FuncDef<'max'>['signature']>;
+export const min: MinSignature = ([values]) => {
   if (!Array.isArray(values)) {
     throw new Error('Expected array input for aggregate function');
   }

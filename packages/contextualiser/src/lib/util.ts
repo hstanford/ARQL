@@ -1,17 +1,21 @@
 import { DataField, DataModel } from '@arql/models';
-import { FunctionDef, RankedOperator, TransformDef } from '@arql/types';
+import { FunctionDef, RankedOperator, TransformDef, Type } from '@arql/types';
 import { ContextualisedCollection } from './collection';
 import { ContextualisedField } from './field';
 import { ContextualisedFunction } from './function';
 import { ContextualisedParam } from './param';
 import { ContextualisedTransform } from './transform';
 
-export type ID = number;
+export type ID = {
+  type: 'ID';
+  id: number;
+  dataType?: Type;
+};
 
 export function isId(
   item: ContextualisedNodeType | DataField | ID
 ): item is ID {
-  return typeof item === 'number';
+  return !(item instanceof DataField) && item.type === 'ID';
 }
 
 export type ContextualisedNodeType =
@@ -42,7 +46,7 @@ export class ContextualiserState {
   aliases: Map<string, ContextualisedOrigin> = new Map();
   items: ContextualisedNodeType[] = [];
   get(id: ID): ContextualisedNodeType {
-    return this.items[id];
+    return this.items[id.id];
   }
   constructor(config: ContextualiserConfig) {
     Object.assign(this, config);
@@ -62,7 +66,7 @@ export function constituentFields(
     | ContextualisedFunction
     | ID
 ): ID[] {
-  if (typeof item === 'number') {
+  if (isId(item)) {
     return [item];
   }
   // propagate required fields down to the arguments

@@ -55,7 +55,10 @@ export class ContextualisedCollection extends Node<ContextualisedCollectionDef> 
 
   constructor(opts: ContextualisedCollectionDef) {
     super(opts);
-    this.id = this.context.items.length;
+    this.id = {
+      type: 'ID',
+      id: this.context.items.length,
+    };
     this.context.items.push(this);
   }
 

@@ -1,6 +1,8 @@
 import { FunctionFn } from '@arql/source-js';
+import { FuncDef } from '@arql/stdlib-definitions';
 
-export const array: FunctionFn = ([values]) => {
+type ArraySignature = FunctionFn<FuncDef<'array'>['signature']>;
+export const array: ArraySignature = ([values]) => {
   if (!Array.isArray(values)) {
     throw new Error('Expected array input for aggregate function');
   }

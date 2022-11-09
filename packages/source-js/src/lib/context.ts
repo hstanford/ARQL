@@ -3,6 +3,7 @@ import {
   ContextualisedTransform,
 } from '@arql/contextualiser';
 import { DataModelDef } from '@arql/models';
+import { FunctionSignature, TypeForTs } from '@arql/types';
 
 // an individual data value
 export type Field = unknown;
@@ -26,7 +27,10 @@ export type TransformFn = (
   context: SourceContext
 ) => Records;
 
-export type FunctionFn = (args: Field[], modifier: string[]) => Field;
+export type FunctionFn<T extends FunctionSignature | unknown = unknown> = (
+  args: T extends FunctionSignature ? TypeForTs<T['args']> : unknown[],
+  modifier: string[]
+) => T extends FunctionSignature ? TypeForTs<T['return']> : unknown;
 
 export interface SourceConfig {
   transforms: Record<string, TransformFn>;

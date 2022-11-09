@@ -1,9 +1,12 @@
 import { FunctionFn } from '@arql/source-js';
+import { FuncDef } from '@arql/stdlib-definitions';
 
-export const or: FunctionFn = ([left, right]) => {
+type OrSignature = FunctionFn<FuncDef<'or'>['signature']>;
+export const or: OrSignature = ([left, right]) => {
   return left || right;
 };
 
-export const and: FunctionFn = ([left, right]) => {
+type AndSignature = FunctionFn<FuncDef<'and'>['signature']>;
+export const and: AndSignature = ([left, right]) => {
   return left && right;
 };

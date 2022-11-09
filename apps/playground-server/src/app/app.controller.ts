@@ -1,6 +1,32 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  CallHandler,
+  Controller,
+  ExecutionContext,
+  Get,
+  Injectable,
+  NestInterceptor,
+  Param,
+  Post,
+  UseInterceptors,
+} from '@nestjs/common';
+import { catchError, Observable } from 'rxjs';
 
 import { AppService } from './app.service';
+
+@Injectable()
+export class ErrorInterceptor implements NestInterceptor {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
+    // next.handle() is an Observable of the controller's result value
+    return next.handle().pipe(
+      catchError((error) => {
+        console.error(error);
+        throw new BadRequestException(error.message);
+      })
+    );
+  }
+}
 
 @Controller()
 export class AppController {
@@ -41,6 +67,7 @@ export class AppController {
   }
 
   @Post('/query')
+  @UseInterceptors(ErrorInterceptor)
   async query(
     @Body()
     data: {

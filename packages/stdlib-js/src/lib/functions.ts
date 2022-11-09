@@ -6,9 +6,8 @@ import { array } from './functions/array';
 import { equals, notEquals } from './functions/equals';
 import { add, minus } from './functions/math';
 import { or, and } from './functions/logic';
-import { strConcat } from './functions/string';
 
-export const functions: SourceConfig['functions'] = {
+export const functions = {
   max,
   min,
   count,
@@ -19,5 +18,4 @@ export const functions: SourceConfig['functions'] = {
   minus,
   or,
   and,
-  strConcat,
-};
+} as unknown as SourceConfig['functions'];

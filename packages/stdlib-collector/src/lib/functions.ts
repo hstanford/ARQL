@@ -6,9 +6,8 @@ import { array } from './functions/array';
 import { equals, notEquals } from './functions/equals';
 import { add, minus } from './functions/math';
 import { or, and } from './functions/logic';
-import { strConcat } from './functions/string';
 
-export const functions: CollectorConfig['functions'] = {
+export const functions = {
   max,
   min,
   count,
@@ -19,5 +18,5 @@ export const functions: CollectorConfig['functions'] = {
   minus,
   or,
   and,
-  strConcat,
-};
+} as unknown as CollectorConfig['functions'];
+// This casting is necessary to avoid https://github.com/microsoft/TypeScript/issues/34933

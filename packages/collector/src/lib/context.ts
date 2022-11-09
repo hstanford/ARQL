@@ -1,5 +1,6 @@
 import { ContextualisedField } from '@arql/contextualiser';
 import { DelegatedTransform } from '@arql/delegator';
+import { FunctionSignature, TypeForTs } from '@arql/types';
 
 // an individual data value
 export type Field = unknown;
@@ -23,11 +24,15 @@ export type TransformFn = (
   context: CollectorContext
 ) => Records;
 
-export type FunctionFn = (args: Field[], modifier: string[]) => Field;
+export type FunctionFn<T extends FunctionSignature | unknown = unknown> = (
+  args: T extends FunctionSignature ? TypeForTs<T['args']> : unknown[],
+  modifier: string[]
+) => T extends FunctionSignature ? TypeForTs<T['return']> : unknown;
 
 // expected configuration format for the collector
 export interface CollectorConfig {
   transforms: Record<string, TransformFn>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   functions: Record<string, FunctionFn>;
 }
 

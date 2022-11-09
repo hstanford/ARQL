@@ -72,7 +72,13 @@ export function Query({
           >
             <Typography
               fontFamily='"Fira code", "Fira Mono", monospace'
-              sx={{ whiteSpace: 'pre-wrap', margin: 1 }}
+              sx={{
+                whiteSpace: 'pre-wrap',
+                wordBreak: 'break-word',
+                margin: 1,
+                color:
+                  mutation.data && 'error' in mutation.data ? 'red' : 'black',
+              }}
             >
               {JSON.stringify(mutation.data, null, 2)}
             </Typography>

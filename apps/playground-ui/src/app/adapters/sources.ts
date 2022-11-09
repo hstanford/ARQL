@@ -64,7 +64,7 @@ export function useArqlQuery() {
           'Content-Type': 'application/json',
         },
       });
-      if (!res.ok) {
+      if (!res.ok && res.status !== 400) {
         throw new Error('Failed to fetch');
       }
       return await res.json();

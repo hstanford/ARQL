@@ -3,7 +3,6 @@ import {
   ContextualisedFieldValue,
   ContextualisedFunction,
   ContextualisedParam,
-  ID,
   isId,
 } from '@arql/contextualiser';
 import { DataField } from '@arql/models';
@@ -50,13 +49,13 @@ export type AliasableNodes =
 // convert a contextualised field value to the sql-ts equivalent
 export function buildFieldValue(
   field: ContextualisedFieldValue,
-  constituentFields: Record<ID, Column>,
+  constituentFields: Record<number, Column>,
   context: SourceContext
 ) {
   let out: AliasableNodes | ParameterNode | undefined;
   if (isId(field)) {
     // if it just references an underlying field directly, grab that field
-    out = constituentFields[field];
+    out = constituentFields[field.id];
   } else if (field instanceof DataField) {
     // if it's a DataField, grab the column with the same name as the field
     const model = context.models[field.model.name];
@@ -67,7 +66,17 @@ export function buildFieldValue(
     out = model.columns.find((c) => c.name === field.name);
   } else if (field instanceof ContextualisedParam) {
     // parameters go from $1 upwards so we need to -1 to get the correct param
-    out = context.sql.parameter(context.params[field.index - 1]);
+    const value = context.params[field.index - 1];
+    const type = (
+      { string: 'TEXT', number: 'NUMERIC' } as Record<
+        string,
+        string | undefined
+      >
+    )[typeof value];
+    out = context.sql.parameter(value);
+    if (type) {
+      out = context.sql.binaryOperator('::')(out, context.sql.literal(type));
+    }
   } else if (field instanceof ContextualisedFunction) {
     const fn = context.functions[field.name];
     if (!fn) {
@@ -78,6 +87,7 @@ export function buildFieldValue(
     out = fn(
       field.args.map((arg) => buildFieldValue(arg, constituentFields, context)),
       context.sql,
+      field.args,
       field.modifier
     );
   }
@@ -91,7 +101,7 @@ export function buildFieldValue(
 // convert a contextualisedField to the sql-ts equivalent
 export function buildField(
   field: ContextualisedField,
-  constituentFields: Record<ID, Column>,
+  constituentFields: Record<number, Column>,
   context: SourceContext
 ) {
   // get the underlying value

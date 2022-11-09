@@ -2,7 +2,6 @@ import {
   ContextualisedCollection,
   ContextualisedField,
   ContextualisedTransform,
-  ID,
 } from '@arql/contextualiser';
 import { Query } from 'sql-ts';
 import { buildCollection } from './collection';
@@ -15,7 +14,7 @@ export function applyShape(
   subQuery: SubQuery,
   name: string,
   shape: ContextualisedField[],
-  constituentFields: Record<ID, Column>,
+  constituentFields: Record<number, Column>,
   context: SourceContext
 ) {
   return subQuery.table
@@ -35,7 +34,7 @@ export function buildTransform(
   }
 
   const origins: SubQuery[] = [];
-  const constituentFields: Record<ID, Column> = {};
+  const constituentFields: Record<number, Column> = {};
 
   // build queries for all origins
   for (const orig of [transform.origin].flat()) {
@@ -54,7 +53,7 @@ export function buildTransform(
       if (!col) {
         throw new Error(`Could not find column ${rf.name}`);
       }
-      constituentFields[rf.id] = col;
+      constituentFields[rf.id.id] = col;
     }
 
     origins.push(origin);

@@ -1,7 +1,6 @@
 import {
   ContextualisedCollection,
   ContextualisedTransform,
-  ID,
 } from '@arql/contextualiser';
 import { DataModel } from '@arql/models';
 import { SourceContext } from './context';
@@ -55,10 +54,10 @@ export function buildCollection(
         throw new Error(`Could not find column ${rf.name}`);
       }
 
-      acc[rf.id] = col;
+      acc[rf.id.id] = col;
       return acc;
     },
-    {} as Record<ID, Column>
+    {} as Record<number, Column>
   );
 
   // select the required fields from the underlying subQuery

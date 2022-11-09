@@ -4,6 +4,7 @@ import {
   FunctionDef,
   generic,
   tuple,
+  union,
   unknown,
   UnknownType,
 } from '@arql/types';
@@ -68,7 +69,10 @@ export const functions = assertType<readonly FunctionDef[]>()([
   {
     name: 'add',
     signature: (genericValues) => ({
-      args: tuple(generic('T', genericValues), generic('T', genericValues)),
+      args: tuple(
+        generic('T', genericValues, union(dataTypes.string, dataTypes.number)),
+        generic('T', genericValues, union(dataTypes.string, dataTypes.number))
+      ),
       return: generic('T', genericValues),
     }),
   },
@@ -83,21 +87,19 @@ export const functions = assertType<readonly FunctionDef[]>()([
     name: 'and',
     signature: {
       args: tuple(dataTypes.boolean, dataTypes.boolean),
-      return: dataTypes.number,
+      return: dataTypes.boolean,
     },
   },
   {
     name: 'or',
     signature: {
       args: tuple(dataTypes.boolean, dataTypes.boolean),
-      return: dataTypes.number,
-    },
-  },
-  {
-    name: 'strConcat',
-    signature: {
-      args: tuple(dataTypes.string, dataTypes.string),
-      return: dataTypes.string,
+      return: dataTypes.boolean,
     },
   },
 ] as const);
+
+export type FuncDef<T extends typeof functions[number]['name']> =
+  typeof functions[number] & {
+    name: T;
+  };

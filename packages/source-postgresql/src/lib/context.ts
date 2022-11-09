@@ -1,4 +1,7 @@
-import { ContextualisedTransform, ID } from '@arql/contextualiser';
+import {
+  ContextualisedFieldValue,
+  ContextualisedTransform,
+} from '@arql/contextualiser';
 import type { ParameterNode, Sql } from 'sql-ts';
 import { AliasableNodes } from './field';
 import { Column, Params, SubQuery, TableWithColumns } from './types';
@@ -7,13 +10,14 @@ export type TransformFn = (
   transform: ContextualisedTransform,
   origin: SubQuery[],
   args: (AliasableNodes | ParameterNode)[],
-  consistuentFields: Record<ID, Column>,
+  consistuentFields: Record<number, Column>,
   context: SourceContext
 ) => SubQuery;
 
 export type FunctionFn = (
   args: (AliasableNodes | ParameterNode)[],
   sql: Sql,
+  contextualisedArgs: ContextualisedFieldValue[],
   modifier: string[]
 ) => AliasableNodes;
 

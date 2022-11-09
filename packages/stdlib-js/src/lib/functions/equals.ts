@@ -1,9 +1,12 @@
 import { FunctionFn } from '@arql/collector';
+import { FuncDef } from '@arql/stdlib-definitions';
 
-export const equals: FunctionFn = ([left, right]) => {
+type EqualsSignature = FunctionFn<FuncDef<'equals'>['signature']>;
+export const equals: EqualsSignature = ([left, right]) => {
   return left === right;
 };
 
-export const notEquals: FunctionFn = ([left, right]) => {
+type notEqualsSignature = FunctionFn<FuncDef<'notEquals'>['signature']>;
+export const notEquals: notEqualsSignature = ([left, right]) => {
   return left !== right;
 };

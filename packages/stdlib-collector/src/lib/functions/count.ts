@@ -1,6 +1,8 @@
 import { FunctionFn } from '@arql/collector';
+import { FuncDef } from '@arql/stdlib-definitions';
 
-export const count: FunctionFn = ([values], modifier) => {
+type CountSignature = FunctionFn<FuncDef<'count'>['signature']>;
+export const count: CountSignature = ([values], modifier) => {
   if (!Array.isArray(values)) {
     throw new Error('Expected array input for aggregate function');
   }

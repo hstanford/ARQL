@@ -10,13 +10,6 @@ export const operators = assertType<
 >()([
   {
     // a binary operator
-    // concatenate two strings
-    // e.g. test | filter(foo `+ $1)
-    name: 'strConcat',
-    pattern: [EXPR, '`+', EXPR],
-  },
-  {
-    // a binary operator
     // sum values
     // e.g. test | filter(foo + $1)
     name: 'add',

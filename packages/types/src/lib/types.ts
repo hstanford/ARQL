@@ -106,12 +106,12 @@ export class ArrayType<M extends Type> extends TypeNode<IArrayType<M>> {
   }
 }
 
-export interface ITupleType<M extends Type[]> {
+export interface ITupleType<M extends [...Type[]]> {
   members: M;
 }
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface TupleType<M extends Type[]> extends ITupleType<M> {}
-export class TupleType<M extends Type[]> extends TypeNode<ITupleType<M>> {
+export interface TupleType<M extends [...Type[]]> extends ITupleType<M> {}
+export class TupleType<M extends [...Type[]]> extends TypeNode<ITupleType<M>> {
   _type = 'tuple' as const;
   satisfiedBy(type: Type): boolean {
     if (!(type instanceof TupleType)) {
@@ -147,12 +147,12 @@ class SpreadType extends TypeNode<ISpreadType> {
   }
 }*/
 
-export interface IUnionType<M extends Type[]> {
+export interface IUnionType<M extends [...Type[]]> {
   members: M;
 }
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface UnionType<M extends Type[]> extends IUnionType<M> {}
-export class UnionType<M extends Type[]> extends TypeNode<IUnionType<M>> {
+export interface UnionType<M extends [...Type[]]> extends IUnionType<M> {}
+export class UnionType<M extends [...Type[]]> extends TypeNode<IUnionType<M>> {
   _type = 'union' as const;
   satisfiedBy(type: Type): boolean {
     if (type instanceof UnionType) {
@@ -299,11 +299,11 @@ export type Type =
   | UnknownType
   | AnyType
   | ArrayType<Type>
-  | UnionType<Type[]>
+  | UnionType<[...Type[]]>
   | InterfaceType<[string, Type][]>
   | GenericType
   | LiteralType<unknown>
-  | TupleType<Type[]>;
+  | TupleType<[...Type[]]>;
 
 /**
  * string
@@ -341,19 +341,19 @@ export const primitives = new UnionType({
   ],
 });
 
-export function union(...types: Type[]) {
+export function union<T extends [...Type[]]>(...types: T) {
   return new UnionType({
     members: types,
   });
 }
 
-export function array(type: Type) {
+export function array<T extends Type>(type: T) {
   return new ArrayType({
     member: type,
   });
 }
 
-export function tuple(...types: Type[]) {
+export function tuple<T extends [...Type[]]>(...types: T) {
   return new TupleType({
     members: types,
   });
@@ -379,7 +379,10 @@ export const dataTypes: { [K in DataType]: PrimitiveType<K> } = {
 };
 
 export type FunctionSignature = {
-  args: ArrayType<Type> | TupleType<Type[]>;
+  args:
+    | ArrayType<Type>
+    | TupleType<Type[]>
+    | UnionType<(ArrayType<Type> | TupleType<Type[]>)[]>;
   return: Type;
 };
 
@@ -413,30 +416,41 @@ type PrimitiveMap = {
   date: Date;
 };
 
-type UnionForTs<T extends UnionType<Type[]>> = {
-  [K in keyof T['members'] & number]: TypeForTs<T['members'][K]>;
-}[number];
+export type UnionForTs<T extends UnionType<[...Type[]]>> = TupleMembersForTs<
+  T['members']
+>[number];
 
-type ArrayForTs<T extends ArrayType<Type>> = Array<TypeForTs<T['member']>>;
+export type ArrayForTs<T extends ArrayType<Type>> = Array<
+  TypeForTs<T['member']>
+>;
 
-type TupleForTs<T extends TupleType<Type[]>> = {
-  [K in keyof T['members'] & number]: TypeForTs<T['members'][K]>;
-};
+export type TupleForTs<T extends TupleType<[...Type[]]>> = TupleMembersForTs<
+  T['members']
+>;
 
-type InterfaceForTs<T extends InterfaceType<[string, Type][]>> = {
+export type TupleMembersForTs<T extends [...Type[]]> = {
+  [Index in keyof T]: TypeForTs<T[Index]>;
+} & { length: T['length'] };
+
+export type InterfaceForTs<T extends InterfaceType<[string, Type][]>> = {
   [K in T['members'][number] as K[0]]: TypeForTs<K[1]>;
 };
 
 export type TypeForTs<T extends Type> = T extends PrimitiveType<DataType>
   ? PrimitiveMap[T['name']]
-  : T extends UnionType<Type[]>
+  : T extends UnionType<[...Type[]]>
   ? UnionForTs<T>
   : T extends ArrayType<Type>
   ? ArrayForTs<T>
-  : T extends TupleType<Type[]>
+  : T extends TupleType<[...Type[]]>
   ? TupleForTs<T>
   : T extends InterfaceType<[string, Type][]>
   ? InterfaceForTs<T>
   : T extends LiteralType<unknown>
   ? T['value']
+  : T extends UnknownType
+  ? unknown
+  : T extends AnyType
+  ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    any
   : never;
