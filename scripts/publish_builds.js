@@ -11,7 +11,7 @@ for (const item of await readdir(packagesDir)) {
     continue;
   }
 
-  const out = execSync('npm publish', {
+  const out = execSync('npm publish --access=public', {
     cwd: itemUrl.pathname,
     encoding: 'utf8',
   });
