@@ -23,4 +23,9 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npm test
-      - run: git rev-parse --short "$GITHUB_SHA"
+      - run: node ./scripts/set_version.js "0.0.1-alpha-$(git rev-parse --short "$GITHUB_SHA")"
+        env:
+          BUILD_ENV: CI
+      - run: node ./scripts/publish_builds.js
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

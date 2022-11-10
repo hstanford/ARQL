@@ -21,6 +21,15 @@ for (const item of await readdir(packagesDir)) {
   // update the version number
   contents.version = process.argv[2];
 
+  // update the peer dependencies
+  contents.peerDependencies = Object.entries(contents.peerDependencies).reduce(
+    (acc, [key, value]) => {
+      acc[key] = /^@arql\//.test(key) ? process.argv[2] : value;
+      return acc;
+    },
+    {}
+  );
+
   // write the new contents in place
   const outputPackage = JSON.stringify(contents, null, 2) + '\n';
   await writeFile(packageUrl, outputPackage);
