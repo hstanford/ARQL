@@ -11,7 +11,7 @@
         "outputPath": "dist/packages/source-postgresql",
         "main": "packages/source-postgresql/src/index.ts",
         "tsConfig": "packages/source-postgresql/tsconfig.lib.json",
-        "assets": ["packages/source-postgresql/*.md"]
+        "assets": ["packages/source-postgresql/*.md", "packages/source-postgresql/**/*.sql"]
       }
     },
     "lint": {

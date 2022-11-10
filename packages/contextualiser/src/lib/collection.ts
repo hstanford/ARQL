@@ -119,7 +119,7 @@ export class ContextualisedCollection extends Node<ContextualisedCollectionDef> 
     const requiredFields = this.origin.availableFields.filter((af) => {
       const found = requiredSubfields.find((rf) => rf.id === af.id);
       if (found) {
-        requiredSubfields = requiredSubfields.filter((f) => f !== found);
+        requiredSubfields = requiredSubfields.filter((f) => f.id !== found.id);
       }
       return !!found;
     });

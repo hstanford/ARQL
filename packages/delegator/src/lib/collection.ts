@@ -3,7 +3,6 @@ import {
   ContextualisedField,
   ContextualisedQuery,
   ContextualiserState,
-  ID,
 } from '@arql/contextualiser';
 import { DataModel, Node, Requirements } from '@arql/models';
 import { DelegatedResults } from './results.js';

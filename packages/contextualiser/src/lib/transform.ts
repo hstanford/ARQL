@@ -119,7 +119,9 @@ export class ContextualisedTransform extends Node<ContextualisedTransformDef> {
       const requiredFields = o.availableFields.filter((af) => {
         const found = requiredSubfields.find((rf) => rf.id === af.id);
         if (found) {
-          requiredSubfields = requiredSubfields.filter((f) => f !== found);
+          requiredSubfields = requiredSubfields.filter(
+            (f) => f.id !== found.id
+          );
         }
         return !!found;
       });
