@@ -22,6 +22,7 @@
       "@arql/delegator": ["packages/delegator/src/index.ts"],
       "@arql/models": ["packages/models/src/index.ts"],
       "@arql/parser": ["packages/parser/src/index.ts"],
+      "@arql/query-builder": ["packages/query-builder/src/index.ts"],
       "@arql/source-js": ["packages/source-js/src/index.ts"],
       "@arql/source-mongodb": ["packages/source-mongodb/src/index.ts"],
       "@arql/source-postgresql": ["packages/source-postgresql/src/index.ts"],
