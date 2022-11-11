@@ -47,6 +47,8 @@ users | filter(first_name = $1) {
 // expect [{surname: 'Blogs'}] if the "users" table in postgres contains record {"first_name": "Joe", "last_name": "Blogs"}
 ```
 
+**Note:** these packages are ESM-only.
+
 ## Benefits
 
 **Abstract**
