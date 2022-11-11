@@ -163,6 +163,7 @@ export function findMatchingFunction(
   const compatible = fnSignature.args.satisfiedBy(tuple(...argTypes));
 
   if (!compatible) {
+    console.log(fnSignature, argTypes);
     throw new Error('Arguments were not compatible with function signature');
   }
 

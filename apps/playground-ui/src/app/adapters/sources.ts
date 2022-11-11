@@ -97,6 +97,32 @@ export function useAddPgSource() {
   });
 }
 
+export function useAddMongoSource() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: {
+      name: string;
+      connectionUri: string;
+      db: string;
+    }) => {
+      const res = await fetch(BASE_URL + '/sources/mongo', {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!res.ok) {
+        throw new Error('Failed to fetch');
+      }
+      return;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['sources'] });
+    },
+  });
+}
+
 export function useAddLocalSource() {
   const queryClient = useQueryClient();
   return useMutation({

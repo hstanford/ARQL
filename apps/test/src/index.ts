@@ -40,8 +40,17 @@ const queries: Query[] = [
     `,
     [],
   ],
+  [
+    `
+    products | filter(qty = $1) {
+      item,
+      q: qty + $2
+    }
+    `,
+    [15, 1],
+  ],
 ];
 
-const out = await test(...queries[4]);
+const out = await test(...queries[5]);
 console.log(out);
 process.exit(0);

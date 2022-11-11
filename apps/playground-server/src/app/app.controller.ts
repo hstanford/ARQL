@@ -47,6 +47,15 @@ export class AppController {
     await this.appService.addPgSource(data.name, data.connectionVariables);
   }
 
+  @Post('/sources/mongo')
+  async addMongoSource(@Body() data) {
+    await this.appService.addMongoSource(
+      data.name,
+      data.connectionUri,
+      data.db
+    );
+  }
+
   @Post('/sources/local')
   async addLocalSource(
     @Body()

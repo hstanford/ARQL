@@ -10,6 +10,14 @@ services:
       - '5432:5432'
     volumes: 
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+  mongo:
+    image: mongo
+    restart: always
+    ports:
+      - '27017:27017'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
 volumes:
   db:
     driver: local

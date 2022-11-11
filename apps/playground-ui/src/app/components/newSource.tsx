@@ -12,7 +12,11 @@ import {
 } from '@mui/material';
 import { useCallback, useState } from 'react';
 import Editor from 'react-simple-code-editor';
-import { useAddLocalSource, useAddPgSource } from '../adapters/sources';
+import {
+  useAddLocalSource,
+  useAddMongoSource,
+  useAddPgSource,
+} from '../adapters/sources';
 import { SourceIcon } from '../icon';
 
 type Variant =
@@ -52,7 +56,7 @@ export function Txt({
   );
 }
 
-type SourceType = 'local' | 'postgres';
+type SourceType = 'local' | 'postgres' | 'mongo';
 
 export function NewSourceModal({
   open,
@@ -74,6 +78,20 @@ export function NewSourceModal({
     (key: string, value: unknown) => setConfig({ ...config, [key]: value }),
     [config, setConfig]
   );
+
+  const [mongoConfig, setMongoConfig] = useState<{
+    connectionUri: string;
+    db: string;
+  }>({
+    connectionUri: 'mongodb://root:example@localhost:27017/',
+    db: 'test',
+  });
+  const updateMongoConfig = useCallback(
+    (key: string, value: unknown) =>
+      setMongoConfig({ ...mongoConfig, [key]: value }),
+    [mongoConfig, setMongoConfig]
+  );
+
   const [data, setData] = useState(
     `{
   "users": [
@@ -85,6 +103,7 @@ export function NewSourceModal({
   );
 
   const pgMutation = useAddPgSource();
+  const mongoMutation = useAddMongoSource();
   const localMutation = useAddLocalSource();
 
   return (
@@ -93,9 +112,9 @@ export function NewSourceModal({
       onClose={() => setOpen(false)}
       sx={{ height: '100%', display: 'flex' }}
     >
-      <Box sx={{ width: '400px', margin: 'auto' }}>
+      <Box sx={{ width: '500px', margin: 'auto' }}>
         <Paper>
-          <Box sx={{ padding: 2 }}>
+          <Box sx={{ padding: 2, overflow: 'hidden' }}>
             <Stack spacing={1}>
               <Txt text={'Add source'} variant="h5" />
               <TextField
@@ -111,6 +130,7 @@ export function NewSourceModal({
                   setType(value);
                 }}
                 aria-label="text alignment"
+                sx={{ overflow: 'auto' }}
               >
                 <ToggleButton value="local">
                   <Box sx={{ marginBlock: 'auto', marginInline: 2 }}>
@@ -124,9 +144,20 @@ export function NewSourceModal({
                   </Box>
                   PostgreSQL
                 </ToggleButton>
+                <ToggleButton value="mongo">
+                  <Box sx={{ marginBlock: 'auto', marginInline: 2 }}>
+                    <SourceIcon sourceType="MongoDb" />
+                  </Box>
+                  MongoDB
+                </ToggleButton>
               </ToggleButtonGroup>
               {type === 'postgres' ? (
                 <PostgresConfig config={config} setConfig={updateConfig} />
+              ) : type === 'mongo' ? (
+                <MongoConfig
+                  config={mongoConfig}
+                  setConfig={updateMongoConfig}
+                />
               ) : (
                 <LocalConfig data={data} setData={setData} />
               )}
@@ -135,6 +166,11 @@ export function NewSourceModal({
                 onClick={() => {
                   if (type === 'postgres') {
                     pgMutation.mutate({ name, connectionVariables: config });
+                  } else if (type === 'mongo') {
+                    mongoMutation.mutate({
+                      name,
+                      ...mongoConfig,
+                    });
                   } else {
                     localMutation.mutate({ name, data: JSON.parse(data) });
                   }
@@ -190,6 +226,34 @@ export function PostgresConfig({
         label="Port"
         value={config['port']}
         onChange={(e) => setConfig('port', e.target.value)}
+      />
+    </Stack>
+  );
+}
+
+export function MongoConfig({
+  setConfig,
+  config,
+}: {
+  setConfig: (key: string, value: unknown) => void;
+  config: {
+    connectionUri: string;
+    db: string;
+  };
+}) {
+  return (
+    <Stack spacing={1}>
+      <TextField
+        variant="outlined"
+        label="Connection URI"
+        value={config['connectionUri']}
+        onChange={(e) => setConfig('connectionUri', e.target.value)}
+      />
+      <TextField
+        variant="outlined"
+        label="Database Name"
+        value={config['db']}
+        onChange={(e) => setConfig('db', e.target.value)}
       />
     </Stack>
   );

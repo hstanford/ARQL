@@ -6,6 +6,7 @@ import { collectorConfig } from '@arql/stdlib-collector';
 import { transforms, functions, opMap } from '@arql/stdlib-definitions';
 import { Injectable } from '@nestjs/common';
 import { createLocalSource } from './sources/local.js';
+import { createMongoSource } from './sources/mongo.js';
 import { createPgSource } from './sources/postgresql.js';
 
 @Injectable()
@@ -65,6 +66,13 @@ export class AppService {
     connectionVariables: Record<string, unknown>
   ) {
     const source = await createPgSource(connectionVariables);
+    this.sources[name] = source;
+    this.refreshRun();
+    return source;
+  }
+
+  async addMongoSource(name: string, connectionUri: string, db: string) {
+    const source = await createMongoSource(connectionUri, db);
     this.sources[name] = source;
     this.refreshRun();
     return source;
